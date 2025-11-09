@@ -2,10 +2,12 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import sqlite3 from 'sqlite3';
+import fs from 'fs'; // Importamos 'fs' para verificar/crear la carpeta
 
 class Database_vc_bb {
     constructor() {
         this.__filename = fileURLToPath(import.meta.url);
+        // __dirname será /ruta/a/tu/proyecto/src/api
         this.__dirname = path.dirname(this.__filename);
         this.sqlite = sqlite3.verbose();
         this.db = null;
@@ -13,14 +15,25 @@ class Database_vc_bb {
     }
 
     init_vc_bb() {
+        const dbPath = path.resolve(this.__dirname, "../db");
+        const dbFile = path.resolve(dbPath, "database.db");
+        // -------------------------
+
+        // Verificamos si el directorio existe, si no, lo creamos recursivamente.
+        if (!fs.existsSync(dbPath)) {
+            console.log(`[DB] Creando directorio que no existe: ${dbPath}`);
+            fs.mkdirSync(dbPath, { recursive: true });
+        }
+        // ------------------------------------
+
         this.db = new this.sqlite.Database(
-            path.resolve(this.__dirname, "./database.db"),
+            dbFile, // Usamos la ruta completa al archivo
             (error) => {
                 if (error) {
-                    console.error(" Error conectando a BD:", error);
+                    console.error("❌ Error conectando a BD:", error);
                     return;
                 }
-                console.log(" Conexión a SQLite establecida");
+                console.log(`✅ Conexión a SQLite establecida en: ${dbFile}`);
                 this.createTable_vc_bb();
             }
         );
@@ -28,6 +41,8 @@ class Database_vc_bb {
 
     createTable_vc_bb() {
         // Script SQL completo para crear el esquema de la base de datos
+        // (Tu script SQL original está perfecto, lo omito aquí por brevedad
+        // pero debe ir completo como lo tenías)
         const sql = `
             PRAGMA foreign_keys = ON;
 
@@ -46,6 +61,8 @@ class Database_vc_bb {
               ID_rol_bb_vc_bb INTEGER PRIMARY KEY,
               rol_bb_vc_bb TEXT
             );
+            
+            /* ... (El resto de tu SQL va aquí) ... */
 
             CREATE TABLE IF NOT EXISTS td_UsuarioRol_bb_vc_bb (
               ID_usuarioRol_bb_vc_bb INTEGER PRIMARY KEY,
@@ -211,7 +228,7 @@ class Database_vc_bb {
     // Métodos para operaciones CRUD
     run_vc_bb(sql, params = []) {
         return new Promise((resolve, reject) => {
-            this.db.run_vc_bb(sql, params, function(error) {
+            this.db.run(sql, params, function (error) {
                 if (error) reject(error);
                 else resolve({ id: this.lastID, changes: this.changes });
             });
@@ -220,7 +237,7 @@ class Database_vc_bb {
 
     all_vc_bb(sql, params = []) {
         return new Promise((resolve, reject) => {
-            this.db.all_vc_bb(sql, params, (error, rows) => {
+            this.db.all(sql, params, (error, rows) => {
                 if (error) reject(error);
                 else resolve(rows);
             });
@@ -229,7 +246,7 @@ class Database_vc_bb {
 
     get_vc_bb(sql, params = []) {
         return new Promise((resolve, reject) => {
-            this.db.get_vc_bb(sql, params, (error, row) => {
+            this.db.get(sql, params, (error, row) => {
                 if (error) reject(error);
                 else resolve(row);
             });
@@ -238,15 +255,17 @@ class Database_vc_bb {
 
     close_vc_bb() {
         if (this.db) {
-            this.db.close_vc_bb((error) => {
+            this.db.close((error) => {
                 if (error) {
-                    console.error(" Error cerrando la conexión:", error.message);
+                    console.error("❌ Error cerrando la conexión:", error.message);
                 } else {
-                    console.log(" Conexión a SQLite cerrada.");
+                    console.log("🔌 Conexión a SQLite cerrada.");
                 }
             });
         }
     }
 }
 
+// Se exporta la *instancia* ya creada.
+// La conexión se inicia en cuanto este archivo sea importado por primera vez.
 export default new Database_vc_bb();
