@@ -1,0 +1,32 @@
+body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #F3EFF5;
+        }
+        .eye-icon {
+            filter: invert(25%) sepia(10%) saturate(1205%) hue-rotate(194deg) brightness(95%) contrast(85%);
+        }
+        .btn-primary {
+            background-color: #72B01D;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #3F7D20;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(63, 125, 32, 0.3);
+        }
+        .input-focus:focus {
+            border-color: #72B01D;
+            box-shadow: 0 0 0 3px rgba(114, 176, 29, 0.2);
+        }
+        /* Estilos para el botón de cambio de modo */
+        #cambio-color {
+            transition: all 0.3s ease;
+        }
+        
+        #cambio-color:hover {
+            transform: scale(1.1);
+        }
+        
+        #cambio-color i {
+            transition: transform 0.3s ease;
+        }

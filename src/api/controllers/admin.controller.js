@@ -1,0 +1,1 @@
+export const show = (req, res) => res.json({ message: "welcome admin" });

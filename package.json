@@ -1,0 +1,37 @@
+{
+  "name": "project",
+  "version": "1.0.0",
+  "description": "Aplicación de escritorio con SQLITE local mediante uso de API REST",
+  "main": "src/js/renderer.js",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VictorContr/Proyecto-DB3.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "Victor Contreras y Barbara Briceño",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "electron": "^39.1.1",
+    "electron-reload": "^2.0.0-alpha.1",
+    "excel4node": "^1.8.2",
+    "express": "^5.1.0",
+    "fs": "^0.0.1-security",
+    "fs-extra": "^11.3.2",
+    "morgan": "^1.10.1",
+    "mysql2": "^3.15.3",
+    "path": "^0.12.7",
+    "sqlite3": "^5.1.7",
+    "xlsx-populate": "^1.21.0"
+  }
+}
