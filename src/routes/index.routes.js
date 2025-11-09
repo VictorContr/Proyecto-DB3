@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { index } from "../api/controllers/index.controller.js";
+import { index_vc_bb } from "../api/controllers/index.controller.js";
 
-const router = Router();
+const router_vc_bb = Router();
 
-router.get("/", index);
+router_vc_bb.get("/", index_vc_bb);
 
-export default router;
+export default router_vc_bb;

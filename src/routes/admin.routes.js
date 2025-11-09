@@ -1,23 +1,23 @@
 import { Router } from "express";
 import {
-  show
+  show_vc_bb
 
 } from "../api/controllers/admin.controller.js";
 
-const router = Router();
+const router_vc_bb = Router();
 
 // GET all admin
-router.get("/admin", show);
+router_vc_bb.get("/admin", show_vc_bb);
 
 // // GET An Employee
-// router.get("/admin/:id", getEmployee);
+// router_vc_bb.get("/admin/:id", getEmployee);
 
 // // DELETE An Employee
-// router.delete("/admin/:id", deleteEmployee);
+// router_vc_bb.delete("/admin/:id", deleteEmployee);
 
 // // INSERT An Employee
-// router.post("/admin", createEmployee);
+// router_vc_bb.post("/admin", createEmployee);
 
-// router.patch("/admin/:id", updateEmployee);
+// router_vc_bb.patch("/admin/:id", updateEmployee);
 
-export default router;
+export default router_vc_bb;
