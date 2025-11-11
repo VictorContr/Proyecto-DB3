@@ -9,14 +9,15 @@
     "url": "https://github.com/VictorContr/Proyecto-DB3.git"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
-    "dev": "nodemon index.js"
+    "nodemon": "nodemon index.js"
   },
   "keywords": [],
   "author": "Victor Contreras y Barbara Briceño",
   "license": "ISC",
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "nodemon": "^3.1.10"
   },
   "dependencies": {
