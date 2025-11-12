@@ -228,6 +228,7 @@ class Database_vc_bb {
 
             // Insertar admin por defecto (solo si no existe)
             this.insertAdmin_vc_bb();  // Llamar a la función async
+            this.insertTeacher_vc_bb();
           }
         });
 
@@ -273,6 +274,48 @@ class Database_vc_bb {
             console.error("❌ Error insertando el admin:", err.message);
           }
         }
+
+        // Función async para insertar un Profesor de prueba
+async insertTeacher_vc_bb() {
+  try {
+    // 1. Insertar usuario Profesor (con contraseña sin cifrar, igual que el admin)
+    // Cambia los valores del VALUES según los datos del profesor que quieras crear
+    await this.run_vc_bb(`
+      INSERT OR IGNORE INTO td_Usuarios_bb_vc (
+        userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc
+      )
+      VALUES ('profe1', 'profesor@colegio.com', '04121234567', 'Carlos', 'Docente', '123456');
+    `);
+
+    // 2. Asegurarnos que el rol 'Profesor' existe (por si acaso no se ejecutó el del admin antes)
+    await this.run_vc_bb(`
+      INSERT OR IGNORE INTO td_Rol_bb_vc (rol_bb_vc)
+      VALUES ('Profesor');
+    `);
+
+    // 3. Asociar el usuario 'profe1' al rol de 'Profesor' en la tabla intermedia
+    await this.run_vc_bb(`
+      INSERT OR IGNORE INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
+      SELECT ID_usuario_bb_vc, ID_rol_bb_vc
+      FROM td_Usuarios_bb_vc, td_Rol_bb_vc
+      WHERE td_Usuarios_bb_vc.userName_bb_vc = 'profe1' AND td_Rol_bb_vc.rol_bb_vc = 'Profesor';
+    `);
+
+    // 4. Insertar en la tabla específica de Profesores (td_Profesores_bb_vc)
+    // NOTA: Verifica que tu tabla se llame 'td_Profesores_bb_vc' y la columna 'ID_usuarioRol_profesor_bb_vc'
+    await this.run_vc_bb(`
+      INSERT OR IGNORE INTO td_Profesores_bb_vc (ID_usuarioRol_profesor_bb_vc)
+      SELECT ID_usuarioRol_bb_vc
+      FROM td_UsuarioRol_bb_vc
+      WHERE ID_usuario_usuarioRol_bb_vc = (SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'profe1')
+      AND ID_rol_usuarioRol_bb_vc = (SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Profesor');
+    `);
+
+    console.log("✅ Profesor creado e insertado correctamente.");
+  } catch (err) {
+    console.error("❌ Error insertando el profesor:", err.message);
+  }
+}
 
     // Métodos para operaciones CRUD
     run_vc_bb(sql, params = []) {

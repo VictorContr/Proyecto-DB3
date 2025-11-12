@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Profesor | U.E Colegio Dr. Jacinto Convit</title>
+    <link rel="shortcut icon" href="../public/img/icon-colegio.png">    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../public/css/login-register.css">
+    <link rel="stylesheet" href="../public/css/modal.css">
+</head>
+
+<body id="admin" class="min-h-screen bg-[#f9fafb] flex justify-center items-center px-4">
+    <p id="mensaje-api"></p>
+
+    <!-- Contenedor principal -->
+    <main class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-8 grid gap-6">
+        <!-- Logo y título -->
+        <div class="flex flex-col items-center text-center mb-6">
+            <img src="../public/img/logoColegio-blanco.png" alt="Logo Colegio" class="w-80 h-80 object-contain">
+            <h1 class="text-xl text-gray-700">Bienvenido al Panel de Profesor</h1>
+            <p class="text-sm text-gray-600">Desde aquí puedes gestionar todas las configuraciones de la plataforma.</p>
+        </div>
+
+        <!-- Contenido del Panel de Admin -->
+        <div class="grid gap-4">
+            <div class="bg-[#106587] text-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold mb-4">Acciones disponibles</h2>
+                <ul class="list-disc pl-5">
+                    <li>Gestionar profesores</li>
+                    <li>Cargar profesores y sus datos</li>
+                    <li>Generar horarios para educación media general</li>
+                </ul>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800">Bienvenido, Administrador</h2>
+                <button id="logoutButton_vc_bb"
+                    class="bg-[#106587] hover:bg-[#0e5773] text-white font-semibold py-2 px-6 rounded-lg transition">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div id="modalContainer" class="modal-container">
+        <div id="modalContent" class="modal-content bg-white">
+            <div id="modalHeader" class="modal-header">
+                <div class="flex items-center">
+                    <i id="modalIcon" class="modal-icon"></i>
+                    <h2 id="modalTitle" class="text-xl font-bold text-white"></h2>
+                </div>
+                <button id="modalClose" class="text-white hover:text-gray-200 text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modalBody" class="modal-body">
+                <p id="modalMessage" class="text-gray-700"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="modalAction" class="px-4 py-2 rounded-lg font-medium text-white">
+                    Aceptar
+                </button>
+                <button id="modalCancel"
+                    class="px-4 py-2 rounded-lg font-medium text-gray-700 bg-gray-200 hover:bg-gray-300"
+                    style="display: none;">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../js/app.js"></script>
+</body>
+
+</html>
