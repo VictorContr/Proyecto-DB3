@@ -1,1 +1,1 @@
-export const index_vc_bb = (req_vc_vc, res_vc_bb) => res_vc_bb.json({ message: "welcome to my api" });
+export const index_vc_bb = (req_vc_bb, res_vc_bb) => res_vc_bb.json({ message: "welcome to my api" });

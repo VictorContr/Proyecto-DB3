@@ -39,59 +39,64 @@ class Database_vc_bb {
         );
     }
 
+
+
     createTable_vc_bb() {
         // Script SQL completo para crear el esquema de la base de datos
         // (Tu script SQL original está perfecto, lo omito aquí por brevedad
         // pero debe ir completo como lo tenías)
+
         const sql = `
             PRAGMA foreign_keys = ON;
 
             -- -----------------------------------------------------
             -- Tablas de Estructura Básica (Usuarios y Roles)
             -- -----------------------------------------------------
-            CREATE TABLE IF NOT EXISTS td_Usuarios_bb_vc_bb (
-              ID_usuario_bb_vc_bb INTEGER PRIMARY KEY,
-              nombre_bb_vc_bb TEXT NOT NULL,
-              apellido_bb_vc_bb TEXT NOT NULL,
-              correo_bb_vc_bb TEXT NOT NULL,
-              telefono_bb_vc_bb TEXT NOT NULL
+            CREATE TABLE IF NOT EXISTS td_Usuarios_bb_vc (
+              ID_usuario_bb_vc INTEGER PRIMARY KEY,
+              nombre_bb_vc TEXT NOT NULL,
+              apellido_bb_vc TEXT NOT NULL,
+              userName_bb_vc VARCHAR(80) UNIQUE NOT NULL,
+              correo_bb_vc TEXT NOT NULL,
+              telefono_bb_vc TEXT NOT NULL,
+              password_bb_vc VARCHAR(250) NOT NULL 
             );
 
-            CREATE TABLE IF NOT EXISTS td_Rol_bb_vc_bb (
-              ID_rol_bb_vc_bb INTEGER PRIMARY KEY,
-              rol_bb_vc_bb TEXT
+            CREATE TABLE IF NOT EXISTS td_Rol_bb_vc (
+              ID_rol_bb_vc INTEGER PRIMARY KEY,
+              rol_bb_vc TEXT
             );
             
             /* ... (El resto de tu SQL va aquí) ... */
 
-            CREATE TABLE IF NOT EXISTS td_UsuarioRol_bb_vc_bb (
-              ID_usuarioRol_bb_vc_bb INTEGER PRIMARY KEY,
-              ID_usuario_usuarioRol_bb_vc_bb INTEGER,
-              ID_rol_usuarioRol_bb_vc_bb INTEGER,
-              FOREIGN KEY (ID_usuario_usuarioRol_bb_vc_bb) REFERENCES td_Usuarios_bb_vc_bb(ID_usuario_bb_vc_bb),
-              FOREIGN KEY (ID_rol_usuarioRol_bb_vc_bb) REFERENCES td_Rol_bb_vc_bb(ID_rol_bb_vc_bb)
+            CREATE TABLE IF NOT EXISTS td_UsuarioRol_bb_vc (
+              ID_usuarioRol_bb_vc INTEGER PRIMARY KEY,
+              ID_usuario_usuarioRol_bb_vc INTEGER,
+              ID_rol_usuarioRol_bb_vc INTEGER,
+              FOREIGN KEY (ID_usuario_usuarioRol_bb_vc) REFERENCES td_Usuarios_bb_vc(ID_usuario_bb_vc),
+              FOREIGN KEY (ID_rol_usuarioRol_bb_vc) REFERENCES td_Rol_bb_vc(ID_rol_bb_vc)
             );
 
             -- Tablas de especialización de usuarios
-            CREATE TABLE IF NOT EXISTS td_Administradores_bb_vc_bb (
-              ID_administradores_bb_vc_bb INTEGER PRIMARY KEY,
-              ID_usuarioRol_admin_bb_vc_bb INTEGER,
-              FOREIGN KEY (ID_usuarioRol_admin_bb_vc_bb) REFERENCES td_UsuarioRol_bb_vc_bb(ID_usuarioRol_bb_vc_bb)
+            CREATE TABLE IF NOT EXISTS td_Administradores_bb_vc(
+              ID_administradores_bb_vc INTEGER PRIMARY KEY,
+              ID_usuarioRol_admin_bb_vc INTEGER,
+              FOREIGN KEY (ID_usuarioRol_admin_bb_vc) REFERENCES td_UsuarioRol_bb_vc(ID_usuarioRol_bb_vc)
             );
 
-            CREATE TABLE IF NOT EXISTS td_Profesores_bb_vc_bb (
-              ID_profesor_bb_vc_bb INTEGER PRIMARY KEY,
-              ID_usuarioRol_profesor_bb_vc_bb INTEGER,
-              FOREIGN KEY (ID_usuarioRol_profesor_bb_vc_bb) REFERENCES td_UsuarioRol_bb_vc_bb(ID_usuarioRol_bb_vc_bb)
+            CREATE TABLE IF NOT EXISTS td_Profesores_bb_vc(
+              ID_profesor_bb_vc INTEGER PRIMARY KEY,
+              ID_usuarioRol_profesor_bb_vc INTEGER,
+              FOREIGN KEY (ID_usuarioRol_profesor_bb_vc) REFERENCES td_UsuarioRol_bb_vc(ID_usuarioRol_bb_vc)
             );
 
             -- -----------------------------------------------------
             -- Tablas de Recursos Temporales y Espaciales
             -- -----------------------------------------------------
-            CREATE TABLE IF NOT EXISTS td_Bloque_bb_vc_bb (
-              ID_bloque_bb_vc_bb INTEGER PRIMARY KEY,
-              hora_bloque_bb_vc_bb TEXT NOT NULL CHECK (
-                hora_bloque_bb_vc_bb IN (
+            CREATE TABLE IF NOT EXISTS td_Bloque_bb_vc(
+              ID_bloque_bb_vc INTEGER PRIMARY KEY,
+              hora_bloque_bb_vc TEXT NOT NULL CHECK (
+              hora_bloque_bb_vc IN (
                   '7:00 am',
                   '8:00 am',
                   '9:00 am',
@@ -106,124 +111,168 @@ class Database_vc_bb {
               )
             );
 
-            CREATE TABLE IF NOT EXISTS td_Dia_bb_vc_bb (
-              ID_dia_bb_vc_bb INTEGER PRIMARY KEY,
-              dia_bb_vc_bb TEXT NOT NULL CHECK (
-                dia_bb_vc_bb IN ('lunes', 'martes', 'miércoles', 'jueves', 'viernes')
+            CREATE TABLE IF NOT EXISTS td_Dia_bb_vc (
+              ID_dia_bb_vc INTEGER PRIMARY KEY,
+              dia_bb_vc TEXT NOT NULL CHECK (
+                dia_bb_vc IN ('lunes', 'martes', 'miércoles', 'jueves', 'viernes')
               )
             );
 
-            CREATE TABLE IF NOT EXISTS td_TipoEspacio_bb_vc_bb (
-              ID_TipoEspacio_bb_vc_bb INTEGER PRIMARY KEY,
-              tipo_bb_vc_bb TEXT -- Ej: "Aula Genérica", "Laboratorio", "Cancha"
+            CREATE TABLE IF NOT EXISTS td_TipoEspacio_bb_vc (
+              ID_TipoEspacio_bb_vc INTEGER PRIMARY KEY,
+              tipo_bb_vc TEXT -- Ej: "Aula Genérica", "Laboratorio", "Cancha"
             );
 
-            CREATE TABLE IF NOT EXISTS td_Espacios_bb_vc_bb (
-              ID_espacio_bb_vc_bb INTEGER PRIMARY KEY,
-              nombre_bb_vc_bb TEXT,
-              capacidad_bb_vc_bb INTEGER,
-              ID_TipoEspacio_espacio_bb_vc_bb INTEGER,
-              FOREIGN KEY (ID_TipoEspacio_espacio_bb_vc_bb) REFERENCES td_TipoEspacio_bb_vc_bb(ID_TipoEspacio_bb_vc_bb)
+            CREATE TABLE IF NOT EXISTS td_Espacios_bb_vc (
+              ID_espacio_bb_vc INTEGER PRIMARY KEY,
+              nombre_bb_vc TEXT,
+              capacidad_bb_vc INTEGER,
+              ID_TipoEspacio_espacio_bb_vc INTEGER,
+              FOREIGN KEY (ID_TipoEspacio_espacio_bb_vc) REFERENCES td_TipoEspacio_bb_vc(ID_TipoEspacio_bb_vc)
             );
 
             -- -----------------------------------------------------
             -- Tablas de Estructura Académica (Pensum)
             -- -----------------------------------------------------
-            CREATE TABLE IF NOT EXISTS td_Grados_bb_vc_bb (
-              ID_grado_bb_vc_bb INTEGER PRIMARY KEY,
-              nro_grado_bb_vc_bb INTEGER,
-              CHECK (nro_grado_bb_vc_bb >= 1 AND nro_grado_bb_vc_bb <= 5)
+            CREATE TABLE IF NOT EXISTS td_Grados_bb_vc (
+              ID_grado_bb_vc INTEGER PRIMARY KEY,
+              nro_grado_bb_vc INTEGER,
+              CHECK (nro_grado_bb_vc >= 1 AND nro_grado_bb_vc <= 5)
             );
 
-            CREATE TABLE IF NOT EXISTS td_Secciones_bb_vc_bb (
-              ID_seccion_bb_vc_bb INTEGER PRIMARY KEY,
-              letra_seccion_bb_vc_bb TEXT -- Ej: 'A', 'B'
+            CREATE TABLE IF NOT EXISTS td_Secciones_bb_vc (
+              ID_seccion_bb_vc INTEGER PRIMARY KEY,
+              letra_seccion_bb_vc TEXT -- Ej: 'A', 'B'
             );
 
-            CREATE TABLE IF NOT EXISTS td_Asignaturas_bb_vc_bb (
-              ID_asignatura_bb_vc_bb INTEGER PRIMARY KEY,
-              nombre_bb_vc_bb TEXT NOT NULL,
-              horas_academicas_bb_vc_bb INTEGER, -- Horas *semanales* requeridas para el pensum
-              descripcion_bb_vc_bb TEXT,
-              duracion_bloque_min_bb_vc_bb INTEGER DEFAULT 1,
-              duracion_bloque_max_bb_vc_bb INTEGER DEFAULT 1,
-              ID_TipoEspacio_requerido_bb_vc_bb INTEGER NULL,
-              FOREIGN KEY (ID_TipoEspacio_requerido_bb_vc_bb) REFERENCES td_TipoEspacio_bb_vc_bb(ID_TipoEspacio_bb_vc_bb)
+            CREATE TABLE IF NOT EXISTS td_Asignaturas_bb_vc (
+              ID_asignatura_bb_vc INTEGER PRIMARY KEY,
+              nombre_bb_vc TEXT NOT NULL,
+              horas_academicas_bb_vc INTEGER, -- Horas *semanales* requeridas para el pensum
+              descripcion_bb_vc TEXT,
+              duracion_bloque_min_bb_vc INTEGER DEFAULT 1,
+              duracion_bloque_max_bb_vc INTEGER DEFAULT 1,
+              ID_TipoEspacio_requerido_bb_vc INTEGER NULL,
+              FOREIGN KEY (ID_TipoEspacio_requerido_bb_vc) REFERENCES td_TipoEspacio_bb_vc(ID_TipoEspacio_bb_vc)
             );
 
-            CREATE TABLE IF NOT EXISTS td_GradosAsignaturas_bb_vc_bb (
-              ID_gradoAsignatura_bb_vc_bb INTEGER PRIMARY KEY,
-              ID_grado_gradoAsig_bb_vc_bb INTEGER,
-              ID_asignatura_gradoAsig_bb_vc_bb INTEGER,
-              FOREIGN KEY (ID_grado_gradoAsig_bb_vc_bb) REFERENCES td_Grados_bb_vc_bb(ID_grado_bb_vc_bb),
-              FOREIGN KEY (ID_asignatura_gradoAsig_bb_vc_bb) REFERENCES td_Asignaturas_bb_vc_bb(ID_asignatura_bb_vc_bb)
+            CREATE TABLE IF NOT EXISTS td_GradosAsignaturas_bb_vc (
+              ID_gradoAsignatura_bb_vc INTEGER PRIMARY KEY,
+              ID_grado_gradoAsig_bb_vc INTEGER,
+              ID_asignatura_gradoAsig_bb_vc INTEGER,
+              FOREIGN KEY (ID_grado_gradoAsig_bb_vc) REFERENCES td_Grados_bb_vc_bb(ID_grado_bb_vc),
+              FOREIGN KEY (ID_asignatura_gradoAsig_bb_vc) REFERENCES td_Asignaturas_bb_vc_bb(ID_asignatura_bb_vc)
             );
 
             -- -----------------------------------------------------
             -- Tabla de Idoneidad de Profesores (R3.4)
             -- -----------------------------------------------------
-            CREATE TABLE IF NOT EXISTS td_ProfesorAsignaturas_bb_vc_bb (
-              ID_profesorAsig_bb_vc_bb INTEGER PRIMARY KEY,
-              ID_profesor_profAsig_bb_vc_bb INTEGER,
-              ID_asignatura_profAsig_bb_vc_bb INTEGER,
-              FOREIGN KEY (ID_profesor_profAsig_bb_vc_bb) REFERENCES td_Profesores_bb_vc_bb(ID_profesor_bb_vc_bb),
-              FOREIGN KEY (ID_asignatura_profAsig_bb_vc_bb) REFERENCES td_Asignaturas_bb_vc_bb(ID_asignatura_bb_vc_bb)
+            CREATE TABLE IF NOT EXISTS td_ProfesorAsignaturas_bb_vc (
+              ID_profesorAsig_bb_vc INTEGER PRIMARY KEY,
+              ID_profesor_profAsig_bb_vc INTEGER,
+              ID_asignatura_profAsig_bb_vc INTEGER,
+              FOREIGN KEY (ID_profesor_profAsig_bb_vc) REFERENCES td_Profesores_bb_vc(ID_profesor_bb_vc),
+              FOREIGN KEY (ID_asignatura_profAsig_bb_vc) REFERENCES td_Asignaturas_bb_vc(ID_asignatura_bb_vc)
             );
 
             -- -----------------------------------------------------
             -- Tablas de Disponibilidad (Restricciones de Entrada)
             -- -----------------------------------------------------
-            CREATE TABLE IF NOT EXISTS td_DisponibilidadProfesor_bb_vc_bb (
-              ID_DisponibilidadProfesor_bb_vc_bb INTEGER PRIMARY KEY,
-              ID_dia_DispProfesor_bb_vc_bb INTEGER,
-              ID_bloque_DispProfesor_bb_vc_bb INTEGER,
-              ID_profesor_DispProfesor_bb_vc_bb INTEGER,
-              FOREIGN KEY (ID_dia_DispProfesor_bb_vc_bb) REFERENCES td_Dia_bb_vc_bb(ID_dia_bb_vc_bb),
-              FOREIGN KEY (ID_bloque_DispProfesor_bb_vc_bb) REFERENCES td_Bloque_bb_vc_bb(ID_bloque_bb_vc_bb),
-              FOREIGN KEY (ID_profesor_DispProfesor_bb_vc_bb) REFERENCES td_Profesores_bb_vc_bb(ID_profesor_bb_vc_bb)
+            CREATE TABLE IF NOT EXISTS td_DisponibilidadProfesor_bb_vc (
+              ID_DisponibilidadProfesor_bb_vc INTEGER PRIMARY KEY,
+              ID_dia_DispProfesor_bb_vc INTEGER,
+              ID_bloque_DispProfesor_bb_vc INTEGER,
+              ID_profesor_DispProfesor_bb_vc INTEGER,
+              FOREIGN KEY (ID_dia_DispProfesor_bb_vc) REFERENCES td_Dia_bb_vc(ID_dia_bb_vc),
+              FOREIGN KEY (ID_bloque_DispProfesor_bb_vc) REFERENCES td_Bloque_bb_vc(ID_bloque_bb_vc),
+              FOREIGN KEY (ID_profesor_DispProfesor_bb_vc) REFERENCES td_Profesores_bb_vc(ID_profesor_bb_vc)
             );
 
-            CREATE TABLE IF NOT EXISTS td_DisponibilidadEspacio_bb_vc_bb (
-              ID_DisponibilidadEspacio_bb_vc_bb INTEGER PRIMARY KEY,
-              ID_dia_DispEspacio_bb_vc_bb INTEGER,
-              ID_bloque_DispEspacio_bb_vc_bb INTEGER,
-              ID_espacio_DispEspacio_bb_vc_bb INTEGER,
-              FOREIGN KEY (ID_dia_DispEspacio_bb_vc_bb) REFERENCES td_Dia_bb_vc_bb(ID_dia_bb_vc_bb),
-              FOREIGN KEY (ID_bloque_DispEspacio_bb_vc_bb) REFERENCES td_Bloque_bb_vc_bb(ID_bloque_bb_vc_bb),
-              FOREIGN KEY (ID_espacio_DispEspacio_bb_vc_bb) REFERENCES td_Espacios_bb_vc_bb(ID_espacio_bb_vc_bb)
+            CREATE TABLE IF NOT EXISTS td_DisponibilidadEspacio_bb_vc (
+              ID_DisponibilidadEspacio_bb_vc INTEGER PRIMARY KEY,
+              ID_dia_DispEspacio_bb_vc INTEGER,
+              ID_bloque_DispEspacio_bb_vc INTEGER,
+              ID_espacio_DispEspacio_bb_vc INTEGER,
+              FOREIGN KEY (ID_dia_DispEspacio_bb_vc) REFERENCES td_Dia_bb_vc(ID_dia_bb_vc),
+              FOREIGN KEY (ID_bloque_DispEspacio_bb_vc) REFERENCES td_Bloque_bb_vc(ID_bloque_bb_vc),
+              FOREIGN KEY (ID_espacio_DispEspacio_bb_vc) REFERENCES td_Espacios_bb_vc(ID_espacio_bb_vc)
             );
 
             -- -----------------------------------------------------
             -- Tabla Central: El Horario (Resultado del Algoritmo)
             -- -----------------------------------------------------
-            CREATE TABLE IF NOT EXISTS td_Horario_bb_vc_bb (
-              ID_Horario_bb_vc_bb INTEGER PRIMARY KEY,
-              ID_dia_horario_bb_vc_bb INTEGER,
-              ID_bloque_horario_bb_vc_bb INTEGER,
-              ID_asignatura_horario_bb_vc_bb INTEGER,
-              ID_espacio_horario_bb_vc_bb INTEGER,
-              ID_profesor_horario_bb_vc_bb INTEGER,
-              ID_grado_horario_bb_vc_bb INTEGER,
-              ID_seccion_horario_bb_vc_bb INTEGER,
-              FOREIGN KEY (ID_dia_horario_bb_vc_bb) REFERENCES td_Dia_bb_vc_bb(ID_dia_bb_vc_bb),
-              FOREIGN KEY (ID_bloque_horario_bb_vc_bb) REFERENCES td_Bloque_bb_vc_bb(ID_bloque_bb_vc_bb),
-              FOREIGN KEY (ID_asignatura_horario_bb_vc_bb) REFERENCES td_Asignaturas_bb_vc_bb(ID_asignatura_bb_vc_bb),
-              FOREIGN KEY (ID_espacio_horario_bb_vc_bb) REFERENCES td_Espacios_bb_vc_bb(ID_espacio_bb_vc_bb),
-              FOREIGN KEY (ID_profesor_horario_bb_vc_bb) REFERENCES td_Profesores_bb_vc_bb(ID_profesor_bb_vc_bb),
-              FOREIGN KEY (ID_grado_horario_bb_vc_bb) REFERENCES td_Grados_bb_vc_bb(ID_grado_bb_vc_bb),
-              FOREIGN KEY (ID_seccion_horario_bb_vc_bb) REFERENCES td_Secciones_bb_vc_bb(ID_seccion_bb_vc_bb)
+            CREATE TABLE IF NOT EXISTS td_Horario_bb_vc (
+              ID_Horario_bb_vc INTEGER PRIMARY KEY,
+              ID_dia_horario_bb_vc INTEGER,
+              ID_bloque_horario_bb_vc INTEGER,
+              ID_asignatura_horario_bb_vc INTEGER,
+              ID_espacio_horario_bb_vc INTEGER,
+              ID_profesor_horario_bb_vc INTEGER,
+              ID_grado_horario_bb_vc INTEGER,
+              ID_seccion_horario_bb_vc INTEGER,
+              FOREIGN KEY (ID_dia_horario_bb_vc) REFERENCES td_Dia_bb_vc(ID_dia_bb_vc),
+              FOREIGN KEY (ID_bloque_horario_bb_vc) REFERENCES td_Bloque_bb_vc(ID_bloque_bb_vc),
+              FOREIGN KEY (ID_asignatura_horario_bb_vc) REFERENCES td_Asignaturas_bb_vc(ID_asignatura_bb_vc),
+              FOREIGN KEY (ID_espacio_horario_bb_vc) REFERENCES td_Espacios_bb_vc(ID_espacio_bb_vc),
+              FOREIGN KEY (ID_profesor_horario_bb_vc) REFERENCES td_Profesores_bb_vc(ID_profesor_bb_vc),
+              FOREIGN KEY (ID_grado_horario_bb_vc) REFERENCES td_Grados_bb_vc(ID_grado_bb_vc),
+              FOREIGN KEY (ID_seccion_horario_bb_vc) REFERENCES td_Secciones_bb_vc(ID_seccion_bb_vc)
             );
         `;
-
         // Usar .exec() para correr múltiples sentencias SQL a la vez
         this.db.exec(sql, (error) => {
-            if (error) {
-                console.error("❌ Error creando el esquema de tablas:", error.message);
-            } else {
-                console.log("✅ Esquema de tablas verificado/creado exitosamente");
-            }
+          if (error) {
+            console.error("❌ Error creando el esquema de tablas:", error.message);
+          } else {
+            console.log("✅ Esquema de tablas verificado/creado exitosamente");
+
+            // Insertar admin por defecto (solo si no existe)
+            this.insertAdmin_vc_bb();  // Llamar a la función async
+          }
         });
+
+        
     }
+
+    // Función async para insertar el admin
+        async insertAdmin_vc_bb() {
+          try {
+            // Insertar usuario admin (con contraseña sin cifrar)
+            await this.run_vc_bb(`
+              INSERT OR IGNORE INTO td_Usuarios_bb_vc (
+                userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc
+              )
+              VALUES ('admin', 'admin@colegio.com', '0000000000', 'Admin', 'Principal', '123456');
+            `);
+
+            // Insertar el rol de Administrador si no existe
+            await this.run_vc_bb(`
+              INSERT OR IGNORE INTO td_Rol_bb_vc (rol_bb_vc)
+              VALUES ('Administrador'), ('Profesor');
+            `);
+
+            // Asociar el usuario admin al rol de administrador
+            await this.run_vc_bb(`
+              INSERT OR IGNORE INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
+              SELECT ID_usuario_bb_vc, ID_rol_bb_vc
+              FROM td_Usuarios_bb_vc, td_Rol_bb_vc
+              WHERE td_Usuarios_bb_vc.userName_bb_vc = 'admin' AND td_Rol_bb_vc.rol_bb_vc = 'Administrador';
+            `);
+
+            // Insertar en tabla de administradores si no existe
+            await this.run_vc_bb(`
+              INSERT OR IGNORE INTO td_Administradores_bb_vc (ID_usuarioRol_admin_bb_vc)
+              SELECT ID_usuarioRol_bb_vc
+              FROM td_UsuarioRol_bb_vc
+              WHERE ID_usuario_usuarioRol_bb_vc = (SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'admin')
+              AND ID_rol_usuarioRol_bb_vc = (SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Administrador');
+            `);
+
+            console.log("✅ Admin creado e insertado correctamente.");
+          } catch (err) {
+            console.error("❌ Error insertando el admin:", err.message);
+          }
+        }
 
     // Métodos para operaciones CRUD
     run_vc_bb(sql, params = []) {

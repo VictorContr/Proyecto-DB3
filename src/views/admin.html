@@ -5,47 +5,49 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión | U.E Colegio Dr. Jacinto Convit</title>
+    <title>Panel de Administrador | U.E Colegio Dr. Jacinto Convit</title>
     <link rel="shortcut icon" href="../public/img/icon-colegio.png">    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../public/css/login-register.css">
     <link rel="stylesheet" href="../public/css/modal.css">
 </head>
 
-<body id="login" class="min-h-screen flex justify-center items-center px-4">
+<body id="admin" class="min-h-screen bg-[#f9fafb] flex justify-center items-center px-4">
     <p id="mensaje-api"></p>
-     <!-- Contenedor principal -->
-  <main class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 grid gap-6">
-    <!-- Logo y título -->
-    <div class="flex flex-col items-center text-center mb-1">
-      <img src="../public/img/logoColegio-blanco.png" alt="Logo Colegio" class="w-80 h-80 object-contain">
-      <p class="text-gray-600 text-sm">Bienvenido al portal del colegio. Inicia sesión para continuar.</p>
-    </div>
 
-    <!-- Formulario de inicio de sesión -->
-    <form id="loginForm" class="grid gap-2">
-      <div>
-        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
-        <input id="username" type="text" name="username" placeholder="Ingresa tu usuario"
-               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#106587] transition">
-      </div>
+    <!-- Contenedor principal -->
+    <main class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-8 grid gap-6">
+        <!-- Logo y título -->
+        <div class="flex flex-col items-center text-center mb-6">
+            <img src="../public/img/logoColegio-blanco.png" alt="Logo Colegio" class="w-80 h-80 object-contain">
+            <h1 class="text-xl text-gray-700">Bienvenido al Panel de Administrador</h1>
+            <p class="text-sm text-gray-600">Desde aquí puedes gestionar todas las configuraciones de la plataforma.</p>
+        </div>
 
-      <div>
-        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-        <input id="password" type="password" name="password" placeholder="Ingresa tu contraseña"
-               class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#106587] transition">
-      </div>
+        <!-- Contenido del Panel de Admin -->
+        <div class="grid gap-4">
+            <div class="bg-[#106587] text-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold mb-4">Acciones disponibles</h2>
+                <ul class="list-disc pl-5">
+                    <li>Gestionar profesores</li>
+                    <li>Cargar profesores y sus datos</li>
+                    <li>Generar horarios para educación media general</li>
+                </ul>
+            </div>
 
-      <button type="submit"
-              class="w-full bg-[#106587] hover:bg-[#0e5773] text-white font-semibold py-3 rounded-lg transition">
-        Iniciar Sesión
-      </button>
-    </form>
-  </main>
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-gray-800">Bienvenido, Administrador</h2>
+                <button id="logoutButton_vc_bb"
+                    class="bg-[#106587] hover:bg-[#0e5773] text-white font-semibold py-2 px-6 rounded-lg transition">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </main>
+
     <!-- Modal -->
     <div id="modalContainer" class="modal-container">
         <div id="modalContent" class="modal-content bg-white">
@@ -73,6 +75,7 @@
             </div>
         </div>
     </div>
+
     <script type="module" src="../js/app.js"></script>
 </body>
 
