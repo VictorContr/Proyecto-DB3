@@ -10,22 +10,17 @@ Abrir terminal en la raíz del proyecto y ejecutar:
 ```bash
 npm install
 ```
-Esto instalará `dependencies` y `devDependencies` (incluye `nodemon`).
 
-## Orden de arranque (IMPORTANTE)
-1. Iniciar la API local en modo desarrollo (recarga automática):
+## Inicio (modo recomendado)
+Solo necesitas ejecutar:
 ```bash
 npm run dev
 ```
-- `npm run dev` ejecuta `nodemon index.js`. Mantener este proceso en ejecución; levanta el servidor/API.
-
-2. En otra terminal, iniciar la aplicación Electron:
-```bash
-npm start
-```
-- `npm start` ejecuta `electron .` y abre la UI de escritorio que consume la API local.
-
-Orden requerido: primero `npm run dev` (API), luego `npm start` (Electron).
+- `npm run dev` utiliza `concurrently` para arrancar simultáneamente la API (`nodemon index.js`) y la aplicación Electron (`electron .`).  
+- No es necesario ejecutar `npm start` de forma separada; `npm run dev` ya lanza ambos procesos.
+- Si quieres ejecutar solo uno de los dos:
+  - Solo API (dev): `npm run api`
+  - Solo Electron: `npm run electron`
 
 ## Estructura del proyecto
 - .env
@@ -35,17 +30,22 @@ Orden requerido: primero `npm run dev` (API), luego `npm start` (Electron).
 - README.md
 - src/
   - api/
-    - db.js
     - controllers/
       - admin.controller.js
+      - excel.controller.js
       - index.controller.js
+      - login.controller.js
+      - teacher.controller.js
   - db/
     - example.sql
   - js/
     - app.js
     - dark-mode.js
+    - excel.js
+    - login.js
     - main.js
     - modal.js
+    - preload.js
     - renderer.js
   - public/
     - css/
@@ -55,19 +55,24 @@ Orden requerido: primero `npm run dev` (API), luego `npm start` (Electron).
     - img/
   - routes/
     - admin.routes.js
+    - excel.routes.js
     - index.routes.js
+    - login.routes.js
     - teacher.routes.js
   - tailwind/
     - tailwind.config.js
   - views/
+    - admin.html
     - index.html
-    - register.html
+    - teacher.html
+- temp/
+- uploads/
 
 Notas:
 - `.env` contiene variables de entorno (no subir a Git).
-- `index.js` arranca la API/servidor (controlado por `nodemon` en dev).
-- `src/js/main.js` / `renderer.js` relacionados con la parte Electron.
+- `index.js` arranca la API/servidor; `nodemon` recarga en cambios durante el desarrollo.
+- `npm run dev` es la forma recomendada para desarrollo local porque levanta API + Electron juntos.
 
 ## Autores
-- Victor Contreras
+- Victor Contreras  
 - Barbara Briceño
