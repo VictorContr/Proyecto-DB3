@@ -4,80 +4,79 @@ import { modal_vc_bb } from "./modal.js";
 // VARIABLES
 export const loginForm_vc_bb = document.getElementById("loginForm");
 export const logoutButton_vc_bb = document.getElementById("logoutButton_vc_bb");
-const mensajeApi_vc_bb = document.getElementById("mensaje-api");
 
 //FUNCIONES
+//Gestor de sesión
+export class GestorSesion_vc_bb {
 
-// Iniciar sesión
-export const iniciarSesion_vc_bb = async () => {
-  const userName_vc_bb = document.getElementById("username").value.trim();
-  const password_vc_bb = document.getElementById("password").value.trim();
+  // 0. NUEVO MÉTODO: INICIAR SESIÓN
+  static async iniciarSesion_vc_bb() {
+    // Obtenemos referencias a los elementos del DOM
+    const userName_vc_bb =  document.getElementById("username").value.trim();
+    const password_vc_bb = document.getElementById("password").value.trim();
 
-  if (!userName_vc_bb || !password_vc_bb) {
-    mensajeApi_vc_bb.textContent = "Por favor ingresa usuario y contraseña.";
-    mensajeApi_vc_bb.classList.add("text-red-500");
-    return;
-  }
 
-  try {
-    const response_vc_bb = await fetch("http://localhost:3000/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userName_bb_vc: userName_vc_bb,
-        password_bb_vc: password_vc_bb,
-      }),
-    });
-
-    const data_vc_bb = await response_vc_bb.json();
-
-    if (!response_vc_bb.ok) {
-      mensajeApi_vc_bb.textContent = data_vc_bb.message || "Error en el login";
-      mensajeApi_vc_bb.classList.add("text-red-500");
-
+    if (!userName_vc_bb || !password_vc_bb) {
+          modal_vc_bb.showError_vc_bb("Error","Por favor ingresa usuario y contraseña.");
       return;
     }
-    // Aquí pasas el objeto completo que trajo tu SQL
-    const datosMinimos_vc_bb = {
-      id_vc_bb: data_vc_bb.usuario.id,
-      rol_vc_bb: data_vc_bb.usuario.rol, // 'Administrador' o 'Profesor'
-      nombre_vc_bb: data_vc_bb.usuario.nombre,
-      apellido_vc_bb: data_vc_bb.usuario.apellido,
-    };
 
-    GestorSesion_vc_bb.guardarUsuarioActual_vc_bb(datosMinimos_vc_bb);
-    const rol_vc_bb = data_vc_bb.usuario.rol;
+    try {
+      const response_vc_bb = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userName_bb_vc: userName_vc_bb,
+          password_bb_vc: password_vc_bb,
+        }),
+      });
 
-    // Redirigir según rol
-    if (rol_vc_bb === "Administrador") {
-      modal_vc_bb.showSuccess_vc_bb(
-        "Sesión exitosa",
-        "Has iniciado sesión correctamente."
-      );
-      setTimeout(() => {
-        location.replace("../views/admin.html");
-      }, 1000);
-    } else if (rol_vc_bb === "Profesor") {
-      modal_vc_bb.showSuccess_vc_bb(
-        "Sesión exitosa",
-        "Has iniciado sesión correctamente."
-      );
-      setTimeout(() => {
-        location.replace("../views/teacher.html");
-      }, 1000);
-    } else {
-      mensajeApi_vc_bb.textContent = "Usuario sin rol asignado";
-      mensajeApi_vc_bb.classList.add("text-red-500");
+      const data_vc_bb = await response_vc_bb.json();
+
+      if (!response_vc_bb.ok) {
+        modal_vc_bb.showError_vc_bb("Error","Error en el login.");
+        return;
+      }
+
+      // Construimos el objeto con los datos mínimos
+      const datosMinimos_vc_bb = {
+        id_vc_bb: data_vc_bb.usuario.id,
+        rol_vc_bb: data_vc_bb.usuario.rol, // 'Administrador' o 'Profesor'
+        nombre_vc_bb: data_vc_bb.usuario.nombre,
+        apellido_vc_bb: data_vc_bb.usuario.apellido,
+      };
+
+      // Usamos 'this' para llamar al método estático de la misma clase
+      this.guardarUsuarioActual_vc_bb(datosMinimos_vc_bb);
+      
+      const rol_vc_bb = data_vc_bb.usuario.rol;
+
+      // Redirigir según rol
+      if (rol_vc_bb === "Administrador") {
+        modal_vc_bb.showSuccess_vc_bb(
+          "Sesión exitosa",
+          "Has iniciado sesión correctamente."
+        );
+        setTimeout(() => {
+          location.replace("../views/admin.html");
+        }, 1000);
+      } else if (rol_vc_bb === "Profesor") {
+        modal_vc_bb.showSuccess_vc_bb(
+          "Sesión exitosa",
+          "Has iniciado sesión correctamente."
+        );
+        setTimeout(() => {
+          location.replace("../views/teacher.html");
+        }, 1000);
+      } else {
+        modal_vc_bb.showError_vc_bb("Error","Usuario sin rol asignado");  
+        }
+    } catch (error_vc_bb) {
+      console.error("❌ Error en login:", error_vc_bb);
+      modal_vc_bb.showError_vc_bb("Error","Error de conexión con el servidor.");  
     }
-  } catch (error_vc_bb) {
-    console.error("❌ Error en login:", error_vc_bb);
-    mensajeApi_vc_bb.textContent = "Error de conexión con el servidor.";
-    mensajeApi_vc_bb.classList.add("text-red-500");
   }
-};
 
-//Clase de Gestor de
-export class GestorSesion_vc_bb {
   // 1. GUARDAR DATOS
   static guardarUsuarioActual_vc_bb(datosMinimos_vc_bb) {
     // Guardamos en storage con las claves actualizadas
@@ -101,10 +100,15 @@ export class GestorSesion_vc_bb {
   static cerrarSesion_vc_bb() {
     sessionStorage.removeItem("usuarioActual_vc_bb");
     sessionStorage.removeItem("selectedUserId_vc_bb");
-    modal_vc_bb.showSuccess_vc_bb(
-      "Sesión finalizada",
-      "Has cerrado sesión correctamente."
-    );
+    
+    // Verificamos si existe el modal antes de usarlo
+    if(typeof modal_vc_bb !== 'undefined') {
+        modal_vc_bb.showSuccess_vc_bb(
+          "Sesión finalizada",
+          "Has cerrado sesión correctamente."
+        );
+    }
+    
     setTimeout(() => {
       location.href = "index.html";
     }, 1000);
@@ -123,11 +127,10 @@ export class GestorSesion_vc_bb {
     if (esPublica_vc_bb) {
       // Si ya hay sesión iniciada y está en el login, redirigir a su dashboard
       if (usuarioActual_vc_bb) {
-        // Nota: accedemos a las propiedades con el sufijo _vc_bb
         if (usuarioActual_vc_bb.rol_vc_bb === "Administrador")
-          location.href = "./admin.html";
+          location.href = "./views/admin.html"; // Asegúrate de la ruta correcta
         if (usuarioActual_vc_bb.rol_vc_bb === "Profesor")
-          location.href = "./teacher.html";
+          location.href = "./views/teacher.html"; // Asegúrate de la ruta correcta
       }
       return true;
     }
@@ -136,15 +139,15 @@ export class GestorSesion_vc_bb {
     if (!usuarioActual_vc_bb) {
       console.warn("Intento de acceso sin sesión.");
 
-      // Asumiendo que el modal también cambia de nombre a modal_vc_bb
       if (typeof modal_vc_bb !== "undefined") {
         modal_vc_bb.showError_vc_bb("Error", "Debe iniciar sesión");
       } else {
-        modal_vc_bb.showError_vc_bb("Debe iniciar sesión");
+         // Fallback si no hay modal
+         console.log("Debe iniciar sesión");
       }
 
       setTimeout(() => {
-        location.href = "./index.html";
+        location.href = "index.html"; // Ajuste de ruta para salir de /views/
       }, 1000);
       return false;
     }
@@ -167,7 +170,7 @@ export class GestorSesion_vc_bb {
             "Usuario no es Admin."
           );
           setTimeout(() => {
-            location.href = "./index.html";
+            location.href = "index.html";
           }, 1000);
         }
         return false;
@@ -195,7 +198,7 @@ export class GestorSesion_vc_bb {
             "Usuario no es Profesor."
           );
           setTimeout(() => {
-            location.href = "./index.html";
+            location.href = "index.html";
           }, 1000);
         }
         return false;
@@ -206,4 +209,4 @@ export class GestorSesion_vc_bb {
 
     return true;
   }
-}
+} 
