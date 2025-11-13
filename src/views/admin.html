@@ -11,64 +11,120 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../public/css/login-register.css">
     <link rel="stylesheet" href="../public/css/modal.css">
 </head>
 
-<body id="admin" class="min-h-screen bg-[#f9fafb] flex justify-center items-center px-4">
-    <p id="mensaje-api"></p>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center px-4 transition-colors duration-300 font-poppins">
+    <!-- Botón de cambio de tema -->
+    <button id="cambio-color" class="fixed top-6 right-6 z-50 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
+        <i class="fas fa-moon text-gray-700 dark:text-yellow-400 text-lg"></i>
+    </button>
+
+    <p id="mensaje-api" class="sr-only"></p>
 
     <!-- Contenedor principal -->
-    <main class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-8 grid gap-6">
+    <main class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl p-8 grid gap-6 transition-colors duration-300 animate-fade-in">
         <!-- Logo y título -->
         <div class="flex flex-col items-center text-center mb-6">
-            <img src="../public/img/logoColegio-blanco.png" alt="Logo Colegio" class="w-80 h-80 object-contain">
-            <h1 class="text-xl text-gray-700">Bienvenido al Panel de Administrador</h1>
-            <p class="text-sm text-gray-600">Desde aquí puedes gestionar todas las configuraciones de la plataforma.</p>
+            <img src="../public/img/logoColegio-blanco.png" alt="Logo Colegio" class="w-80 h-80 object-contain ">
+            <h1 class="text-xl text-gray-700 dark:text-gray-300 mt-4">Bienvenido al Panel de Administrador</h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Desde aquí puedes gestionar todas las configuraciones de la plataforma.</p>
         </div>
 
         <!-- Contenido del Panel de Admin -->
-        <div class="grid gap-4">
-            <div class="bg-[#106587] text-white p-6 rounded-lg shadow-md">
+        <div class="grid gap-6">
+            <!-- Tarjeta de acciones disponibles -->
+            <div class="bg-colegio-blue dark:bg-colegio-darkblue text-white p-6 rounded-lg shadow-md transition-colors duration-300">
                 <h2 class="text-2xl font-semibold mb-4">Acciones disponibles</h2>
-                <ul class="list-disc pl-5">
-                    <li>Gestionar profesores</li>
-                    <li>Cargar profesores y sus datos</li>
-                    <li>Generar horarios para educación media general</li>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li class="text-lg">Gestionar profesores</li>
+                    <li class="text-lg">Cargar profesores y sus datos</li>
+                    <li class="text-lg">Generar horarios para educación media general</li>
                 </ul>
             </div>
 
-            <div class="flex justify-between items-center">
-                <h2 class="text-lg font-semibold text-gray-800">Bienvenido, Administrador</h2>
+            <!-- Sección de bienvenida y botón de cerrar sesión -->
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors duration-300">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Bienvenido, Administrador</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Último acceso: <span id="lastAccess">Hoy</span></p>
+                </div>
                 <button id="logoutButton_vc_bb"
-                    class="bg-[#106587] hover:bg-[#0e5773] text-white font-semibold py-2 px-6 rounded-lg transition">
+                    class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg w-full sm:w-auto">
                     Cerrar Sesión
                 </button>
+            </div>
+
+            <!-- Tarjetas de funcionalidades -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <!-- Tarjeta 1: Gestión de Profesores -->
+                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-chalkboard-teacher text-colegio-blue text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Gestión de Profesores</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Administra la información de los profesores, sus materias y disponibilidad.
+                    </p>
+                    <button class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200">
+                        Acceder
+                    </button>
+                </div>
+
+                <!-- Tarjeta 2: Carga de Datos -->
+                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-file-upload text-colegio-blue text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Datos</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Importa datos de profesores y estudiantes mediante archivos CSV o Excel.
+                    </p>
+                    <button class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200">
+                        Acceder
+                    </button>
+                </div>
+
+                <!-- Tarjeta 3: Generación de Horarios -->
+                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-calendar-alt text-colegio-blue text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Generar Horarios</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Crea y optimiza horarios automáticamente para educación media general.
+                    </p>
+                    <button class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200">
+                        Acceder
+                    </button>
+                </div>
             </div>
         </div>
     </main>
 
     <!-- Modal -->
-    <div id="modalContainer" class="modal-container">
-        <div id="modalContent" class="modal-content bg-white">
-            <div id="modalHeader" class="modal-header">
+    <div id="modalContainer" class="modal-container" aria-hidden="true" role="dialog" aria-labelledby="modalTitle" aria-describedby="modalMessage">
+        <div id="modalContent" class="modal-content bg-white dark:bg-gray-800 transition-colors duration-300">
+            <div id="modalHeader" class="modal-header bg-colegio-blue dark:bg-colegio-darkblue">
                 <div class="flex items-center">
                     <i id="modalIcon" class="modal-icon"></i>
                     <h2 id="modalTitle" class="text-xl font-bold text-white"></h2>
                 </div>
-                <button id="modalClose" class="text-white hover:text-gray-200 text-xl">
+                <button id="modalClose" class="text-white hover:text-gray-200 text-xl transition-colors duration-200" aria-label="Cerrar modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div id="modalBody" class="modal-body">
-                <p id="modalMessage" class="text-gray-700"></p>
+                <p id="modalMessage" class="text-gray-700 dark:text-gray-300"></p>
             </div>
             <div class="modal-footer">
-                <button id="modalAction" class="px-4 py-2 rounded-lg font-medium text-white">
+                <button id="modalAction" class="px-4 py-2 rounded-lg font-medium text-white bg-colegio-blue hover:bg-colegio-darkblue transition-colors duration-200">
                     Aceptar
                 </button>
                 <button id="modalCancel"
-                    class="px-4 py-2 rounded-lg font-medium text-gray-700 bg-gray-200 hover:bg-gray-300"
+                    class="px-4 py-2 rounded-lg font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200"
                     style="display: none;">
                     Cancelar
                 </button>

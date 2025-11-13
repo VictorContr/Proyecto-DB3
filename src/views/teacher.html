@@ -11,64 +11,211 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../public/css/login-register.css">
     <link rel="stylesheet" href="../public/css/modal.css">
+    
+    <!-- Configuración de Tailwind -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#106587',
+                            600: '#0e5773',
+                        },
+                        colegio: {
+                            blue: '#106587',
+                            darkblue: '#0e5773',
+                            light: '#f8fafc',
+                            dark: '#1e293b'
+                        }
+                    },
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 
-<body id="admin" class="min-h-screen bg-[#f9fafb] flex justify-center items-center px-4">
-    <p id="mensaje-api"></p>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center px-4 transition-colors duration-300 font-poppins">
+    <!-- Botón de cambio de tema -->
+    <button id="cambio-color" class="fixed top-6 right-6 z-50 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
+        <i class="fas fa-moon text-gray-700 dark:text-yellow-400 text-lg"></i>
+    </button>
 
     <!-- Contenedor principal -->
-    <main class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-8 grid gap-6">
+    <main class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl p-8 grid gap-6 transition-colors duration-300 animate-fade-in">
         <!-- Logo y título -->
         <div class="flex flex-col items-center text-center mb-6">
             <img src="../public/img/logoColegio-blanco.png" alt="Logo Colegio" class="w-80 h-80 object-contain">
-            <h1 class="text-xl text-gray-700">Bienvenido al Panel de Profesor</h1>
-            <p class="text-sm text-gray-600">Desde aquí puedes gestionar todas las configuraciones de la plataforma.</p>
+            <h1 class="text-xl text-gray-700 dark:text-gray-300 mt-4">Bienvenido al Panel de Profesor</h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Desde aquí puedes gestionar tus actividades académicas y estudiantes.</p>
         </div>
 
-        <!-- Contenido del Panel de Admin -->
-        <div class="grid gap-4">
-            <div class="bg-[#106587] text-white p-6 rounded-lg shadow-md">
+        <!-- Contenido del Panel de Profesor -->
+        <div class="grid gap-6">
+            <!-- Tarjeta de acciones disponibles -->
+            <div class="bg-colegio-blue dark:bg-colegio-darkblue text-white p-6 rounded-lg shadow-md transition-colors duration-300">
                 <h2 class="text-2xl font-semibold mb-4">Acciones disponibles</h2>
-                <ul class="list-disc pl-5">
-                    <li>Gestionar profesores</li>
-                    <li>Cargar profesores y sus datos</li>
-                    <li>Generar horarios para educación media general</li>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li class="text-lg">Ver mi horario de clases</li>
+                    <li class="text-lg">Gestionar calificaciones de estudiantes</li>
+                    <li class="text-lg">Registrar asistencia de estudiantes</li>
+                    <li class="text-lg">Subir material de estudio</li>
+                    <li class="text-lg">Comunicarme con estudiantes y padres</li>
                 </ul>
             </div>
 
-            <div class="flex justify-between items-center">
-                <h2 class="text-lg font-semibold text-gray-800">Bienvenido, Administrador</h2>
+            <!-- Sección de bienvenida y botón de cerrar sesión -->
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors duration-300">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Bienvenido, Profesor</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Próxima clase: <span id="nextClass">Matemáticas - 10:00 AM</span></p>
+                </div>
                 <button id="logoutButton_vc_bb"
-                    class="bg-[#106587] hover:bg-[#0e5773] text-white font-semibold py-2 px-6 rounded-lg transition">
+                    class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg w-full sm:w-auto">
                     Cerrar Sesión
                 </button>
+            </div>
+
+            <!-- Tarjetas de funcionalidades -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                <!-- Tarjeta 1: Horario -->
+                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-calendar-alt text-colegio-blue text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Mi Horario</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Consulta y gestiona tu horario de clases semanal.
+                    </p>
+                    <button class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200">
+                        Ver Horario
+                    </button>
+                </div>
+
+                <!-- Tarjeta 2: Calificaciones -->
+                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-graduation-cap text-colegio-blue text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Calificaciones</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Registra y modifica las calificaciones de tus estudiantes.
+                    </p>
+                    <button class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200">
+                        Gestionar
+                    </button>
+                </div>
+
+                <!-- Tarjeta 3: Asistencia -->
+                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-clipboard-check text-colegio-blue text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Asistencia</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Toma lista y registra la asistencia de tus estudiantes.
+                    </p>
+                    <button class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200">
+                        Registrar
+                    </button>
+                </div>
+
+                <!-- Tarjeta 4: Material de Estudio -->
+                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-book text-colegio-blue text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Material</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Comparte material de estudio con tus estudiantes.
+                    </p>
+                    <button class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200">
+                        Subir Material
+                    </button>
+                </div>
+
+                <!-- Tarjeta 5: Comunicación -->
+                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-comments text-colegio-blue text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Comunicación</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Envía mensajes a estudiantes y padres.
+                    </p>
+                    <button class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200">
+                        Mensajes
+                    </button>
+                </div>
+
+                <!-- Tarjeta 6: Reportes -->
+                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-chart-bar text-colegio-blue text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Reportes</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Genera reportes de rendimiento y asistencia.
+                    </p>
+                    <button class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200">
+                        Ver Reportes
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sección de actividades recientes -->
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Actividades Recientes</h3>
+                <div class="bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 p-4">
+                    <div class="space-y-3">
+                        <div class="flex items-center text-sm">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            <span class="text-gray-600 dark:text-gray-400">Calificaciones de Matemáticas actualizadas - Hoy 8:30 AM</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            <span class="text-gray-600 dark:text-gray-400">Asistencia registrada para 4to Año - Ayer 2:15 PM</span>
+                        </div>
+                        <div class="flex items-center text-sm">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            <span class="text-gray-600 dark:text-gray-400">Material de Física subido - 15 Oct 3:45 PM</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 
     <!-- Modal -->
-    <div id="modalContainer" class="modal-container">
-        <div id="modalContent" class="modal-content bg-white">
-            <div id="modalHeader" class="modal-header">
+    <div id="modalContainer" class="modal-container" aria-hidden="true" role="dialog" aria-labelledby="modalTitle" aria-describedby="modalMessage">
+        <div id="modalContent" class="modal-content bg-white dark:bg-gray-800 transition-colors duration-300">
+            <div id="modalHeader" class="modal-header bg-colegio-blue dark:bg-colegio-darkblue">
                 <div class="flex items-center">
                     <i id="modalIcon" class="modal-icon"></i>
                     <h2 id="modalTitle" class="text-xl font-bold text-white"></h2>
                 </div>
-                <button id="modalClose" class="text-white hover:text-gray-200 text-xl">
+                <button id="modalClose" class="text-white hover:text-gray-200 text-xl transition-colors duration-200" aria-label="Cerrar modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div id="modalBody" class="modal-body">
-                <p id="modalMessage" class="text-gray-700"></p>
+                <p id="modalMessage" class="text-gray-700 dark:text-gray-300"></p>
             </div>
             <div class="modal-footer">
-                <button id="modalAction" class="px-4 py-2 rounded-lg font-medium text-white">
+                <button id="modalAction" class="px-4 py-2 rounded-lg font-medium text-white bg-colegio-blue hover:bg-colegio-darkblue transition-colors duration-200">
                     Aceptar
                 </button>
                 <button id="modalCancel"
-                    class="px-4 py-2 rounded-lg font-medium text-gray-700 bg-gray-200 hover:bg-gray-300"
+                    class="px-4 py-2 rounded-lg font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200"
                     style="display: none;">
                     Cancelar
                 </button>

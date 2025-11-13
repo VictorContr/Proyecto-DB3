@@ -1,7 +1,10 @@
 class ThemeToggle_vc_bb {
   constructor() {
     this.btnColorModo_vc_bb = document.getElementById("cambio-color");
-    this.icon_vc_bb = this.btnColorModo_vc_bb.querySelector('i');
+    // Verificamos si existe el botón para evitar errores si no se carga en alguna página
+    if (this.btnColorModo_vc_bb) {
+        this.icon_vc_bb = this.btnColorModo_vc_bb.querySelector('i');
+    }
     this.currentTheme_vc_bb = null;
     this.mediaQuery_vc_bb = window.matchMedia('(prefers-color-scheme: dark)');
     
@@ -17,10 +20,14 @@ class ThemeToggle_vc_bb {
   applyTheme_vc_bb(theme_vc_bb) {
     document.documentElement.classList.toggle('dark', theme_vc_bb === 'dark');
     
-    this.icon_vc_bb.classList.replace(
-      theme_vc_bb === 'dark' ? 'fa-sun' : 'fa-moon',
-      theme_vc_bb === 'dark' ? 'fa-moon' : 'fa-sun'
-    );
+    // Cambiar icono según el tema (si el icono existe)
+    if (this.icon_vc_bb) {
+        if (theme_vc_bb === 'dark') {
+        this.icon_vc_bb.classList.replace('fa-moon', 'fa-sun');
+        } else {
+        this.icon_vc_bb.classList.replace('fa-sun', 'fa-moon');
+        }
+    }
   }
 
   saveThemePreference_vc_bb(theme_vc_bb) {
@@ -56,9 +63,15 @@ class ThemeToggle_vc_bb {
   }
 
   init_vc_bb() {
-    this.mediaQuery_vc_bb.addEventListener('change', this.handleSystemThemeChange_vc_bb);
-    this.currentTheme_vc_bb = this.loadTheme_vc_bb();
-    this.btnColorModo_vc_bb.addEventListener('click', this.toggleTheme_vc_bb);
+    // Solo inicializar si el botón existe en el DOM
+    if (this.btnColorModo_vc_bb) {
+        this.mediaQuery_vc_bb.addEventListener('change', this.handleSystemThemeChange_vc_bb);
+        this.currentTheme_vc_bb = this.loadTheme_vc_bb();
+        this.btnColorModo_vc_bb.addEventListener('click', this.toggleTheme_vc_bb);
+    } else {
+        // Si no hay botón, al menos cargamos el tema guardado
+        this.loadTheme_vc_bb();
+    }
   }
 }
 
@@ -67,5 +80,3 @@ export const setupThemeToggle_vc_bb = () => {
   const themeToggle_vc_bb = new ThemeToggle_vc_bb();
   themeToggle_vc_bb.init_vc_bb();
 };
-
-
