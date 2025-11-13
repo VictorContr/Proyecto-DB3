@@ -43,9 +43,6 @@ class Database_vc_bb {
 
     createTable_vc_bb() {
         // Script SQL completo para crear el esquema de la base de datos
-        // (Tu script SQL original está perfecto, lo omito aquí por brevedad
-        // pero debe ir completo como lo tenías)
-
         const sql = `
             PRAGMA foreign_keys = ON;
 
@@ -67,8 +64,6 @@ class Database_vc_bb {
               rol_bb_vc TEXT
             );
             
-            /* ... (El resto de tu SQL va aquí) ... */
-
             CREATE TABLE IF NOT EXISTS td_UsuarioRol_bb_vc (
               ID_usuarioRol_bb_vc INTEGER PRIMARY KEY,
               ID_usuario_usuarioRol_bb_vc INTEGER,
@@ -95,7 +90,7 @@ class Database_vc_bb {
             -- -----------------------------------------------------
             CREATE TABLE IF NOT EXISTS td_Bloque_bb_vc(
               ID_bloque_bb_vc INTEGER PRIMARY KEY,
-              hora_bloque_bb_vc TEXT NOT NULL CHECK (
+              hora_bloque_bb_vc TEXT NOT NULL UNIQUE CHECK (
               hora_bloque_bb_vc IN (
                   '7:00 am',
                   '8:00 am',
@@ -113,7 +108,7 @@ class Database_vc_bb {
 
             CREATE TABLE IF NOT EXISTS td_Dia_bb_vc (
               ID_dia_bb_vc INTEGER PRIMARY KEY,
-              dia_bb_vc TEXT NOT NULL CHECK (
+              dia_bb_vc TEXT NOT NULL UNIQUE CHECK (
                 dia_bb_vc IN ('lunes', 'martes', 'miércoles', 'jueves', 'viernes')
               )
             );
@@ -136,13 +131,13 @@ class Database_vc_bb {
             -- -----------------------------------------------------
             CREATE TABLE IF NOT EXISTS td_Grados_bb_vc (
               ID_grado_bb_vc INTEGER PRIMARY KEY,
-              nro_grado_bb_vc INTEGER,
+              nro_grado_bb_vc INTEGER UNIQUE,
               CHECK (nro_grado_bb_vc >= 1 AND nro_grado_bb_vc <= 5)
             );
 
             CREATE TABLE IF NOT EXISTS td_Secciones_bb_vc (
               ID_seccion_bb_vc INTEGER PRIMARY KEY,
-              letra_seccion_bb_vc TEXT -- Ej: 'A', 'B'
+              letra_seccion_bb_vc TEXT UNIQUE -- Ej: 'A', 'B'
             );
 
             CREATE TABLE IF NOT EXISTS td_Asignaturas_bb_vc (
@@ -160,8 +155,9 @@ class Database_vc_bb {
               ID_gradoAsignatura_bb_vc INTEGER PRIMARY KEY,
               ID_grado_gradoAsig_bb_vc INTEGER,
               ID_asignatura_gradoAsig_bb_vc INTEGER,
-              FOREIGN KEY (ID_grado_gradoAsig_bb_vc) REFERENCES td_Grados_bb_vc_bb(ID_grado_bb_vc),
-              FOREIGN KEY (ID_asignatura_gradoAsig_bb_vc) REFERENCES td_Asignaturas_bb_vc_bb(ID_asignatura_bb_vc)
+              -- CORRECCIÓN: Se quitaron los '_bb' extra al final de los nombres de tabla
+              FOREIGN KEY (ID_grado_gradoAsig_bb_vc) REFERENCES td_Grados_bb_vc(ID_grado_bb_vc),
+              FOREIGN KEY (ID_asignatura_gradoAsig_bb_vc) REFERENCES td_Asignaturas_bb_vc(ID_asignatura_bb_vc)
             );
 
             -- -----------------------------------------------------
@@ -219,6 +215,7 @@ class Database_vc_bb {
               FOREIGN KEY (ID_seccion_horario_bb_vc) REFERENCES td_Secciones_bb_vc(ID_seccion_bb_vc)
             );
         `;
+        
         // Usar .exec() para correr múltiples sentencias SQL a la vez
         this.db.exec(sql, (error) => {
           if (error) {
@@ -226,96 +223,108 @@ class Database_vc_bb {
           } else {
             console.log("✅ Esquema de tablas verificado/creado exitosamente");
 
-            // Insertar admin por defecto (solo si no existe)
-            this.insertAdmin_vc_bb();  // Llamar a la función async
-            this.insertTeacher_vc_bb();
+            // MEJORA: Llamar a una sola función para insertar TODOS los datos iniciales
+            this.seedInitialData_vc_bb();
           }
         });
-
-        
     }
 
-    // Función async para insertar el admin
-        async insertAdmin_vc_bb() {
-          try {
-            // Insertar usuario admin (con contraseña sin cifrar)
-            await this.run_vc_bb(`
-              INSERT OR IGNORE INTO td_Usuarios_bb_vc (
-                userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc
-              )
-              VALUES ('admin', 'admin@colegio.com', '0000000000', 'Admin', 'Principal', '123456');
-            `);
+    /**
+     * Inserta los datos iniciales (roles, admin, profesor, días, bloques, etc.)
+     * Utiliza 'INSERT OR IGNORE' para evitar duplicados si la base de datos ya existe.
+     */
+    async seedInitialData_vc_bb() {
+      console.log("[DB] Verificando e insertando datos iniciales (roles, admin, profesor, etc.)...");
+      try {
+        
+        // --- 1. Insertar Roles ---
+        // 'INSERT OR IGNORE' evita que se inserten si ya existen.
+        await this.run_vc_bb(`INSERT OR IGNORE INTO td_Rol_bb_vc (rol_bb_vc) VALUES ('Administrador'), ('Profesor');`);
 
-            // Insertar el rol de Administrador si no existe
-            await this.run_vc_bb(`
-              INSERT OR IGNORE INTO td_Rol_bb_vc (rol_bb_vc)
-              VALUES ('Administrador'), ('Profesor');
-            `);
+        // --- 2. Insertar Admin ---
+        await this.run_vc_bb(`
+          INSERT OR IGNORE INTO td_Usuarios_bb_vc (
+            userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc
+          )
+          VALUES ('admin', 'admin@colegio.com', '0000000000', 'Admin', 'Principal', '123456');
+        `);
 
-            // Asociar el usuario admin al rol de administrador
-            await this.run_vc_bb(`
-              INSERT OR IGNORE INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
-              SELECT ID_usuario_bb_vc, ID_rol_bb_vc
-              FROM td_Usuarios_bb_vc, td_Rol_bb_vc
-              WHERE td_Usuarios_bb_vc.userName_bb_vc = 'admin' AND td_Rol_bb_vc.rol_bb_vc = 'Administrador';
-            `);
+        await this.run_vc_bb(`
+          INSERT OR IGNORE INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
+          SELECT ID_usuario_bb_vc, ID_rol_bb_vc
+          FROM td_Usuarios_bb_vc, td_Rol_bb_vc
+          WHERE td_Usuarios_bb_vc.userName_bb_vc = 'admin' AND td_Rol_bb_vc.rol_bb_vc = 'Administrador';
+        `);
 
-            // Insertar en tabla de administradores si no existe
-            await this.run_vc_bb(`
-              INSERT OR IGNORE INTO td_Administradores_bb_vc (ID_usuarioRol_admin_bb_vc)
-              SELECT ID_usuarioRol_bb_vc
-              FROM td_UsuarioRol_bb_vc
-              WHERE ID_usuario_usuarioRol_bb_vc = (SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'admin')
-              AND ID_rol_usuarioRol_bb_vc = (SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Administrador');
-            `);
+        await this.run_vc_bb(`
+          INSERT OR IGNORE INTO td_Administradores_bb_vc (ID_usuarioRol_admin_bb_vc)
+          SELECT ID_usuarioRol_bb_vc
+          FROM td_UsuarioRol_bb_vc
+          WHERE ID_usuario_usuarioRol_bb_vc = (SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'admin')
+          AND ID_rol_usuarioRol_bb_vc = (SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Administrador');
+        `);
 
-            console.log("✅ Admin creado e insertado correctamente.");
-          } catch (err) {
-            console.error("❌ Error insertando el admin:", err.message);
-          }
-        }
+        // --- 3. Insertar Profesor de prueba ---
+        await this.run_vc_bb(`
+          INSERT OR IGNORE INTO td_Usuarios_bb_vc (
+            userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc
+          )
+          VALUES ('profe1', 'profesor@colegio.com', '04121234567', 'Carlos', 'Docente', '123456');
+        `);
 
-        // Función async para insertar un Profesor de prueba
-async insertTeacher_vc_bb() {
-  try {
-    // 1. Insertar usuario Profesor (con contraseña sin cifrar, igual que el admin)
-    // Cambia los valores del VALUES según los datos del profesor que quieras crear
-    await this.run_vc_bb(`
-      INSERT OR IGNORE INTO td_Usuarios_bb_vc (
-        userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc
-      )
-      VALUES ('profe1', 'profesor@colegio.com', '04121234567', 'Carlos', 'Docente', '123456');
-    `);
+        await this.run_vc_bb(`
+          INSERT OR IGNORE INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
+          SELECT ID_usuario_bb_vc, ID_rol_bb_vc
+          FROM td_Usuarios_bb_vc, td_Rol_bb_vc
+          WHERE td_Usuarios_bb_vc.userName_bb_vc = 'profe1' AND td_Rol_bb_vc.rol_bb_vc = 'Profesor';
+        `);
 
-    // 2. Asegurarnos que el rol 'Profesor' existe (por si acaso no se ejecutó el del admin antes)
-    await this.run_vc_bb(`
-      INSERT OR IGNORE INTO td_Rol_bb_vc (rol_bb_vc)
-      VALUES ('Profesor');
-    `);
+        await this.run_vc_bb(`
+          INSERT OR IGNORE INTO td_Profesores_bb_vc (ID_usuarioRol_profesor_bb_vc)
+          SELECT ID_usuarioRol_bb_vc
+          FROM td_UsuarioRol_bb_vc
+          WHERE ID_usuario_usuarioRol_bb_vc = (SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'profe1')
+          AND ID_rol_usuarioRol_bb_vc = (SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Profesor');
+        `);
 
-    // 3. Asociar el usuario 'profe1' al rol de 'Profesor' en la tabla intermedia
-    await this.run_vc_bb(`
-      INSERT OR IGNORE INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
-      SELECT ID_usuario_bb_vc, ID_rol_bb_vc
-      FROM td_Usuarios_bb_vc, td_Rol_bb_vc
-      WHERE td_Usuarios_bb_vc.userName_bb_vc = 'profe1' AND td_Rol_bb_vc.rol_bb_vc = 'Profesor';
-    `);
+        // --- 4. Insertar Días de la semana ---
+        // (Añadí UNIQUE a la columna dia_bb_vc en el CREATE TABLE)
+        await this.run_vc_bb(`
+          INSERT OR IGNORE INTO td_Dia_bb_vc (dia_bb_vc) 
+          VALUES ('lunes'), ('martes'), ('miércoles'), ('jueves'), ('viernes');
+        `);
 
-    // 4. Insertar en la tabla específica de Profesores (td_Profesores_bb_vc)
-    // NOTA: Verifica que tu tabla se llame 'td_Profesores_bb_vc' y la columna 'ID_usuarioRol_profesor_bb_vc'
-    await this.run_vc_bb(`
-      INSERT OR IGNORE INTO td_Profesores_bb_vc (ID_usuarioRol_profesor_bb_vc)
-      SELECT ID_usuarioRol_bb_vc
-      FROM td_UsuarioRol_bb_vc
-      WHERE ID_usuario_usuarioRol_bb_vc = (SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'profe1')
-      AND ID_rol_usuarioRol_bb_vc = (SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Profesor');
-    `);
+        // --- 5. Insertar Bloques de hora ---
+        // (Añadí UNIQUE a la columna hora_bloque_bb_vc en el CREATE TABLE)
+        await this.run_vc_bb(`
+          INSERT OR IGNORE INTO td_Bloque_bb_vc (hora_bloque_bb_vc) 
+          VALUES 
+            ('7:00 am'), ('8:00 am'), ('9:00 am'), ('10:00 am'), ('11:00 am'), 
+            ('12:00 pm'), ('1:00 pm'), ('2:00 pm'), ('3:00 pm'), ('4:00 pm');
+        `);
 
-    console.log("✅ Profesor creado e insertado correctamente.");
-  } catch (err) {
-    console.error("❌ Error insertando el profesor:", err.message);
-  }
-}
+        // --- 6. Insertar Grados ---
+        // (Añadí UNIQUE a la columna nro_grado_bb_vc en el CREATE TABLE)
+        await this.run_vc_bb(`
+          INSERT OR IGNORE INTO td_Grados_bb_vc (nro_grado_bb_vc) 
+          VALUES (1), (2), (3), (4), (5);
+        `);
+        
+        // --- 7. Insertar Secciones ---
+        // (Añadí UNIQUE a la columna letra_seccion_bb_vc en el CREATE TABLE)
+        await this.run_vc_bb(`
+          INSERT OR IGNORE INTO td_Secciones_bb_vc (letra_seccion_bb_vc) 
+          VALUES ('A'), ('B');
+        `);
+
+
+        console.log("✅ Datos iniciales (admin, profesor, roles, etc.) insertados/verificados correctamente.");
+
+      } catch (err) {
+        console.error("❌ Error insertando datos iniciales:", err.message);
+      }
+    }
+
 
     // Métodos para operaciones CRUD
     run_vc_bb(sql, params = []) {

@@ -1,0 +1,12 @@
+{
+  "watch": ["src", "views", "public"],
+  "ext": "js,json,html,css",
+  "ignore": [
+    "node_modules",
+    "temp_excel",
+    "temp_uploads",
+    "*.test.js",
+    "db/*.db"
+  ],
+  "exec": "node index.js"
+}

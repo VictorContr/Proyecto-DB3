@@ -1,4 +1,5 @@
 import { setupThemeToggle_vc_bb } from "./dark-mode.js";
+import { admin_vc_bb, ExcelHandler_vc_bb } from "./excel.js";
 import { GestorSesion_vc_bb, loginForm_vc_bb, logoutButton_vc_bb } from "./login.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -74,5 +75,24 @@ document.addEventListener("DOMContentLoaded", () => {
       GestorSesion_vc_bb.cerrarSesion_vc_bb();
     });
     setupThemeToggle_vc_bb();
+  }
+
+  if (admin_vc_bb) {
+    new ExcelHandler_vc_bb("http://localhost:3000");
+    document.addEventListener("excel:upload", async (e) => {
+    // e.detail.file contiene el archivo seleccionado (o null)
+    const file = e.detail.file;
+    if (!file) {
+        // Dejar que la lógica interna muestre la advertencia o manejarlo aquí:
+        console.log("No hay archivo, manejando externamente");
+        e.preventDefault(); // cancela la subida interna
+        return;
+    }
+
+    // Si quieres encargarte tú mismo:
+    e.preventDefault(); // evita que ExcelHandler haga el POST
+    // ...procesa file, manda a tu endpoint, muestra modal, etc.
+});
+     
   }
 });
