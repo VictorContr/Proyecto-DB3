@@ -50,7 +50,7 @@ class Database_vc_bb {
             -- Tablas de Estructura Básica (Usuarios y Roles)
             -- -----------------------------------------------------
             CREATE TABLE IF NOT EXISTS td_Usuarios_bb_vc (
-              ID_usuario_bb_vc INTEGER PRIMARY KEY,
+              ID_usuario_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
               nombre_bb_vc TEXT NOT NULL,
               apellido_bb_vc TEXT NOT NULL,
               userName_bb_vc VARCHAR(80) UNIQUE NOT NULL,
@@ -60,28 +60,28 @@ class Database_vc_bb {
             );
 
             CREATE TABLE IF NOT EXISTS td_Rol_bb_vc (
-              ID_rol_bb_vc INTEGER PRIMARY KEY,
+              ID_rol_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
               rol_bb_vc TEXT
             );
             
             CREATE TABLE IF NOT EXISTS td_UsuarioRol_bb_vc (
-              ID_usuarioRol_bb_vc INTEGER PRIMARY KEY,
-              ID_usuario_usuarioRol_bb_vc INTEGER,
-              ID_rol_usuarioRol_bb_vc INTEGER,
+              ID_usuarioRol_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+              ID_usuario_usuarioRol_bb_vc INTEGER NOT NULL,
+              ID_rol_usuarioRol_bb_vc INTEGER NOT NULL,
               FOREIGN KEY (ID_usuario_usuarioRol_bb_vc) REFERENCES td_Usuarios_bb_vc(ID_usuario_bb_vc),
               FOREIGN KEY (ID_rol_usuarioRol_bb_vc) REFERENCES td_Rol_bb_vc(ID_rol_bb_vc)
             );
 
             -- Tablas de especialización de usuarios
             CREATE TABLE IF NOT EXISTS td_Administradores_bb_vc(
-              ID_administradores_bb_vc INTEGER PRIMARY KEY,
-              ID_usuarioRol_admin_bb_vc INTEGER,
+              ID_administradores_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+              ID_usuarioRol_admin_bb_vc INTEGER NOT NULL,
               FOREIGN KEY (ID_usuarioRol_admin_bb_vc) REFERENCES td_UsuarioRol_bb_vc(ID_usuarioRol_bb_vc)
             );
 
             CREATE TABLE IF NOT EXISTS td_Profesores_bb_vc(
-              ID_profesor_bb_vc INTEGER PRIMARY KEY,
-              ID_usuarioRol_profesor_bb_vc INTEGER,
+              ID_profesor_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+              ID_usuarioRol_profesor_bb_vc INTEGER NOT NULL,
               FOREIGN KEY (ID_usuarioRol_profesor_bb_vc) REFERENCES td_UsuarioRol_bb_vc(ID_usuarioRol_bb_vc)
             );
 
@@ -327,14 +327,29 @@ class Database_vc_bb {
 
 
     // Métodos para operaciones CRUD
-    run_vc_bb(sql, params = []) {
-        return new Promise((resolve, reject) => {
-            this.db.run(sql, params, function (error) {
-                if (error) reject(error);
-                else resolve({ id: this.lastID, changes: this.changes });
-            });
+    // Archivo: src/api/db.js
+
+run_vc_bb(sql, params = []) {
+    return new Promise((resolve, reject) => {
+        // ❌ INCORRECTO (lo que seguro tienes ahora):
+        // this.db.run(sql, params, (err) => { ... }) 
+        
+        // ✅ CORRECTO (Copia y pega esto):
+        this.db.run(sql, params, function(err) {  // <--- OJO: Usa 'function(err)'
+            if (err) {
+                console.log('Error ejecutando SQL: ' + sql);
+                console.log(err);
+                reject(err);
+            } else {
+                // Solo usando 'function' podemos acceder a 'this.lastID'
+                resolve({ 
+                    lastID: this.lastID,  // Aquí es donde estaba el 'undefined'
+                    changes: this.changes 
+                });
+            }
         });
-    }
+    });
+}
 
     all_vc_bb(sql, params = []) {
         return new Promise((resolve, reject) => {

@@ -17,28 +17,28 @@ CREATE TABLE IF NOT EXISTS td_Usuarios_bb_vc (
 );
 
 CREATE TABLE IF NOT EXISTS td_Rol_bb_vc (
-  ID_rol_bb_vc INTEGER PRIMARY KEY,
+  ID_rol_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
   rol_bb_vc TEXT
 );
 
 CREATE TABLE IF NOT EXISTS td_UsuarioRol_bb_vc (
-  ID_usuarioRol_bb_vc INTEGER PRIMARY KEY,
-  ID_usuario_usuarioRol_bb_vc INTEGER,
-  ID_rol_usuarioRol_bb_vc INTEGER,
+  ID_usuarioRol_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+  ID_usuario_usuarioRol_bb_vc INTEGER NOT NULL,
+  ID_rol_usuarioRol_bb_vc INTEGER NOT NULL,
   FOREIGN KEY (ID_usuario_usuarioRol_bb_vc) REFERENCES td_Usuarios_bb_vc(ID_usuario_bb_vc),
   FOREIGN KEY (ID_rol_usuarioRol_bb_vc) REFERENCES td_Rol_bb_vc(ID_rol_bb_vc)
 );
 
 -- Tablas de especialización de usuarios
 CREATE TABLE IF NOT EXISTS td_Administradores_bb_vc (
-  ID_administradores_bb_vc INTEGER PRIMARY KEY,
+  ID_administradores_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
   ID_usuarioRol_admin_bb_vc INTEGER,
   FOREIGN KEY (ID_usuarioRol_admin_bb_vc) REFERENCES td_UsuarioRol_bb_vc(ID_usuarioRol_bb_vc)
 );
 
 CREATE TABLE IF NOT EXISTS td_Profesores_bb_vc (
-  ID_profesor_bb_vc INTEGER PRIMARY KEY,
-  ID_usuarioRol_profesor_bb_vc INTEGER,
+  ID_profesor_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+  ID_usuarioRol_profesor_bb_vc INTEGER NOT NULL,
   FOREIGN KEY (ID_usuarioRol_profesor_bb_vc) REFERENCES td_UsuarioRol_bb_vc(ID_usuarioRol_bb_vc)
 );
 

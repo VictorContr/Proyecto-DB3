@@ -78,21 +78,34 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (admin_vc_bb) {
-    new ExcelHandler_vc_bb("http://localhost:3000");
-    document.addEventListener("excel:upload", async (e) => {
-    // e.detail.file contiene el archivo seleccionado (o null)
-    const file = e.detail.file;
-    if (!file) {
-        // Dejar que la lógica interna muestre la advertencia o manejarlo aquí:
-        console.log("No hay archivo, manejando externamente");
-        e.preventDefault(); // cancela la subida interna
-        return;
+    const excelHandler = new ExcelHandler_vc_bb();
+    
+    // Evento para subir (submit o click)
+    const btnUpload = document.getElementById('btnUpload');
+    const formExcel = document.getElementById('formExcel');
+    
+    if (formExcel) {
+        formExcel.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = excelHandler.getCurrentFile_vc_bb();
+            await excelHandler.uploadExcel_vc_bb(file);
+        });
+    } else if (btnUpload) {
+        
+        btnUpload.addEventListener('click', async (e) => {
+            e.preventDefault();
+            console.log("subir")
+            const file = excelHandler.getCurrentFile_vc_bb();
+            await excelHandler.uploadExcel_vc_bb(file);
+        });
     }
-
-    // Si quieres encargarte tú mismo:
-    e.preventDefault(); // evita que ExcelHandler haga el POST
-    // ...procesa file, manda a tu endpoint, muestra modal, etc.
-});
-     
+    
+    // Evento para descargar (click)
+    const btnDownload = document.getElementById('btnDownloadReporte');
+    if (btnDownload) {
+        btnDownload.addEventListener('click', async () => {
+            await excelHandler.downloadExcel_vc_bb();
+        });
+    }
   }
 });
