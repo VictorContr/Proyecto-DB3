@@ -1,65 +1,57 @@
-import XlsxPopulate from "xlsx-populate";
-import xl from "excel4node";
+import XlsxPopulate_vc_bb from "xlsx-populate";
+import xl_vc_bb from "excel4node";
 import db_vc_bb from "../db.js";
-import fs from "fs";
-import path from "path";
+import fs_vc_bb from "fs";
+import path_vc_bb from "path";
 
 // 📤 Descargar profesores en Excel
 // 📤 Descargar profesores en Excel (CORREGIDO)
 export const descargarProfesoresExcel_vc_bb = async (req, res) => {
   try {
-    const profesores = await db_vc_bb.all_vc_bb(`
+    const profesores_vc_bb = await db_vc_bb.all_vc_bb(`
       SELECT p.ID_profesor_bb_vc, u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc
       FROM td_Profesores_bb_vc p
       JOIN td_UsuarioRol_bb_vc ur ON p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc
       JOIN td_Usuarios_bb_vc u ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc
     `);
 
-    const wb = new xl.Workbook();
-    const ws = wb.addWorksheet("Profesores");
+    const wb_vc_bb = new xl_vc_bb.Workbook();
+    const ws_vc_bb = wb_vc_bb.addWorksheet("Profesores");
 
-    // Cabeceras
-    const headers = ["ID", "Nombre", "Apellido", "Correo", "Teléfono"];
-    headers.forEach((h, i) => ws.cell(1, i + 1).string(h));
+    const headers_vc_bb = ["ID", "Nombre", "Apellido", "Correo", "Teléfono"];
+    headers_vc_bb.forEach((h_vc_bb, i_vc_bb) => ws_vc_bb.cell(1, i_vc_bb + 1).string(h_vc_bb));
 
-    // Datos
-    profesores.forEach((prof, rowIndex) => {
-      ws.cell(rowIndex + 2, 1).number(prof.ID_profesor_bb_vc);
-      ws.cell(rowIndex + 2, 2).string(prof.nombre_bb_vc);
-      ws.cell(rowIndex + 2, 3).string(prof.apellido_bb_vc);
-      ws.cell(rowIndex + 2, 4).string(prof.correo_bb_vc);
-      ws.cell(rowIndex + 2, 5).string(prof.telefono_bb_vc);
+    profesores_vc_bb.forEach((prof_vc_bb, rowIndex_vc_bb) => {
+      ws_vc_bb.cell(rowIndex_vc_bb + 2, 1).number(prof_vc_bb.ID_profesor_bb_vc);
+      ws_vc_bb.cell(rowIndex_vc_bb + 2, 2).string(prof_vc_bb.nombre_bb_vc);
+      ws_vc_bb.cell(rowIndex_vc_bb + 2, 3).string(prof_vc_bb.apellido_bb_vc);
+      ws_vc_bb.cell(rowIndex_vc_bb + 2, 4).string(prof_vc_bb.correo_bb_vc);
+      ws_vc_bb.cell(rowIndex_vc_bb + 2, 5).string(prof_vc_bb.telefono_bb_vc);
     });
 
-    // DEFINIR RUTA ABSOLUTA (Más seguro)
-    const tempDir = path.resolve("temp");
-    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
+    const tempDir_vc_bb = path_vc_bb.resolve("temp");
+    if (!fs_vc_bb.existsSync(tempDir_vc_bb)) fs_vc_bb.mkdirSync(tempDir_vc_bb);
 
-    const fileName = `profesores_${Date.now()}.xlsx`;
-    const filePath = path.join(tempDir, fileName);
+    const fileName_vc_bb = `profesores_${Date.now()}.xlsx`;
+    const filePath_vc_bb = path_vc_bb.join(tempDir_vc_bb, fileName_vc_bb);
 
-    // 🔥 CORRECCIÓN CLAVE: Envolver wb.write en una Promesa
-    await new Promise((resolve, reject) => {
-      wb.write(filePath, (err, stats) => {
-        if (err) return reject(err);
-        resolve(stats);
+    await new Promise((resolve_vc_bb, reject_vc_bb) => {
+      wb_vc_bb.write(filePath_vc_bb, (err_vc_bb, stats_vc_bb) => {
+        if (err_vc_bb) return reject_vc_bb(err_vc_bb);
+        resolve_vc_bb(stats_vc_bb);
       });
     });
 
-    // Ahora sí estamos seguros de que el archivo existe
-    res.download(filePath, "profesores.xlsx", (err) => {
-      if (err) {
-        console.error("Error al enviar archivo:", err);
-        // Solo intentamos borrar si el archivo existe para evitar error doble
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    res.download(filePath_vc_bb, "profesores.xlsx", (err_vc_bb) => {
+      if (err_vc_bb) {
+        console.error("Error al enviar archivo:", err_vc_bb);
+        if (fs_vc_bb.existsSync(filePath_vc_bb)) fs_vc_bb.unlinkSync(filePath_vc_bb);
       } else {
-        // Borrar después de enviar exitosamente
-        fs.unlinkSync(filePath);
+        fs_vc_bb.unlinkSync(filePath_vc_bb);
       }
     });
-  } catch (error) {
-    console.error("❌ Error al generar Excel:", error.message);
-    // Evitar enviar respuesta si ya se enviaron cabeceras (por si acaso)
+  } catch (error_vc_bb) {
+    console.error("❌ Error al generar Excel:", error_vc_bb.message);
     if (!res.headersSent) {
       res.status(500).json({ message: "Error al generar Excel." });
     }
@@ -68,107 +60,97 @@ export const descargarProfesoresExcel_vc_bb = async (req, res) => {
 // 📥 Subir profesores desde un Excel
 // 📥 Subir profesores desde un Excel (CORREGIDO y BLINDADO)
 export const subirProfesoresExcel_vc_bb = async (req, res) => {
-  let filePath = req.file?.path;
+  let filePath_vc_bb = req.file?.path;
 
   try {
     if (!req.file) {
       return res.status(400).json({ message: "No se subió ningún archivo." });
     }
 
-    // Validar extensión del archivo
     if (!req.file.originalname.match(/\.(xlsx)$/)) {
-      fs.unlinkSync(filePath);
+      fs_vc_bb.unlinkSync(filePath_vc_bb);
       return res
         .status(400)
         .json({ message: "Solo se permiten archivos .xlsx" });
     }
 
-    const workbook = await XlsxPopulate.fromFileAsync(filePath);
-    const sheet = workbook.sheet(0);
-    const rows = sheet.usedRange().value();
+    const workbook_vc_bb = await XlsxPopulate_vc_bb.fromFileAsync(filePath_vc_bb);
+    const sheet_vc_bb = workbook_vc_bb.sheet(0);
+    const rows_vc_bb = sheet_vc_bb.usedRange().value();
 
-    if (!rows || rows.length < 2) {
-      fs.unlinkSync(filePath);
+    if (!rows_vc_bb || rows_vc_bb.length < 2) {
+      fs_vc_bb.unlinkSync(filePath_vc_bb);
       return res
         .status(400)
         .json({ message: "El archivo está vacío o no tiene formato válido." });
     }
 
-    const headers = rows[0];
-    let successfulImports = 0;
-    let errors = [];
+    const headers_vc_bb = rows_vc_bb[0];
+    let successfulImports_vc_bb = 0;
+    let errors_vc_bb = [];
 
-    // Función interna para generar username único
-    const generateUsername = async (nombre, apellido) => {
-      // Limpieza agresiva para evitar nulos
-      const cleanNombre = nombre ? nombre.toString().toLowerCase().trim() : "u";
-      const cleanApellido = apellido
-        ? apellido.toString().toLowerCase().replace(/\s/g, "").trim()
+    const generateUsername_vc_bb = async (nombre_vc_bb, apellido_vc_bb) => {
+      const cleanNombre_vc_bb = nombre_vc_bb ? nombre_vc_bb.toString().toLowerCase().trim() : "u";
+      const cleanApellido_vc_bb = apellido_vc_bb
+        ? apellido_vc_bb.toString().toLowerCase().replace(/\s/g, "").trim()
         : "user";
 
-      const baseUsername = `${cleanNombre.charAt(0)}${cleanApellido}`;
-      let username = baseUsername;
-      let counter = 1;
+      const baseUsername_vc_bb = `${cleanNombre_vc_bb.charAt(0)}${cleanApellido_vc_bb}`;
+      let username_vc_bb = baseUsername_vc_bb;
+      let counter_vc_bb = 1;
 
       while (true) {
-        const existingUser = await db_vc_bb.get_vc_bb(
+        const existingUser_vc_bb = await db_vc_bb.get_vc_bb(
           "SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE userName_bb_vc = ?",
-          [username]
+          [username_vc_bb]
         );
 
-        if (!existingUser) {
-          return username; // Retorna el string libre
+        if (!existingUser_vc_bb) {
+          return username_vc_bb;
         }
 
-        username = `${baseUsername}${counter}`;
-        counter++;
-        if (counter > 100) return `${baseUsername}${Date.now()}`; // Fallback de seguridad
+        username_vc_bb = `${baseUsername_vc_bb}${counter_vc_bb}`;
+        counter_vc_bb++;
+        if (counter_vc_bb > 100) return `${baseUsername_vc_bb}${Date.now()}`;
       }
     };
 
-    // Procesar filas (empezando desde la fila 1)
-    for (let i = 1; i < rows.length; i++) {
-      const row = rows[i];
+    for (let i_vc_bb = 1; i_vc_bb < rows_vc_bb.length; i_vc_bb++) {
+      const row_vc_bb = rows_vc_bb[i_vc_bb];
 
       if (
-        !row ||
-        row.every((cell) => cell === null || cell === undefined || cell === "")
+        !row_vc_bb ||
+        row_vc_bb.every((cell_vc_bb) => cell_vc_bb === null || cell_vc_bb === undefined || cell_vc_bb === "")
       )
         continue;
 
-      const [nombre, apellido, correo, telefono] = row;
+      const [nombre_vc_bb, apellido_vc_bb, correo_vc_bb, telefono_vc_bb] = row_vc_bb;
 
-      if (!nombre || !apellido || !correo) {
-        errors.push(`Fila ${i + 1}: Faltan datos obligatorios.`);
+      if (!nombre_vc_bb || !apellido_vc_bb || !correo_vc_bb) {
+        errors_vc_bb.push(`Fila ${i_vc_bb + 1}: Faltan datos obligatorios.`);
         continue;
       }
 
       try {
-        // 1. Verificar si el correo ya existe
-        const existingUser = await db_vc_bb.get_vc_bb(
+        const existingUser_vc_bb = await db_vc_bb.get_vc_bb(
           "SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE correo_bb_vc = ?",
-          [correo]
+          [correo_vc_bb]
         );
 
-        if (existingUser) {
-          errors.push(`Fila ${i + 1}: El correo ${correo} ya existe`);
+        if (existingUser_vc_bb) {
+          errors_vc_bb.push(`Fila ${i_vc_bb + 1}: El correo ${correo_vc_bb} ya existe`);
           continue;
         }
 
-        // 2. Generar Username
-        const userNameGenerado = await generateUsername(nombre, apellido);
+        const userNameGenerado_vc_bb = await generateUsername_vc_bb(nombre_vc_bb, apellido_vc_bb);
 
-        // 3. Definir contraseña por defecto (IMPORTANTE: suele ser obligatoria)
-        const passwordDefault = "123456";
+        const passwordDefault_vc_bb = "123456";
 
-        // LOG DE DEPURACIÓN: Mira esto en tu consola si vuelve a fallar
         console.log(
-          `Insertando: User=${userNameGenerado}, Mail=${correo}, Pass=${passwordDefault}`
+          `Insertando: User=${userNameGenerado_vc_bb}, Mail=${correo_vc_bb}, Pass=${passwordDefault_vc_bb}`
         );
 
-        // 4. Insertar usuario (Agregué password_bb_vc por si acaso)
-        // Si tu tabla NO tiene columna password, borra esa línea, pero es probable que sí la tenga.
-        const userInsert = await db_vc_bb.run_vc_bb(
+        const userInsert_vc_bb = await db_vc_bb.run_vc_bb(
           `
           INSERT INTO td_Usuarios_bb_vc (
             nombre_bb_vc, 
@@ -180,67 +162,65 @@ export const subirProfesoresExcel_vc_bb = async (req, res) => {
           ) VALUES (?, ?, ?, ?, ?, ?)
         `,
           [
-            nombre.toString().trim(),
-            apellido.toString().trim(),
-            correo.toString().trim(),
-            telefono.toString().trim(),
-            userNameGenerado, // Aquí va el username garantizado
-            passwordDefault, // Contraseña por defecto
+            nombre_vc_bb.toString().trim(),
+            apellido_vc_bb.toString().trim(),
+            correo_vc_bb.toString().trim(),
+            telefono_vc_bb.toString().trim(),
+            userNameGenerado_vc_bb,
+            passwordDefault_vc_bb,
           ]
         );
 
-        const newUserId = userInsert.lastID;
-        if (!newUserId) {
+        const newUserId_vc_bb = userInsert_vc_bb.lastID;
+        if (!newUserId_vc_bb) {
           throw new Error("No se pudo obtener el ID del usuario nuevo");
         }
-        // 5. Asignar Rol (Profesor = 2)
-        const userRolInsert = await db_vc_bb.run_vc_bb(
+
+        const userRolInsert_vc_bb = await db_vc_bb.run_vc_bb(
           `
           INSERT INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
           VALUES (?, 2)
         `,
-          [newUserId]
+          [newUserId_vc_bb]
         );
 
-        // 6. Crear registro de Profesor
-        const newUserRolId = userRolInsert.lastID;
+        const newUserRolId_vc_bb = userRolInsert_vc_bb.lastID;
 
-        if (!newUserRolId) {
-          throw new Error(`Error al crear rol para usuario ID ${newUserId}`);
+        if (!newUserRolId_vc_bb) {
+          throw new Error(`Error al crear rol para usuario ID ${newUserId_vc_bb}`);
         }
 
-        console.log(`ID UsuarioRol generado: ${newUserRolId}`);
+        console.log(`ID UsuarioRol generado: ${newUserRolId_vc_bb}`);
 
-        // 3. Insertar Profesor
         await db_vc_bb.run_vc_bb(
           `
           INSERT INTO td_Profesores_bb_vc (
             ID_usuarioRol_profesor_bb_vc
           ) VALUES (?)
         `,
-          [newUserRolId]
-        ); // Usamos el ID de rol validado
+          [newUserRolId_vc_bb]
+        );
 
-        successfulImports++;
-        console.log(`✅ Éxito completo para ${nombre}`);
+        successfulImports_vc_bb++;
+        console.log(`✅ Éxito completo para ${nombre_vc_bb}`);
 
-        successfulImports++;
-      } catch (dbError) {
-        console.error(`❌ Error detallado en fila ${i + 1}:`, dbError);
-        errors.push(`Fila ${i + 1}: Error DB - ${dbError.message}`);
+        successfulImports_vc_bb++;
+      } catch (dbError_vc_bb) {
+        console.error(`❌ Error detallado en fila ${i_vc_bb + 1}:`, dbError_vc_bb);
+        errors_vc_bb.push(`Fila ${i_vc_bb + 1}: Error DB - ${dbError_vc_bb.message}`);
       }
     }
 
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    if (fs_vc_bb.existsSync(filePath_vc_bb)) fs_vc_bb.unlinkSync(filePath_vc_bb);
 
     res.status(200).json({
-      message: `Proceso finalizado. Importados: ${successfulImports}.`,
-      errors: errors,
-      exito: successfulImports > 0,
+      message: `Proceso finalizado. Importados: ${successfulImports_vc_bb}.`,
+      errors: errors_vc_bb,
+      exito: successfulImports_vc_bb > 0,
     });
-  } catch (error) {
-    console.error("❌ Error general:", error);
-    if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  } catch (error_vc_bb) {
+    console.error("❌ Error general:", error_vc_bb);
+    if (filePath_vc_bb && fs_vc_bb.existsSync(filePath_vc_bb)) fs_vc_bb.unlinkSync(filePath_vc_bb);
     res.status(500).json({ message: "Error crítico al procesar Excel." });
   }
 };

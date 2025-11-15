@@ -13,7 +13,7 @@ import loginRoutes_vc_bb from "./src/routes/login.routes.js"; // nueva ruta de l
 import excelRoutes_vc_bb from "./src/routes/excel.routes.js"
 config();
 
-const PORT_vc_bb = process.env.PORT || 3000;
+const PORT_vc_bb = process.env.PORT;
 const app_vc_bb = express();
 
 // Para __dirname en ES modules

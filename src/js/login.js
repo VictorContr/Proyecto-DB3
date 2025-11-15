@@ -34,22 +34,22 @@ export class GestorSesion_vc_bb {
       const data_vc_bb = await response_vc_bb.json();
 
       if (!response_vc_bb.ok) {
-        modal_vc_bb.showError_vc_bb("Error","Error en el login.");
+        modal_vc_bb.showError_vc_bb("Error", data_vc_bb?.message || "Error en el login.");
         return;
       }
 
-      // Construimos el objeto con los datos mínimos
+      // Construimos el objeto con los datos mínimos usando JSON plano del backend
       const datosMinimos_vc_bb = {
-        id_vc_bb: data_vc_bb.usuario.id,
-        rol_vc_bb: data_vc_bb.usuario.rol, // 'Administrador' o 'Profesor'
-        nombre_vc_bb: data_vc_bb.usuario.nombre,
-        apellido_vc_bb: data_vc_bb.usuario.apellido,
+        id_vc_bb: data_vc_bb.ID_usuario,
+        rol_vc_bb: data_vc_bb.rol, // 'Administrador' o 'Profesor'
+        nombre_vc_bb: data_vc_bb.nombre,
+        apellido_vc_bb: data_vc_bb.apellido,
       };
 
       // Usamos 'this' para llamar al método estático de la misma clase
       this.guardarUsuarioActual_vc_bb(datosMinimos_vc_bb);
       
-      const rol_vc_bb = data_vc_bb.usuario.rol;
+      const rol_vc_bb = data_vc_bb.rol;
 
       // Redirigir según rol
       if (rol_vc_bb === "Administrador") {
@@ -209,4 +209,4 @@ export class GestorSesion_vc_bb {
 
     return true;
   }
-} 
+}

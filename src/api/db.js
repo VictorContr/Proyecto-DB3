@@ -1,39 +1,39 @@
 "use strict";
-import path from 'path';
-import { fileURLToPath } from 'url';
-import sqlite3 from 'sqlite3';
-import fs from 'fs'; // Importamos 'fs' para verificar/crear la carpeta
+import path_vc_bb from 'path';
+import { fileURLToPath as fileURLToPath_vc_bb } from 'url';
+import sqlite3_vc_bb from 'sqlite3';
+import fs_vc_bb from 'fs';
 
 class Database_vc_bb {
     constructor() {
-        this.__filename = fileURLToPath(import.meta.url);
+        this.__filename_vc_bb = fileURLToPath_vc_bb(import.meta.url);
         // __dirname será /ruta/a/tu/proyecto/src/api
-        this.__dirname = path.dirname(this.__filename);
-        this.sqlite = sqlite3.verbose();
-        this.db = null;
+        this.__dirname_vc_bb = path_vc_bb.dirname(this.__filename_vc_bb);
+        this.sqlite_vc_bb = sqlite3_vc_bb.verbose();
+        this.db_vc_bb = null;
         this.init_vc_bb();
     }
 
     init_vc_bb() {
-        const dbPath = path.resolve(this.__dirname, "../db");
-        const dbFile = path.resolve(dbPath, "database.db");
+        const dbPath_vc_bb = path_vc_bb.resolve(this.__dirname_vc_bb, "../db");
+        const dbFile_vc_bb = path_vc_bb.resolve(dbPath_vc_bb, "database.db");
         // -------------------------
 
         // Verificamos si el directorio existe, si no, lo creamos recursivamente.
-        if (!fs.existsSync(dbPath)) {
-            console.log(`[DB] Creando directorio que no existe: ${dbPath}`);
-            fs.mkdirSync(dbPath, { recursive: true });
+        if (!fs_vc_bb.existsSync(dbPath_vc_bb)) {
+            console.log(`[DB] Creando directorio que no existe: ${dbPath_vc_bb}`);
+            fs_vc_bb.mkdirSync(dbPath_vc_bb, { recursive: true });
         }
         // ------------------------------------
 
-        this.db = new this.sqlite.Database(
-            dbFile, // Usamos la ruta completa al archivo
-            (error) => {
-                if (error) {
-                    console.error("❌ Error conectando a BD:", error);
+        this.db_vc_bb = new this.sqlite_vc_bb.Database(
+            dbFile_vc_bb, // Usamos la ruta completa al archivo
+            (error_vc_bb) => {
+                if (error_vc_bb) {
+                    console.error("❌ Error conectando a BD:", error_vc_bb);
                     return;
                 }
-                console.log(`✅ Conexión a SQLite establecida en: ${dbFile}`);
+                console.log(`✅ Conexión a SQLite establecida en: ${dbFile_vc_bb}`);
                 this.createTable_vc_bb();
             }
         );
@@ -43,7 +43,7 @@ class Database_vc_bb {
 
     createTable_vc_bb() {
         // Script SQL completo para crear el esquema de la base de datos
-        const sql = `
+        const sql_vc_bb = `
             PRAGMA foreign_keys = ON;
 
             -- -----------------------------------------------------
@@ -217,16 +217,42 @@ class Database_vc_bb {
         `;
         
         // Usar .exec() para correr múltiples sentencias SQL a la vez
-        this.db.exec(sql, (error) => {
-          if (error) {
-            console.error("❌ Error creando el esquema de tablas:", error.message);
+        this.db_vc_bb.exec(sql_vc_bb, (error_vc_bb) => {
+          if (error_vc_bb) {
+            console.error("❌ Error creando el esquema de tablas:", error_vc_bb.message);
           } else {
             console.log("✅ Esquema de tablas verificado/creado exitosamente");
 
-            // MEJORA: Llamar a una sola función para insertar TODOS los datos iniciales
-            this.seedInitialData_vc_bb();
+            // Antes de sembrar, garantizar unicidad y limpiar duplicados
+            this.enforceUniqueness_vc_bb()
+              .then(() => this.seedInitialData_vc_bb())
+              .catch((err_vc_bb) => {
+                console.error("❌ Error aplicando unicidad antes del seed:", err_vc_bb.message);
+                // Aun así intentamos el seed para no bloquear el arranque
+                this.seedInitialData_vc_bb();
+              });
           }
         });
+    }
+
+    async enforceUniqueness_vc_bb() {
+      try {
+        // Depurar duplicados en tablas relacionadas con usuarios
+        await this.run_vc_bb(`DELETE FROM td_Rol_bb_vc WHERE rowid NOT IN (SELECT MIN(rowid) FROM td_Rol_bb_vc GROUP BY rol_bb_vc);`);
+        await this.run_vc_bb(`DELETE FROM td_UsuarioRol_bb_vc WHERE rowid NOT IN (SELECT MIN(rowid) FROM td_UsuarioRol_bb_vc GROUP BY ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc);`);
+        await this.run_vc_bb(`DELETE FROM td_Administradores_bb_vc WHERE rowid NOT IN (SELECT MIN(rowid) FROM td_Administradores_bb_vc GROUP BY ID_usuarioRol_admin_bb_vc);`);
+        await this.run_vc_bb(`DELETE FROM td_Profesores_bb_vc WHERE rowid NOT IN (SELECT MIN(rowid) FROM td_Profesores_bb_vc GROUP BY ID_usuarioRol_profesor_bb_vc);`);
+
+        // Crear índices únicos para garantizar no duplicar nuevamente
+        await this.run_vc_bb(`CREATE UNIQUE INDEX IF NOT EXISTS idx_td_Rol_unq_rol ON td_Rol_bb_vc(rol_bb_vc);`);
+        await this.run_vc_bb(`CREATE UNIQUE INDEX IF NOT EXISTS idx_td_UsuarioRol_unq ON td_UsuarioRol_bb_vc(ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc);`);
+        await this.run_vc_bb(`CREATE UNIQUE INDEX IF NOT EXISTS idx_td_Administradores_unq ON td_Administradores_bb_vc(ID_usuarioRol_admin_bb_vc);`);
+        await this.run_vc_bb(`CREATE UNIQUE INDEX IF NOT EXISTS idx_td_Profesores_unq ON td_Profesores_bb_vc(ID_usuarioRol_profesor_bb_vc);`);
+
+        console.log("✅ Unicidad aplicada: índices únicos creados y duplicados depurados");
+      } catch (err_vc_bb) {
+        console.error("❌ Error aplicando unicidad:", err_vc_bb.message);
+      }
     }
 
     /**
@@ -236,11 +262,9 @@ class Database_vc_bb {
     async seedInitialData_vc_bb() {
       console.log("[DB] Verificando e insertando datos iniciales (roles, admin, profesor, etc.)...");
       try {
-        
         // --- 1. Insertar Roles ---
         // 'INSERT OR IGNORE' evita que se inserten si ya existen.
         await this.run_vc_bb(`INSERT OR IGNORE INTO td_Rol_bb_vc (rol_bb_vc) VALUES ('Administrador'), ('Profesor');`);
-
         // --- 2. Insertar Admin ---
         await this.run_vc_bb(`
           INSERT OR IGNORE INTO td_Usuarios_bb_vc (
@@ -248,14 +272,12 @@ class Database_vc_bb {
           )
           VALUES ('admin', 'admin@colegio.com', '0000000000', 'Admin', 'Principal', '123456');
         `);
-
         await this.run_vc_bb(`
           INSERT OR IGNORE INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
           SELECT ID_usuario_bb_vc, ID_rol_bb_vc
           FROM td_Usuarios_bb_vc, td_Rol_bb_vc
           WHERE td_Usuarios_bb_vc.userName_bb_vc = 'admin' AND td_Rol_bb_vc.rol_bb_vc = 'Administrador';
         `);
-
         await this.run_vc_bb(`
           INSERT OR IGNORE INTO td_Administradores_bb_vc (ID_usuarioRol_admin_bb_vc)
           SELECT ID_usuarioRol_bb_vc
@@ -263,7 +285,6 @@ class Database_vc_bb {
           WHERE ID_usuario_usuarioRol_bb_vc = (SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'admin')
           AND ID_rol_usuarioRol_bb_vc = (SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Administrador');
         `);
-
         // --- 3. Insertar Profesor de prueba ---
         await this.run_vc_bb(`
           INSERT OR IGNORE INTO td_Usuarios_bb_vc (
@@ -271,14 +292,12 @@ class Database_vc_bb {
           )
           VALUES ('profe1', 'profesor@colegio.com', '04121234567', 'Carlos', 'Docente', '123456');
         `);
-
         await this.run_vc_bb(`
           INSERT OR IGNORE INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
           SELECT ID_usuario_bb_vc, ID_rol_bb_vc
           FROM td_Usuarios_bb_vc, td_Rol_bb_vc
           WHERE td_Usuarios_bb_vc.userName_bb_vc = 'profe1' AND td_Rol_bb_vc.rol_bb_vc = 'Profesor';
         `);
-
         await this.run_vc_bb(`
           INSERT OR IGNORE INTO td_Profesores_bb_vc (ID_usuarioRol_profesor_bb_vc)
           SELECT ID_usuarioRol_bb_vc
@@ -286,40 +305,29 @@ class Database_vc_bb {
           WHERE ID_usuario_usuarioRol_bb_vc = (SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'profe1')
           AND ID_rol_usuarioRol_bb_vc = (SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Profesor');
         `);
-
         // --- 4. Insertar Días de la semana ---
-        // (Añadí UNIQUE a la columna dia_bb_vc en el CREATE TABLE)
         await this.run_vc_bb(`
           INSERT OR IGNORE INTO td_Dia_bb_vc (dia_bb_vc) 
           VALUES ('lunes'), ('martes'), ('miércoles'), ('jueves'), ('viernes');
         `);
-
         // --- 5. Insertar Bloques de hora ---
-        // (Añadí UNIQUE a la columna hora_bloque_bb_vc en el CREATE TABLE)
         await this.run_vc_bb(`
           INSERT OR IGNORE INTO td_Bloque_bb_vc (hora_bloque_bb_vc) 
           VALUES 
             ('7:00 am'), ('8:00 am'), ('9:00 am'), ('10:00 am'), ('11:00 am'), 
             ('12:00 pm'), ('1:00 pm'), ('2:00 pm'), ('3:00 pm'), ('4:00 pm');
         `);
-
         // --- 6. Insertar Grados ---
-        // (Añadí UNIQUE a la columna nro_grado_bb_vc en el CREATE TABLE)
         await this.run_vc_bb(`
           INSERT OR IGNORE INTO td_Grados_bb_vc (nro_grado_bb_vc) 
           VALUES (1), (2), (3), (4), (5);
         `);
-        
         // --- 7. Insertar Secciones ---
-        // (Añadí UNIQUE a la columna letra_seccion_bb_vc en el CREATE TABLE)
         await this.run_vc_bb(`
           INSERT OR IGNORE INTO td_Secciones_bb_vc (letra_seccion_bb_vc) 
           VALUES ('A'), ('B');
         `);
-
-
         console.log("✅ Datos iniciales (admin, profesor, roles, etc.) insertados/verificados correctamente.");
-
       } catch (err) {
         console.error("❌ Error insertando datos iniciales:", err.message);
       }
@@ -329,17 +337,17 @@ class Database_vc_bb {
     // Métodos para operaciones CRUD
     // Archivo: src/api/db.js
 
-run_vc_bb(sql, params = []) {
+run_vc_bb(sql_vc_bb, params_vc_bb = []) {
     return new Promise((resolve, reject) => {
         // ❌ INCORRECTO (lo que seguro tienes ahora):
         // this.db.run(sql, params, (err) => { ... }) 
         
         // ✅ CORRECTO (Copia y pega esto):
-        this.db.run(sql, params, function(err) {  // <--- OJO: Usa 'function(err)'
-            if (err) {
-                console.log('Error ejecutando SQL: ' + sql);
-                console.log(err);
-                reject(err);
+        this.db_vc_bb.run(sql_vc_bb, params_vc_bb, function(err_vc_bb) {  // <--- OJO: Usa 'function(err)'
+            if (err_vc_bb) {
+                console.log('Error ejecutando SQL: ' + sql_vc_bb);
+                console.log(err_vc_bb);
+                reject(err_vc_bb);
             } else {
                 // Solo usando 'function' podemos acceder a 'this.lastID'
                 resolve({ 
@@ -351,29 +359,29 @@ run_vc_bb(sql, params = []) {
     });
 }
 
-    all_vc_bb(sql, params = []) {
+    all_vc_bb(sql_vc_bb, params_vc_bb = []) {
         return new Promise((resolve, reject) => {
-            this.db.all(sql, params, (error, rows) => {
-                if (error) reject(error);
-                else resolve(rows);
+            this.db_vc_bb.all(sql_vc_bb, params_vc_bb, (error_vc_bb, rows_vc_bb) => {
+                if (error_vc_bb) reject(error_vc_bb);
+                else resolve(rows_vc_bb);
             });
         });
     }
 
-    get_vc_bb(sql, params = []) {
+    get_vc_bb(sql_vc_bb, params_vc_bb = []) {
         return new Promise((resolve, reject) => {
-            this.db.get(sql, params, (error, row) => {
-                if (error) reject(error);
-                else resolve(row);
+            this.db_vc_bb.get(sql_vc_bb, params_vc_bb, (error_vc_bb, row_vc_bb) => {
+                if (error_vc_bb) reject(error_vc_bb);
+                else resolve(row_vc_bb);
             });
         });
     }
 
     close_vc_bb() {
-        if (this.db) {
-            this.db.close((error) => {
-                if (error) {
-                    console.error("❌ Error cerrando la conexión:", error.message);
+        if (this.db_vc_bb) {
+            this.db_vc_bb.close((error_vc_bb) => {
+                if (error_vc_bb) {
+                    console.error("❌ Error cerrando la conexión:", error_vc_bb.message);
                 } else {
                     console.log("🔌 Conexión a SQLite cerrada.");
                 }

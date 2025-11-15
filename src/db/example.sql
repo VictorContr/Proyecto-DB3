@@ -2,10 +2,6 @@
 PRAGMA foreign_keys = ON;
 
 -- -----------------------------------------------------
--- SECCIÓN 1: CREACIÓN DE TABLAS (ESQUEMA)
--- -----------------------------------------------------
-
--- -----------------------------------------------------
 -- Tablas de Estructura Básica (Usuarios y Roles)
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS td_Usuarios_bb_vc (
