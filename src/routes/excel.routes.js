@@ -17,6 +17,8 @@ import {
   descargarSeccionesExcel_vc_bb,
   subirGradosSeccionesExcel_vc_bb,
   descargarGradosSeccionesExcel_vc_bb,
+  subirAsignaturasGradosExcel_vc_bb,
+  descargarAsignaturasGradosExcel_vc_bb,
 } from "../api/controllers/excel.controller.js";
 
 const routerProfesoresExcel_vc_bb = Router();
@@ -27,6 +29,7 @@ const routerCalendarioExcel_vc_bb = Router();
 const routerGradosExcel_vc_bb = Router();
 const routerSeccionesExcel_vc_bb = Router();
 const routerPensumExcel_vc_bb = Router();
+const routerAsignaturasExcel_vc_bb = Router();
 
 // Configuración de Multer (carpeta temporal)
 const upload_vc_bb = multer({ dest: "uploads/" });
@@ -68,5 +71,9 @@ routerSeccionesExcel_vc_bb.get("/download", descargarSeccionesExcel_vc_bb);
 routerPensumExcel_vc_bb.post("/upload", upload_vc_bb.single("archivo"), subirGradosSeccionesExcel_vc_bb);
 routerPensumExcel_vc_bb.get("/download", descargarGradosSeccionesExcel_vc_bb);
 
-export { routerEspaciosExcel_vc_bb, routerBloquesExcel_vc_bb, routerDiasExcel_vc_bb, routerCalendarioExcel_vc_bb, routerGradosExcel_vc_bb, routerSeccionesExcel_vc_bb, routerPensumExcel_vc_bb };
+// --- Asignaturas + Grados (una sola hoja) ---
+routerAsignaturasExcel_vc_bb.post("/upload", upload_vc_bb.single("archivo"), subirAsignaturasGradosExcel_vc_bb);
+routerAsignaturasExcel_vc_bb.get("/download", descargarAsignaturasGradosExcel_vc_bb);
+
+export { routerEspaciosExcel_vc_bb, routerBloquesExcel_vc_bb, routerDiasExcel_vc_bb, routerCalendarioExcel_vc_bb, routerGradosExcel_vc_bb, routerSeccionesExcel_vc_bb, routerPensumExcel_vc_bb, routerAsignaturasExcel_vc_bb };
 export default routerProfesoresExcel_vc_bb;

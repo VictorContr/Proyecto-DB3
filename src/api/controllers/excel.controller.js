@@ -435,6 +435,125 @@ export const subirSeccionesExcel_vc_bb = async (req, res) => {
     res.status(500).json({ message: "Error crítico al procesar Excel." });
   }
 };
+
+// 📤 Descargar asignaturas con su grado (una sola hoja)
+export const descargarAsignaturasGradosExcel_vc_bb = async (req, res) => {
+  return ExcelModel_vc_bb.generateAndSendExcel_vc_bb({
+    res_vc_bb: res,
+    sheetName_vc_bb: "Asignaturas",
+    filePrefix_vc_bb: "asignaturas_grados",
+    headers_vc_bb: [
+      { title_vc_bb: "ID Asignatura", key_vc_bb: "ID_asignatura_bb_vc" },
+      { title_vc_bb: "Asignatura", key_vc_bb: "nombre_bb_vc" },
+      { title_vc_bb: "Horas Semanales", key_vc_bb: "horas_academicas_bb_vc" },
+      { title_vc_bb: "Grado", key_vc_bb: "nro_grado_bb_vc" },
+    ],
+    fetchRows_vc_bb: async () => {
+      const rows_vc_bb = await db_vc_bb.all_vc_bb(
+        `SELECT a.ID_asignatura_bb_vc, a.nombre_bb_vc, a.horas_academicas_bb_vc, g.nro_grado_bb_vc
+         FROM td_Asignaturas_bb_vc a
+         LEFT JOIN td_GradosAsignaturas_bb_vc ga ON ga.ID_asignatura_gradoAsig_bb_vc = a.ID_asignatura_bb_vc
+         LEFT JOIN td_Grados_bb_vc g ON ga.ID_grado_gradoAsig_bb_vc = g.ID_grado_bb_vc
+         ORDER BY a.nombre_bb_vc ASC, g.nro_grado_bb_vc ASC`
+      );
+      return rows_vc_bb;
+    },
+  });
+};
+
+// 📥 Subir asignaturas y su relación de grado (una sola hoja)
+export const subirAsignaturasGradosExcel_vc_bb = async (req, res) => {
+  const filePath_vc_bb = req.file?.path;
+
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No se subió ningún archivo." });
+    }
+
+    if (!req.file.originalname.match(/\.(xlsx)$/)) {
+      return res.status(400).json({ message: "Solo se permiten archivos .xlsx" });
+    }
+
+    const { successfulImports_vc_bb, errors_vc_bb } = await ExcelModel_vc_bb.parseAndProcessExcel_vc_bb({
+      filePath_vc_bb,
+      columns_vc_bb: [
+        { key_vc_bb: "nombre_bb_vc", required_vc_bb: true },
+        { key_vc_bb: "horas_academicas_bb_vc", required_vc_bb: false },
+        { key_vc_bb: "nro_grado_bb_vc", required_vc_bb: false },
+      ],
+      processRow_vc_bb: async (rowMap_vc_bb) => {
+        const nombre_vc_bb = String(rowMap_vc_bb.nombre_bb_vc || "").trim();
+        const horasRaw_vc_bb = rowMap_vc_bb.horas_academicas_bb_vc;
+        const gradoRaw_vc_bb = rowMap_vc_bb.nro_grado_bb_vc;
+
+        if (!nombre_vc_bb) throw new Error("Nombre de asignatura vacío");
+
+        const horas_vc_bb = horasRaw_vc_bb != null && horasRaw_vc_bb !== ""
+          ? parseInt(String(horasRaw_vc_bb).trim(), 10)
+          : null;
+        if (horas_vc_bb != null && (!Number.isInteger(horas_vc_bb) || horas_vc_bb < 0)) {
+          throw new Error("Horas académicas inválidas");
+        }
+
+        // Upsert asignatura por nombre (evitar duplicados de nombre)
+        let asignatura_vc_bb = await db_vc_bb.get_vc_bb(
+          "SELECT ID_asignatura_bb_vc, horas_academicas_bb_vc FROM td_Asignaturas_bb_vc WHERE nombre_bb_vc = ?",
+          [nombre_vc_bb]
+        );
+
+        if (!asignatura_vc_bb) {
+          const insert_vc_bb = await db_vc_bb.run_vc_bb(
+            `INSERT INTO td_Asignaturas_bb_vc (nombre_bb_vc, horas_academicas_bb_vc) VALUES (?, ?)`,
+            [nombre_vc_bb, horas_vc_bb ?? null]
+          );
+          asignatura_vc_bb = { ID_asignatura_bb_vc: insert_vc_bb.lastID };
+        } else if (horas_vc_bb != null && horas_vc_bb !== asignatura_vc_bb.horas_academicas_bb_vc) {
+          // Actualizar horas si viene valor nuevo
+          await db_vc_bb.run_vc_bb(
+            `UPDATE td_Asignaturas_bb_vc SET horas_academicas_bb_vc = ? WHERE ID_asignatura_bb_vc = ?`,
+            [horas_vc_bb, asignatura_vc_bb.ID_asignatura_bb_vc]
+          );
+        }
+
+        // Relación con grado si viene provisto
+        if (gradoRaw_vc_bb != null && gradoRaw_vc_bb !== "") {
+          const gradoNum_vc_bb = parseInt(String(gradoRaw_vc_bb).trim(), 10);
+          if (!Number.isInteger(gradoNum_vc_bb) || gradoNum_vc_bb < 1 || gradoNum_vc_bb > 5) {
+            throw new Error("Grado inválido (debe ser 1-5)");
+          }
+
+          const grado_vc_bb = await db_vc_bb.get_vc_bb(
+            "SELECT ID_grado_bb_vc FROM td_Grados_bb_vc WHERE nro_grado_bb_vc = ?",
+            [gradoNum_vc_bb]
+          );
+          if (!grado_vc_bb) throw new Error(`El grado '${gradoNum_vc_bb}' no existe`);
+
+          const existingRel_vc_bb = await db_vc_bb.get_vc_bb(
+            `SELECT ID_gradoAsignatura_bb_vc FROM td_GradosAsignaturas_bb_vc WHERE ID_grado_gradoAsig_bb_vc = ? AND ID_asignatura_gradoAsig_bb_vc = ?`,
+            [grado_vc_bb.ID_grado_bb_vc, asignatura_vc_bb.ID_asignatura_bb_vc]
+          );
+          if (existingRel_vc_bb) {
+            throw new Error(`La asignatura '${nombre_vc_bb}' ya está asociada al grado '${gradoNum_vc_bb}'`);
+          }
+
+          await db_vc_bb.run_vc_bb(
+            `INSERT INTO td_GradosAsignaturas_bb_vc (ID_grado_gradoAsig_bb_vc, ID_asignatura_gradoAsig_bb_vc) VALUES (?, ?)`,
+            [grado_vc_bb.ID_grado_bb_vc, asignatura_vc_bb.ID_asignatura_bb_vc]
+          );
+        }
+      },
+    });
+
+    res.status(200).json({
+      message: `Proceso finalizado. Importados: ${successfulImports_vc_bb}.`,
+      errors: errors_vc_bb,
+      exito: successfulImports_vc_bb > 0,
+    });
+  } catch (error_vc_bb) {
+    console.error("❌ Error general:", error_vc_bb);
+    res.status(500).json({ message: "Error crítico al procesar Excel." });
+  }
+};
 // 📤 Descargar bloques en Excel
 export const descargarBloquesExcel_vc_bb = async (req, res) => {
   return ExcelModel_vc_bb.generateAndSendExcel_vc_bb({
