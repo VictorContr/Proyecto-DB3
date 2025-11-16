@@ -303,6 +303,138 @@ export const subirEspaciosExcel_vc_bb = async (req, res) => {
   }
 };
 
+// 📤 Descargar grados en Excel
+export const descargarGradosExcel_vc_bb = async (req, res) => {
+  return ExcelModel_vc_bb.generateAndSendExcel_vc_bb({
+    res_vc_bb: res,
+    sheetName_vc_bb: "Grados",
+    filePrefix_vc_bb: "grados",
+    headers_vc_bb: [
+      { title_vc_bb: "ID Grado", key_vc_bb: "ID_grado_bb_vc" },
+      { title_vc_bb: "Grado", key_vc_bb: "nro_grado_bb_vc" },
+    ],
+    fetchRows_vc_bb: async () => {
+      const grados_vc_bb = await db_vc_bb.all_vc_bb(
+        `SELECT ID_grado_bb_vc, nro_grado_bb_vc FROM td_Grados_bb_vc ORDER BY nro_grado_bb_vc`
+      );
+      return grados_vc_bb;
+    },
+  });
+};
+
+// 📥 Subir grados desde un Excel
+export const subirGradosExcel_vc_bb = async (req, res) => {
+  const filePath_vc_bb = req.file?.path;
+
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No se subió ningún archivo." });
+    }
+
+    if (!req.file.originalname.match(/\.(xlsx)$/)) {
+      return res.status(400).json({ message: "Solo se permiten archivos .xlsx" });
+    }
+
+    const { successfulImports_vc_bb, errors_vc_bb } = await ExcelModel_vc_bb.parseAndProcessExcel_vc_bb({
+      filePath_vc_bb,
+      columns_vc_bb: [
+        { key_vc_bb: "nro_grado_bb_vc", required_vc_bb: true },
+      ],
+      processRow_vc_bb: async (rowMap_vc_bb) => {
+        const raw_vc_bb = rowMap_vc_bb.nro_grado_bb_vc;
+        const grado_vc_bb = Number.parseInt(String(raw_vc_bb).trim(), 10);
+        if (!Number.isInteger(grado_vc_bb)) throw new Error("Grado inválido (no entero)");
+        if (grado_vc_bb < 1 || grado_vc_bb > 5) throw new Error("Grado fuera de rango (1-5)");
+
+        const existing_vc_bb = await db_vc_bb.get_vc_bb(
+          "SELECT ID_grado_bb_vc FROM td_Grados_bb_vc WHERE nro_grado_bb_vc = ?",
+          [grado_vc_bb]
+        );
+        if (existing_vc_bb) throw new Error(`El grado '${grado_vc_bb}' ya existe`);
+
+        await db_vc_bb.run_vc_bb(
+          `INSERT INTO td_Grados_bb_vc (nro_grado_bb_vc) VALUES (?)`,
+          [grado_vc_bb]
+        );
+      },
+    });
+
+    res.status(200).json({
+      message: `Proceso finalizado. Importados: ${successfulImports_vc_bb}.`,
+      errors: errors_vc_bb,
+      exito: successfulImports_vc_bb > 0,
+    });
+  } catch (error_vc_bb) {
+    console.error("❌ Error general:", error_vc_bb);
+    res.status(500).json({ message: "Error crítico al procesar Excel." });
+  }
+};
+
+// 📤 Descargar secciones en Excel
+export const descargarSeccionesExcel_vc_bb = async (req, res) => {
+  return ExcelModel_vc_bb.generateAndSendExcel_vc_bb({
+    res_vc_bb: res,
+    sheetName_vc_bb: "Secciones",
+    filePrefix_vc_bb: "secciones",
+    headers_vc_bb: [
+      { title_vc_bb: "ID Sección", key_vc_bb: "ID_seccion_bb_vc" },
+      { title_vc_bb: "Sección", key_vc_bb: "letra_seccion_bb_vc" },
+    ],
+    fetchRows_vc_bb: async () => {
+      const secciones_vc_bb = await db_vc_bb.all_vc_bb(
+        `SELECT ID_seccion_bb_vc, letra_seccion_bb_vc FROM td_Secciones_bb_vc ORDER BY letra_seccion_bb_vc`
+      );
+      return secciones_vc_bb;
+    },
+  });
+};
+
+// 📥 Subir secciones desde un Excel
+export const subirSeccionesExcel_vc_bb = async (req, res) => {
+  const filePath_vc_bb = req.file?.path;
+
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No se subió ningún archivo." });
+    }
+
+    if (!req.file.originalname.match(/\.(xlsx)$/)) {
+      return res.status(400).json({ message: "Solo se permiten archivos .xlsx" });
+    }
+
+    const { successfulImports_vc_bb, errors_vc_bb } = await ExcelModel_vc_bb.parseAndProcessExcel_vc_bb({
+      filePath_vc_bb,
+      columns_vc_bb: [
+        { key_vc_bb: "letra_seccion_bb_vc", required_vc_bb: true },
+      ],
+      processRow_vc_bb: async (rowMap_vc_bb) => {
+        const seccionRaw_vc_bb = rowMap_vc_bb.letra_seccion_bb_vc;
+        const seccion_vc_bb = String(seccionRaw_vc_bb || "").trim().toUpperCase();
+        if (!seccion_vc_bb) throw new Error("Sección vacía");
+
+        const existing_vc_bb = await db_vc_bb.get_vc_bb(
+          "SELECT ID_seccion_bb_vc FROM td_Secciones_bb_vc WHERE letra_seccion_bb_vc = ?",
+          [seccion_vc_bb]
+        );
+        if (existing_vc_bb) throw new Error(`La sección '${seccion_vc_bb}' ya existe`);
+
+        await db_vc_bb.run_vc_bb(
+          `INSERT INTO td_Secciones_bb_vc (letra_seccion_bb_vc) VALUES (?)`,
+          [seccion_vc_bb]
+        );
+      },
+    });
+
+    res.status(200).json({
+      message: `Proceso finalizado. Importados: ${successfulImports_vc_bb}.`,
+      errors: errors_vc_bb,
+      exito: successfulImports_vc_bb > 0,
+    });
+  } catch (error_vc_bb) {
+    console.error("❌ Error general:", error_vc_bb);
+    res.status(500).json({ message: "Error crítico al procesar Excel." });
+  }
+};
 // 📤 Descargar bloques en Excel
 export const descargarBloquesExcel_vc_bb = async (req, res) => {
   return ExcelModel_vc_bb.generateAndSendExcel_vc_bb({
@@ -609,6 +741,141 @@ export const subirDiasBloquesExcel_vc_bb = async (req, res) => {
       }
     } catch (errBloques_vc_bb) {
       result_vc_bb.errors_vc_bb.push(`Error procesando hoja 'Bloques': ${errBloques_vc_bb.message}`);
+    }
+
+    res.status(200).json({
+      message: `Proceso finalizado. Importados: ${result_vc_bb.successfulImports_vc_bb}.`,
+      errors: result_vc_bb.errors_vc_bb,
+      exito: result_vc_bb.successfulImports_vc_bb > 0,
+    });
+  } catch (error_vc_bb) {
+    console.error("❌ Error general:", error_vc_bb);
+    res.status(500).json({ message: "Error crítico al procesar Excel." });
+  } finally {
+    if (filePath_vc_bb && fs_vc_bb.existsSync(filePath_vc_bb)) {
+      try { fs_vc_bb.unlinkSync(filePath_vc_bb); } catch (_) {}
+    }
+  }
+};
+
+// ===============================================
+// 📦 Excel combinado: Grados + Secciones (una sola .xlsx)
+// ===============================================
+
+// 📤 Descargar Grados y Secciones en un solo Excel (dos hojas)
+export const descargarGradosSeccionesExcel_vc_bb = async (req, res) => {
+  try {
+    const wb_vc_bb = new xl_vc_bb.Workbook();
+
+    // Hoja: Grados
+    const wsGrados_vc_bb = wb_vc_bb.addWorksheet("Grados");
+    const grados_vc_bb = await db_vc_bb.all_vc_bb(
+      `SELECT ID_grado_bb_vc, nro_grado_bb_vc FROM td_Grados_bb_vc ORDER BY nro_grado_bb_vc`
+    );
+    wsGrados_vc_bb.cell(1, 1).string("ID Grado");
+    wsGrados_vc_bb.cell(1, 2).string("Grado");
+    grados_vc_bb.forEach((g_vc_bb, i_vc_bb) => {
+      wsGrados_vc_bb.cell(i_vc_bb + 2, 1).number(Number(g_vc_bb.ID_grado_bb_vc));
+      wsGrados_vc_bb.cell(i_vc_bb + 2, 2).number(Number(g_vc_bb.nro_grado_bb_vc));
+    });
+
+    // Hoja: Secciones
+    const wsSecciones_vc_bb = wb_vc_bb.addWorksheet("Secciones");
+    const secciones_vc_bb = await db_vc_bb.all_vc_bb(
+      `SELECT ID_seccion_bb_vc, letra_seccion_bb_vc FROM td_Secciones_bb_vc ORDER BY letra_seccion_bb_vc`
+    );
+    wsSecciones_vc_bb.cell(1, 1).string("ID Sección");
+    wsSecciones_vc_bb.cell(1, 2).string("Sección");
+    secciones_vc_bb.forEach((s_vc_bb, i_vc_bb) => {
+      wsSecciones_vc_bb.cell(i_vc_bb + 2, 1).number(Number(s_vc_bb.ID_seccion_bb_vc));
+      wsSecciones_vc_bb.cell(i_vc_bb + 2, 2).string(String(s_vc_bb.letra_seccion_bb_vc));
+    });
+
+    const tempDir_vc_bb = path_vc_bb.resolve("temp");
+    if (!fs_vc_bb.existsSync(tempDir_vc_bb)) fs_vc_bb.mkdirSync(tempDir_vc_bb);
+    const fileName_vc_bb = `grados_secciones_${Date.now()}.xlsx`;
+    const filePath_vc_bb = path_vc_bb.join(tempDir_vc_bb, fileName_vc_bb);
+
+    await new Promise((resolve_vc_bb, reject_vc_bb) => {
+      wb_vc_bb.write(filePath_vc_bb, (err_vc_bb) => {
+        if (err_vc_bb) return reject_vc_bb(err_vc_bb);
+        resolve_vc_bb(true);
+      });
+    });
+
+    res.download(filePath_vc_bb, "grados_secciones.xlsx", (err_vc_bb) => {
+      if (fs_vc_bb.existsSync(filePath_vc_bb)) {
+        try { fs_vc_bb.unlinkSync(filePath_vc_bb); } catch (_) {}
+      }
+      if (err_vc_bb) {
+        console.error("Error enviando Excel combinado (Grados+Secciones):", err_vc_bb);
+        if (!res.headersSent) res.status(500).json({ message: "Error al enviar Excel." });
+      }
+    });
+  } catch (error_vc_bb) {
+    console.error("❌ Error al generar Excel combinado (Grados+Secciones):", error_vc_bb);
+    if (!res.headersSent) res.status(500).json({ message: "Error al generar Excel." });
+  }
+};
+
+// 📥 Subir Grados y Secciones desde un solo Excel (dos hojas)
+export const subirGradosSeccionesExcel_vc_bb = async (req, res) => {
+  const filePath_vc_bb = req.file?.path;
+
+  const result_vc_bb = { successfulImports_vc_bb: 0, errors_vc_bb: [] };
+
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No se subió ningún archivo." });
+    }
+    if (!req.file.originalname.match(/\.(xlsx)$/)) {
+      return res.status(400).json({ message: "Solo se permiten archivos .xlsx" });
+    }
+
+    const workbook_vc_bb = await XlsxPopulate_vc_bb.fromFileAsync(filePath_vc_bb);
+    const sheets_vc_bb = workbook_vc_bb.sheets();
+
+    const findSheet_vc_bb = (name_vc_bb, fallbackIndex_vc_bb) => {
+      const byName_vc_bb = sheets_vc_bb.find((s_vc_bb) => s_vc_bb.name() === name_vc_bb);
+      return byName_vc_bb || workbook_vc_bb.sheet(fallbackIndex_vc_bb);
+    };
+
+    // --- Procesar Grados --- (hoja "Grados" o índice 1)
+    try {
+      const sheetGrados_vc_bb = findSheet_vc_bb("Grados", 1);
+      const rowsGrados_vc_bb = sheetGrados_vc_bb.usedRange().value();
+      for (let i_vc_bb = 1; i_vc_bb < rowsGrados_vc_bb.length; i_vc_bb++) {
+        const row_vc_bb = rowsGrados_vc_bb[i_vc_bb];
+        if (!row_vc_bb || row_vc_bb.every((c_vc_bb) => c_vc_bb == null || c_vc_bb === "")) continue;
+        const raw_vc_bb = row_vc_bb[0];
+        const grado_vc_bb = Number.parseInt(String(raw_vc_bb).trim(), 10);
+        if (!Number.isInteger(grado_vc_bb)) { result_vc_bb.errors_vc_bb.push(`Fila ${i_vc_bb + 1} (Grados): valor no entero`); continue; }
+        if (grado_vc_bb < 1 || grado_vc_bb > 5) { result_vc_bb.errors_vc_bb.push(`Fila ${i_vc_bb + 1} (Grados): fuera de rango (1-5)`); continue; }
+        const exists_vc_bb = await db_vc_bb.get_vc_bb("SELECT ID_grado_bb_vc FROM td_Grados_bb_vc WHERE nro_grado_bb_vc = ?", [grado_vc_bb]);
+        if (exists_vc_bb) { result_vc_bb.errors_vc_bb.push(`Fila ${i_vc_bb + 1} (Grados): duplicado '${grado_vc_bb}'`); continue; }
+        await db_vc_bb.run_vc_bb(`INSERT INTO td_Grados_bb_vc (nro_grado_bb_vc) VALUES (?)`, [grado_vc_bb]);
+        result_vc_bb.successfulImports_vc_bb++;
+      }
+    } catch (errGrados_vc_bb) {
+      result_vc_bb.errors_vc_bb.push(`Error procesando hoja 'Grados': ${errGrados_vc_bb.message}`);
+    }
+
+    // --- Procesar Secciones --- (hoja "Secciones" o índice 2)
+    try {
+      const sheetSecciones_vc_bb = findSheet_vc_bb("Secciones", 2);
+      const rowsSecciones_vc_bb = sheetSecciones_vc_bb.usedRange().value();
+      for (let i_vc_bb = 1; i_vc_bb < rowsSecciones_vc_bb.length; i_vc_bb++) {
+        const row_vc_bb = rowsSecciones_vc_bb[i_vc_bb];
+        if (!row_vc_bb || row_vc_bb.every((c_vc_bb) => c_vc_bb == null || c_vc_bb === "")) continue;
+        const seccion_vc_bb = String(row_vc_bb[0] || "").trim().toUpperCase();
+        if (!seccion_vc_bb) { result_vc_bb.errors_vc_bb.push(`Fila ${i_vc_bb + 1} (Secciones): vacía`); continue; }
+        const exists_vc_bb = await db_vc_bb.get_vc_bb("SELECT ID_seccion_bb_vc FROM td_Secciones_bb_vc WHERE letra_seccion_bb_vc = ?", [seccion_vc_bb]);
+        if (exists_vc_bb) { result_vc_bb.errors_vc_bb.push(`Fila ${i_vc_bb + 1} (Secciones): duplicada '${seccion_vc_bb}'`); continue; }
+        await db_vc_bb.run_vc_bb(`INSERT INTO td_Secciones_bb_vc (letra_seccion_bb_vc) VALUES (?)`, [seccion_vc_bb]);
+        result_vc_bb.successfulImports_vc_bb++;
+      }
+    } catch (errSecciones_vc_bb) {
+      result_vc_bb.errors_vc_bb.push(`Error procesando hoja 'Secciones': ${errSecciones_vc_bb.message}`);
     }
 
     res.status(200).json({

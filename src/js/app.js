@@ -2,6 +2,7 @@ import { setupThemeToggle_vc_bb } from "./dark-mode.js";
 import { admin_vc_bb, ExcelHandler_vc_bb } from "./excelProfesor.js";
 import { ExcelEspaciosHandler_vc_bb } from "./excelEspacios.js";
 import { ExcelBloqueDiaHandler_vc_bb } from "./excelBloqueDia.js";
+import { ExcelSeccionesGradosHandler_vc_bb } from "./excelSeccionesGrados.js";
 import { GestorSesion_vc_bb, loginForm_vc_bb, logoutButton_vc_bb } from "./login.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -83,6 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const excelHandler = new ExcelHandler_vc_bb();
     const excelEspaciosHandler_vc_bb = new ExcelEspaciosHandler_vc_bb();
     const excelBloqueDiaHandler_vc_bb = new ExcelBloqueDiaHandler_vc_bb();
+    const excelSeccionesGradosHandler_vc_bb = new ExcelSeccionesGradosHandler_vc_bb();
     
     // Evento para subir (submit o click)
     const btnUpload = document.getElementById('btnUploadProfesores');
@@ -159,6 +161,31 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnDownloadBloque_vc_bb) {
       btnDownloadBloque_vc_bb.addEventListener('click', async () => {
         await excelBloqueDiaHandler_vc_bb.downloadExcel_vc_bb();
+      });
+    }
+
+    // ====== Pensum (Grados + Secciones) usando formulario de Secciones ======
+    const formSecciones_vc_bb = document.getElementById('formUploadSecciones');
+    const btnUploadSecciones_vc_bb = document.getElementById('btnUploadSecciones');
+    const btnDownloadSecciones_vc_bb = document.getElementById('btnDownloadReporteSecciones');
+
+    if (formSecciones_vc_bb) {
+      formSecciones_vc_bb.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const file_vc_bb = excelSeccionesGradosHandler_vc_bb.getCurrentFile_vc_bb();
+        await excelSeccionesGradosHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
+      });
+    } else if (btnUploadSecciones_vc_bb) {
+      btnUploadSecciones_vc_bb.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const file_vc_bb = excelSeccionesGradosHandler_vc_bb.getCurrentFile_vc_bb();
+        await excelSeccionesGradosHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
+      });
+    }
+
+    if (btnDownloadSecciones_vc_bb) {
+      btnDownloadSecciones_vc_bb.addEventListener('click', async () => {
+        await excelSeccionesGradosHandler_vc_bb.downloadExcel_vc_bb();
       });
     }
   }

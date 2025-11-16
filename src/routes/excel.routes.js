@@ -11,6 +11,12 @@ import {
   descargarDiasExcel_vc_bb,
   subirDiasBloquesExcel_vc_bb,
   descargarDiasBloquesExcel_vc_bb,
+  subirGradosExcel_vc_bb,
+  descargarGradosExcel_vc_bb,
+  subirSeccionesExcel_vc_bb,
+  descargarSeccionesExcel_vc_bb,
+  subirGradosSeccionesExcel_vc_bb,
+  descargarGradosSeccionesExcel_vc_bb,
 } from "../api/controllers/excel.controller.js";
 
 const routerProfesoresExcel_vc_bb = Router();
@@ -18,6 +24,9 @@ const routerEspaciosExcel_vc_bb = Router();
 const routerBloquesExcel_vc_bb = Router();
 const routerDiasExcel_vc_bb = Router();
 const routerCalendarioExcel_vc_bb = Router();
+const routerGradosExcel_vc_bb = Router();
+const routerSeccionesExcel_vc_bb = Router();
+const routerPensumExcel_vc_bb = Router();
 
 // Configuración de Multer (carpeta temporal)
 const upload_vc_bb = multer({ dest: "uploads/" });
@@ -47,5 +56,17 @@ routerDiasExcel_vc_bb.get("/download", descargarDiasExcel_vc_bb);
 routerCalendarioExcel_vc_bb.post("/upload", upload_vc_bb.single("archivo"), subirDiasBloquesExcel_vc_bb);
 routerCalendarioExcel_vc_bb.get("/download", descargarDiasBloquesExcel_vc_bb);
 
-export { routerEspaciosExcel_vc_bb, routerBloquesExcel_vc_bb, routerDiasExcel_vc_bb, routerCalendarioExcel_vc_bb };
+// --- Grados ---
+routerGradosExcel_vc_bb.post("/upload", upload_vc_bb.single("archivo"), subirGradosExcel_vc_bb);
+routerGradosExcel_vc_bb.get("/download", descargarGradosExcel_vc_bb);
+
+// --- Secciones ---
+routerSeccionesExcel_vc_bb.post("/upload", upload_vc_bb.single("archivo"), subirSeccionesExcel_vc_bb);
+routerSeccionesExcel_vc_bb.get("/download", descargarSeccionesExcel_vc_bb);
+
+// --- Pensum (Combinado: Grados + Secciones en un solo .xlsx) ---
+routerPensumExcel_vc_bb.post("/upload", upload_vc_bb.single("archivo"), subirGradosSeccionesExcel_vc_bb);
+routerPensumExcel_vc_bb.get("/download", descargarGradosSeccionesExcel_vc_bb);
+
+export { routerEspaciosExcel_vc_bb, routerBloquesExcel_vc_bb, routerDiasExcel_vc_bb, routerCalendarioExcel_vc_bb, routerGradosExcel_vc_bb, routerSeccionesExcel_vc_bb, routerPensumExcel_vc_bb };
 export default routerProfesoresExcel_vc_bb;
