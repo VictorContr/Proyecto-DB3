@@ -27,7 +27,7 @@ export const login_vc_bb = async (req, res) => {
       correo: user_vc_bb.correo_bb_vc,
       telefono: user_vc_bb.telefono_bb_vc,
       userName: user_vc_bb.userName_bb_vc,
-      rol: user_vc_bb.nombre_rol_bb_vc || "Sin rol asignado",
+      rol: user_vc_bb.nombre_rol_bb_vc,
     });
   } catch (error_vc_bb) {
     console.error("Error en login:", error_vc_bb);

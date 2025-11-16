@@ -72,7 +72,7 @@
                     </button>
                 </div>
 
-                <!-- Tarjeta 2: Carga de Datos -->
+                <!-- Tarjeta 2: Carga de Datos de Profesores -->
                 <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
                     <div class="flex items-center mb-3">
                         <i class="fas fa-file-upload text-colegio-blue text-xl mr-3"></i>
@@ -84,15 +84,15 @@
                     
                     <!-- FORMULARIO DE CARGA -->
                     <form id="formUploadProfesores" class="space-y-3 mt-4">
-                        <label for="archivoExcel" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
-                        <input type="file" id="archivoExcel" name="archivoExcel" 
+                        <label for="archivoExcelProfesores" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
+                        <input type="file" id="archivoExcelProfesores" name="archivoExcelProfesores" 
                                accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                class="block w-full text-sm text-gray-500 dark:text-gray-400 file:cursor-pointer">
                         
-                        <button type="submit" id="btnUpload"
+                        <button type="submit" id="btnUploadProfesores"
                                 class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
-                            <span id="uploadText">Subir Archivo</span>
-                            <i id="uploadSpinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+                            <span id="uploadTextProfesores">Subir Archivo</span>
+                            <i id="uploadSpinnerProfesores" class="fas fa-spinner fa-spin ml-2 hidden"></i>
                         </button>
                     </form>
 
@@ -101,15 +101,88 @@
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descargar reporte</label>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Descarga la lista actualizada de profesores.</p>
                         
-                        <button id="btnDownloadReporte"
+                        <button id="btnDownloadReporteProfesores"
                                 class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
-                            <span id="downloadText">Descargar Reporte</span>
-                            <i id="downloadSpinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+                            <span id="downloadTextProfesores">Descargar Reporte</span>
+                            <i id="downloadSpinnerProfesores" class="fas fa-spinner fa-spin ml-2 hidden"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Tarjeta 3: Generación de Horarios -->
+                                <!-- Tarjeta 3: Carga de Datos Asignaturas-->
+                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-file-upload text-colegio-blue text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Asignaturas</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Importa o exporta la lista de Asignaturas usando un archivo Excel.
+                    </p>
+                    
+                    <!-- FORMULARIO DE CARGA -->
+                    <form id="formUploadAsignaturas" class="space-y-3 mt-4">
+                        <label for="archivoExcelAsignaturas" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
+                        <input type="file" id="archivoExcelAsignaturas" name="archivoExcelAsignaturas" 
+                               accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                               class="block w-full text-sm text-gray-500 dark:text-gray-400 file:cursor-pointer">
+                        
+                        <button type="submit" id="btnUploadAsignaturas"
+                                class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+                            <span id="uploadTextAsignaturas">Subir Archivo</span>
+                            <i id="uploadSpinnerAsignaturas" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+                        </button>
+                    </form>
+
+                    <!-- DIVISOR Y DESCARGA -->
+                    <div class="mt-4 border-t border-gray-200 dark:border-gray-600 pt-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descargar reporte</label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Descarga la lista actualizada de Asignaturas.</p>
+                        
+                        <button id="btnDownloadReporteAsignaturas"
+                                class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+                            <span id="downloadTextAsignaturas">Descargar Reporte</span>
+                            <i id="downloadSpinnerAsignaturas" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+                        </button>
+                    </div>
+                </div>
+
+                                <!-- Tarjeta 4: Carga de Datos Secciones/Clases-->
+                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-file-upload text-colegio-blue text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Secciones/Clases</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Importa o exporta la lista de Secciones usando un archivo Excel.
+                    </p>
+                    
+                    <!-- FORMULARIO DE CARGA -->
+                    <form id="formUploadSecciones" class="space-y-3 mt-4">
+                        <label for="archivoExcelSecciones" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
+                        <input type="file" id="archivoExcelSecciones" name="archivoExcelSecciones" 
+                               accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                               class="block w-full text-sm text-gray-500 dark:text-gray-400 file:cursor-pointer">
+                        
+                        <button type="submit" id="btnUploadSecciones"
+                                class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+                            <span id="uploadTextSecciones">Subir Archivo</span>
+                            <i id="uploadSpinnerSecciones" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+                        </button>
+                    </form>
+
+                    <!-- DIVISOR Y DESCARGA -->
+                    <div class="mt-4 border-t border-gray-200 dark:border-gray-600 pt-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descargar reporte</label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Descarga la lista actualizada de Secciones.</p>
+                        
+                        <button id="btnDownloadReporteSecciones"
+                                class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+                            <span id="downloadTextSecciones">Descargar Reporte</span>
+                            <i id="downloadSpinnerSecciones" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Tarjeta 5: Generación de Horarios -->
                 <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
                     <div class="flex items-center mb-3">
                         <i class="fas fa-calendar-alt text-colegio-blue text-xl mr-3"></i>

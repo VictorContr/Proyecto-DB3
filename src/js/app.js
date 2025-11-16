@@ -1,5 +1,5 @@
 import { setupThemeToggle_vc_bb } from "./dark-mode.js";
-import { admin_vc_bb, ExcelHandler_vc_bb } from "./excel.js";
+import { admin_vc_bb, ExcelHandler_vc_bb } from "./excelProfesor.js";
 import { GestorSesion_vc_bb, loginForm_vc_bb, logoutButton_vc_bb } from "./login.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -81,8 +81,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const excelHandler = new ExcelHandler_vc_bb();
     
     // Evento para subir (submit o click)
-    const btnUpload = document.getElementById('btnUpload');
-    const formExcel = document.getElementById('formExcel');
+    const btnUpload = document.getElementById('btnUploadProfesores');
+    const formExcel = document.getElementById('formUploadProfesores');
     
     if (formExcel) {
         formExcel.addEventListener('submit', async (e) => {
@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     // Evento para descargar (click)
-    const btnDownload = document.getElementById('btnDownloadReporte');
+    const btnDownload = document.getElementById('btnDownloadReporteProfesores');
     if (btnDownload) {
         btnDownload.addEventListener('click', async () => {
             await excelHandler.downloadExcel_vc_bb();

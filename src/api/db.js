@@ -155,7 +155,6 @@ class Database_vc_bb {
               ID_gradoAsignatura_bb_vc INTEGER PRIMARY KEY,
               ID_grado_gradoAsig_bb_vc INTEGER,
               ID_asignatura_gradoAsig_bb_vc INTEGER,
-              -- CORRECCIÓN: Se quitaron los '_bb' extra al final de los nombres de tabla
               FOREIGN KEY (ID_grado_gradoAsig_bb_vc) REFERENCES td_Grados_bb_vc(ID_grado_bb_vc),
               FOREIGN KEY (ID_asignatura_gradoAsig_bb_vc) REFERENCES td_Asignaturas_bb_vc(ID_asignatura_bb_vc)
             );
