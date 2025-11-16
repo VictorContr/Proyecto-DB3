@@ -103,6 +103,9 @@ class Database_vc_bb {
                   '3:00 pm',
                   '4:00 pm'
                 )
+              ),
+              turno_bloque_bb_vc TEXT NOT NULL CHECK (
+                turno_bloque_bb_vc IN ('mañana', 'tarde')
               )
             );
 
@@ -222,8 +225,9 @@ class Database_vc_bb {
           } else {
             console.log("✅ Esquema de tablas verificado/creado exitosamente");
 
-            // Antes de sembrar, garantizar unicidad y limpiar duplicados
-            this.enforceUniqueness_vc_bb()
+            // Antes de sembrar, asegurar columna de turno y luego unicidad
+            this.ensureBloqueTurnoColumn_vc_bb()
+              .then(() => this.enforceUniqueness_vc_bb())
               .then(() => this.seedInitialData_vc_bb())
               .catch((err_vc_bb) => {
                 console.error("❌ Error aplicando unicidad antes del seed:", err_vc_bb.message);
@@ -304,31 +308,29 @@ class Database_vc_bb {
           WHERE ID_usuario_usuarioRol_bb_vc = (SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'profe1')
           AND ID_rol_usuarioRol_bb_vc = (SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Profesor');
         `);
-        // --- 4. Insertar Días de la semana ---
-        await this.run_vc_bb(`
-          INSERT OR IGNORE INTO td_Dia_bb_vc (dia_bb_vc) 
-          VALUES ('lunes'), ('martes'), ('miércoles'), ('jueves'), ('viernes');
-        `);
-        // --- 5. Insertar Bloques de hora ---
-        await this.run_vc_bb(`
-          INSERT OR IGNORE INTO td_Bloque_bb_vc (hora_bloque_bb_vc) 
-          VALUES 
-            ('7:00 am'), ('8:00 am'), ('9:00 am'), ('10:00 am'), ('11:00 am'), 
-            ('12:00 pm'), ('1:00 pm'), ('2:00 pm'), ('3:00 pm'), ('4:00 pm');
-        `);
-        // --- 6. Insertar Grados ---
-        await this.run_vc_bb(`
-          INSERT OR IGNORE INTO td_Grados_bb_vc (nro_grado_bb_vc) 
-          VALUES (1), (2), (3), (4), (5);
-        `);
-        // --- 7. Insertar Secciones ---
-        await this.run_vc_bb(`
-          INSERT OR IGNORE INTO td_Secciones_bb_vc (letra_seccion_bb_vc) 
-          VALUES ('A'), ('B');
-        `);
+        // (Se omiten inserciones de días, bloques, grados y secciones según requerimiento)
         console.log("✅ Datos iniciales (admin, profesor, roles, etc.) insertados/verificados correctamente.");
       } catch (err) {
         console.error("❌ Error insertando datos iniciales:", err.message);
+      }
+    }
+
+    async ensureBloqueTurnoColumn_vc_bb() {
+      try {
+        const cols_vc_bb = await this.all_vc_bb(`PRAGMA table_info(td_Bloque_bb_vc);`);
+        const hasTurno_vc_bb = cols_vc_bb.some((c_vc_bb) => c_vc_bb.name === 'turno_bloque_bb_vc');
+        if (!hasTurno_vc_bb) {
+          console.log("[DB] Añadiendo columna 'turno_bloque_bb_vc' a td_Bloque_bb_vc...");
+          await this.run_vc_bb(`ALTER TABLE td_Bloque_bb_vc ADD COLUMN turno_bloque_bb_vc TEXT;`);
+          await this.run_vc_bb(`UPDATE td_Bloque_bb_vc
+            SET turno_bloque_bb_vc = CASE
+              WHEN hora_bloque_bb_vc IN ('1:00 pm','2:00 pm','3:00 pm','4:00 pm') THEN 'tarde'
+              ELSE 'mañana'
+            END;`);
+          console.log("[DB] Columna 'turno_bloque_bb_vc' añadida y poblada.");
+        }
+      } catch (err_vc_bb) {
+        console.error("❌ Error asegurando columna turno_bloque_bb_vc:", err_vc_bb.message);
       }
     }
 

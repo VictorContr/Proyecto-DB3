@@ -10,7 +10,7 @@ import adminRoutes_vc_bb from "./src/routes/admin.routes.js";
 import teacherRoutes_vc_bb from "./src/routes/teacher.routes.js";
 import indexRoutes_vc_bb from "./src/routes/index.routes.js";
 import loginRoutes_vc_bb from "./src/routes/login.routes.js"; // nueva ruta de login
-import excelRoutes_vc_bb, { routerEspaciosExcel_vc_bb } from "./src/routes/excel.routes.js"
+import excelRoutes_vc_bb, { routerEspaciosExcel_vc_bb, routerBloquesExcel_vc_bb, routerDiasExcel_vc_bb, routerCalendarioExcel_vc_bb } from "./src/routes/excel.routes.js"
 config();
 
 const PORT_vc_bb = process.env.PORT;
@@ -37,6 +37,9 @@ app_vc_bb.use("/api/admin", adminRoutes_vc_bb); // rutas admin
 app_vc_bb.use("/api/teacher", teacherRoutes_vc_bb); // rutas profesor
 app_vc_bb.use("/api/profesores/excel", excelRoutes_vc_bb);
 app_vc_bb.use("/api/espacios/excel", routerEspaciosExcel_vc_bb);
+app_vc_bb.use("/api/bloques/excel", routerBloquesExcel_vc_bb);
+app_vc_bb.use("/api/dias/excel", routerDiasExcel_vc_bb);
+app_vc_bb.use("/api/calendario/excel", routerCalendarioExcel_vc_bb);
 // Manejo de errores 404
 app_vc_bb.use((req, res, next) => {
   res.status(404).json({ message: "Ruta no encontrada" });
