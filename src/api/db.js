@@ -89,7 +89,7 @@ class Database_vc_bb {
             -- Tablas de Recursos Temporales y Espaciales
             -- -----------------------------------------------------
             CREATE TABLE IF NOT EXISTS td_Bloque_bb_vc(
-              ID_bloque_bb_vc INTEGER PRIMARY KEY,
+              ID_bloque_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
               hora_bloque_bb_vc TEXT NOT NULL UNIQUE CHECK (
               hora_bloque_bb_vc IN (
                   '7:00 am',
@@ -107,19 +107,19 @@ class Database_vc_bb {
             );
 
             CREATE TABLE IF NOT EXISTS td_Dia_bb_vc (
-              ID_dia_bb_vc INTEGER PRIMARY KEY,
+              ID_dia_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
               dia_bb_vc TEXT NOT NULL UNIQUE CHECK (
                 dia_bb_vc IN ('lunes', 'martes', 'miércoles', 'jueves', 'viernes')
               )
             );
 
             CREATE TABLE IF NOT EXISTS td_TipoEspacio_bb_vc (
-              ID_TipoEspacio_bb_vc INTEGER PRIMARY KEY,
+              ID_TipoEspacio_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
               tipo_bb_vc TEXT -- Ej: "Aula Genérica", "Laboratorio", "Cancha"
             );
 
             CREATE TABLE IF NOT EXISTS td_Espacios_bb_vc (
-              ID_espacio_bb_vc INTEGER PRIMARY KEY,
+              ID_espacio_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
               nombre_bb_vc TEXT,
               capacidad_bb_vc INTEGER,
               ID_TipoEspacio_espacio_bb_vc INTEGER,
@@ -130,18 +130,18 @@ class Database_vc_bb {
             -- Tablas de Estructura Académica (Pensum)
             -- -----------------------------------------------------
             CREATE TABLE IF NOT EXISTS td_Grados_bb_vc (
-              ID_grado_bb_vc INTEGER PRIMARY KEY,
+              ID_grado_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
               nro_grado_bb_vc INTEGER UNIQUE,
               CHECK (nro_grado_bb_vc >= 1 AND nro_grado_bb_vc <= 5)
             );
 
             CREATE TABLE IF NOT EXISTS td_Secciones_bb_vc (
-              ID_seccion_bb_vc INTEGER PRIMARY KEY,
+              ID_seccion_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
               letra_seccion_bb_vc TEXT UNIQUE -- Ej: 'A', 'B'
             );
 
             CREATE TABLE IF NOT EXISTS td_Asignaturas_bb_vc (
-              ID_asignatura_bb_vc INTEGER PRIMARY KEY,
+              ID_asignatura_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
               nombre_bb_vc TEXT NOT NULL,
               horas_academicas_bb_vc INTEGER, -- Horas *semanales* requeridas para el pensum
               descripcion_bb_vc TEXT,
@@ -152,7 +152,7 @@ class Database_vc_bb {
             );
 
             CREATE TABLE IF NOT EXISTS td_GradosAsignaturas_bb_vc (
-              ID_gradoAsignatura_bb_vc INTEGER PRIMARY KEY,
+              ID_gradoAsignatura_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
               ID_grado_gradoAsig_bb_vc INTEGER,
               ID_asignatura_gradoAsig_bb_vc INTEGER,
               FOREIGN KEY (ID_grado_gradoAsig_bb_vc) REFERENCES td_Grados_bb_vc(ID_grado_bb_vc),
@@ -163,7 +163,7 @@ class Database_vc_bb {
             -- Tabla de Idoneidad de Profesores (R3.4)
             -- -----------------------------------------------------
             CREATE TABLE IF NOT EXISTS td_ProfesorAsignaturas_bb_vc (
-              ID_profesorAsig_bb_vc INTEGER PRIMARY KEY,
+              ID_profesorAsig_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
               ID_profesor_profAsig_bb_vc INTEGER,
               ID_asignatura_profAsig_bb_vc INTEGER,
               FOREIGN KEY (ID_profesor_profAsig_bb_vc) REFERENCES td_Profesores_bb_vc(ID_profesor_bb_vc),
@@ -174,7 +174,7 @@ class Database_vc_bb {
             -- Tablas de Disponibilidad (Restricciones de Entrada)
             -- -----------------------------------------------------
             CREATE TABLE IF NOT EXISTS td_DisponibilidadProfesor_bb_vc (
-              ID_DisponibilidadProfesor_bb_vc INTEGER PRIMARY KEY,
+              ID_DisponibilidadProfesor_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
               ID_dia_DispProfesor_bb_vc INTEGER,
               ID_bloque_DispProfesor_bb_vc INTEGER,
               ID_profesor_DispProfesor_bb_vc INTEGER,
@@ -184,7 +184,7 @@ class Database_vc_bb {
             );
 
             CREATE TABLE IF NOT EXISTS td_DisponibilidadEspacio_bb_vc (
-              ID_DisponibilidadEspacio_bb_vc INTEGER PRIMARY KEY,
+              ID_DisponibilidadEspacio_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
               ID_dia_DispEspacio_bb_vc INTEGER,
               ID_bloque_DispEspacio_bb_vc INTEGER,
               ID_espacio_DispEspacio_bb_vc INTEGER,
@@ -197,7 +197,7 @@ class Database_vc_bb {
             -- Tabla Central: El Horario (Resultado del Algoritmo)
             -- -----------------------------------------------------
             CREATE TABLE IF NOT EXISTS td_Horario_bb_vc (
-              ID_Horario_bb_vc INTEGER PRIMARY KEY,
+              ID_Horario_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
               ID_dia_horario_bb_vc INTEGER,
               ID_bloque_horario_bb_vc INTEGER,
               ID_asignatura_horario_bb_vc INTEGER,

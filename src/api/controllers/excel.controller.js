@@ -142,3 +142,161 @@ export const subirProfesoresExcel_vc_bb = async (req, res) => {
     res.status(500).json({ message: "Error crítico al procesar Excel." });
   }
 };
+
+// 📤 Descargar tipos de espacio en Excel
+export const descargarTipoEspacioExcel_vc_bb = async (req, res) => {
+  return ExcelModel_vc_bb.generateAndSendExcel_vc_bb({
+    res_vc_bb: res,
+    sheetName_vc_bb: "TiposEspacio",
+    filePrefix_vc_bb: "tipos_espacio",
+    headers_vc_bb: [
+      { title_vc_bb: "ID Tipo", key_vc_bb: "ID_TipoEspacio_bb_vc" },
+      { title_vc_bb: "Tipo", key_vc_bb: "tipo_bb_vc" },
+    ],
+    fetchRows_vc_bb: async () => {
+      const tipos_vc_bb = await db_vc_bb.all_vc_bb(`
+        SELECT ID_TipoEspacio_bb_vc, tipo_bb_vc FROM td_TipoEspacio_bb_vc
+      `);
+      return tipos_vc_bb;
+    },
+  });
+};
+
+// 📥 Subir tipos de espacio desde un Excel
+export const subirTipoEspacioExcel_vc_bb = async (req, res) => {
+  const filePath_vc_bb = req.file?.path;
+
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No se subió ningún archivo." });
+    }
+
+    if (!req.file.originalname.match(/\.(xlsx)$/)) {
+      return res.status(400).json({ message: "Solo se permiten archivos .xlsx" });
+    }
+
+    const { successfulImports_vc_bb, errors_vc_bb } = await ExcelModel_vc_bb.parseAndProcessExcel_vc_bb({
+      filePath_vc_bb,
+      columns_vc_bb: [
+        { key_vc_bb: "tipo_bb_vc", required_vc_bb: true },
+      ],
+      processRow_vc_bb: async (rowMap_vc_bb) => {
+        const tipo_vc_bb = String(rowMap_vc_bb.tipo_bb_vc || "").trim();
+        if (!tipo_vc_bb) throw new Error("Tipo de espacio vacío");
+
+        const existing_vc_bb = await db_vc_bb.get_vc_bb(
+          "SELECT ID_TipoEspacio_bb_vc FROM td_TipoEspacio_bb_vc WHERE tipo_bb_vc = ?",
+          [tipo_vc_bb]
+        );
+        if (existing_vc_bb) {
+          throw new Error(`El tipo de espacio '${tipo_vc_bb}' ya existe`);
+        }
+
+        await db_vc_bb.run_vc_bb(
+          `INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) VALUES (?)`,
+          [tipo_vc_bb]
+        );
+      },
+    });
+
+    res.status(200).json({
+      message: `Proceso finalizado. Importados: ${successfulImports_vc_bb}.`,
+      errors: errors_vc_bb,
+      exito: successfulImports_vc_bb > 0,
+    });
+  } catch (error_vc_bb) {
+    console.error("❌ Error general:", error_vc_bb);
+    res.status(500).json({ message: "Error crítico al procesar Excel." });
+  }
+};
+
+// 📤 Descargar espacios en Excel
+export const descargarEspaciosExcel_vc_bb = async (req, res) => {
+  return ExcelModel_vc_bb.generateAndSendExcel_vc_bb({
+    res_vc_bb: res,
+    sheetName_vc_bb: "Espacios",
+    filePrefix_vc_bb: "espacios",
+    headers_vc_bb: [
+      { title_vc_bb: "ID", key_vc_bb: "ID_espacio_bb_vc" },
+      { title_vc_bb: "Nombre", key_vc_bb: "nombre_bb_vc" },
+      { title_vc_bb: "Capacidad", key_vc_bb: "capacidad_bb_vc" },
+      { title_vc_bb: "Tipo", key_vc_bb: "tipo_bb_vc" },
+    ],
+    fetchRows_vc_bb: async () => {
+      const espacios_vc_bb = await db_vc_bb.all_vc_bb(`
+        SELECT e.ID_espacio_bb_vc, e.nombre_bb_vc, e.capacidad_bb_vc, t.tipo_bb_vc
+        FROM td_Espacios_bb_vc e
+        LEFT JOIN td_TipoEspacio_bb_vc t ON e.ID_TipoEspacio_espacio_bb_vc = t.ID_TipoEspacio_bb_vc
+      `);
+      return espacios_vc_bb;
+    },
+  });
+};
+
+// 📥 Subir espacios desde un Excel
+export const subirEspaciosExcel_vc_bb = async (req, res) => {
+  const filePath_vc_bb = req.file?.path;
+
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No se subió ningún archivo." });
+    }
+
+    if (!req.file.originalname.match(/\.(xlsx)$/)) {
+      return res.status(400).json({ message: "Solo se permiten archivos .xlsx" });
+    }
+
+    const { successfulImports_vc_bb, errors_vc_bb } = await ExcelModel_vc_bb.parseAndProcessExcel_vc_bb({
+      filePath_vc_bb,
+      columns_vc_bb: [
+        { key_vc_bb: "nombre_bb_vc", required_vc_bb: true },
+        { key_vc_bb: "capacidad_bb_vc", required_vc_bb: false },
+        { key_vc_bb: "tipo_bb_vc", required_vc_bb: true },
+      ],
+      processRow_vc_bb: async (rowMap_vc_bb) => {
+        const nombre_vc_bb = String(rowMap_vc_bb.nombre_bb_vc || "").trim();
+        const capacidadRaw_vc_bb = rowMap_vc_bb.capacidad_bb_vc;
+        const tipoNombre_vc_bb = String(rowMap_vc_bb.tipo_bb_vc || "").trim();
+
+        if (!nombre_vc_bb || !tipoNombre_vc_bb) {
+          throw new Error("Faltan campos requeridos (nombre o tipo)");
+        }
+
+        const capacidad_vc_bb = capacidadRaw_vc_bb != null && capacidadRaw_vc_bb !== ""
+          ? parseInt(capacidadRaw_vc_bb, 10)
+          : null;
+
+        // Buscar o crear el tipo de espacio
+        let tipo_vc_bb = await db_vc_bb.get_vc_bb(
+          "SELECT ID_TipoEspacio_bb_vc FROM td_TipoEspacio_bb_vc WHERE tipo_bb_vc = ?",
+          [tipoNombre_vc_bb]
+        );
+        if (!tipo_vc_bb) {
+          const inserted_vc_bb = await db_vc_bb.run_vc_bb(
+            `INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) VALUES (?)`,
+            [tipoNombre_vc_bb]
+          );
+          tipo_vc_bb = { ID_TipoEspacio_bb_vc: inserted_vc_bb.lastID };
+        }
+
+        // Insertar espacio
+        await db_vc_bb.run_vc_bb(
+          `
+          INSERT INTO td_Espacios_bb_vc (nombre_bb_vc, capacidad_bb_vc, ID_TipoEspacio_espacio_bb_vc)
+          VALUES (?, ?, ?)
+        `,
+          [nombre_vc_bb, capacidad_vc_bb ?? null, tipo_vc_bb.ID_TipoEspacio_bb_vc]
+        );
+      },
+    });
+
+    res.status(200).json({
+      message: `Proceso finalizado. Importados: ${successfulImports_vc_bb}.`,
+      errors: errors_vc_bb,
+      exito: successfulImports_vc_bb > 0,
+    });
+  } catch (error_vc_bb) {
+    console.error("❌ Error general:", error_vc_bb);
+    res.status(500).json({ message: "Error crítico al procesar Excel." });
+  }
+};

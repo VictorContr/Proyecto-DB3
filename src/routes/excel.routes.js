@@ -1,8 +1,14 @@
 import { Router } from "express";
 import multer from "multer";
-import { subirProfesoresExcel_vc_bb, descargarProfesoresExcel_vc_bb } from "../api/controllers/excel.controller.js";
+import { 
+  subirProfesoresExcel_vc_bb, 
+  descargarProfesoresExcel_vc_bb,
+  subirEspaciosExcel_vc_bb,
+  descargarEspaciosExcel_vc_bb,
+} from "../api/controllers/excel.controller.js";
 
 const routerProfesoresExcel_vc_bb = Router();
+const routerEspaciosExcel_vc_bb = Router();
 
 // Configuración de Multer (carpeta temporal)
 const upload_vc_bb = multer({ dest: "uploads/" });
@@ -13,4 +19,12 @@ routerProfesoresExcel_vc_bb.post("/upload", upload_vc_bb.single("archivo"), subi
 // GET → descargar Excel actualizado
 routerProfesoresExcel_vc_bb.get("/download", descargarProfesoresExcel_vc_bb);
 
+// --- Espacios ---
+// POST → subir Excel de espacios
+routerEspaciosExcel_vc_bb.post("/upload", upload_vc_bb.single("archivo"), subirEspaciosExcel_vc_bb);
+
+// GET → descargar Excel de espacios
+routerEspaciosExcel_vc_bb.get("/download", descargarEspaciosExcel_vc_bb);
+
+export { routerEspaciosExcel_vc_bb };
 export default routerProfesoresExcel_vc_bb;

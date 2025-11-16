@@ -1,5 +1,6 @@
 import { setupThemeToggle_vc_bb } from "./dark-mode.js";
 import { admin_vc_bb, ExcelHandler_vc_bb } from "./excelProfesor.js";
+import { ExcelEspaciosHandler_vc_bb } from "./excelEspacios.js";
 import { GestorSesion_vc_bb, loginForm_vc_bb, logoutButton_vc_bb } from "./login.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -79,6 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (admin_vc_bb) {
     const excelHandler = new ExcelHandler_vc_bb();
+    const excelEspaciosHandler_vc_bb = new ExcelEspaciosHandler_vc_bb();
     
     // Evento para subir (submit o click)
     const btnUpload = document.getElementById('btnUploadProfesores');
@@ -106,6 +108,31 @@ document.addEventListener("DOMContentLoaded", () => {
         btnDownload.addEventListener('click', async () => {
             await excelHandler.downloadExcel_vc_bb();
         });
+    }
+
+    // ====== Espacios: Upload/Download ======
+    const formEspacios_vc_bb = document.getElementById('formUploadEspacios');
+    const btnUploadEspacios_vc_bb = document.getElementById('btnUploadEspacios');
+    const btnDownloadEspacios_vc_bb = document.getElementById('btnDownloadReporteEspacios');
+
+    if (formEspacios_vc_bb) {
+      formEspacios_vc_bb.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const file_vc_bb = excelEspaciosHandler_vc_bb.getCurrentFile_vc_bb();
+        await excelEspaciosHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
+      });
+    } else if (btnUploadEspacios_vc_bb) {
+      btnUploadEspacios_vc_bb.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const file_vc_bb = excelEspaciosHandler_vc_bb.getCurrentFile_vc_bb();
+        await excelEspaciosHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
+      });
+    }
+
+    if (btnDownloadEspacios_vc_bb) {
+      btnDownloadEspacios_vc_bb.addEventListener('click', async () => {
+        await excelEspaciosHandler_vc_bb.downloadExcel_vc_bb();
+      });
     }
   }
 });
