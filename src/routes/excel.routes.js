@@ -13,6 +13,8 @@ import {
   descargarGradosSeccionesExcel_vc_bb,
   subirAsignaturasGradosExcel_vc_bb,
   descargarAsignaturasGradosExcel_vc_bb,
+  subirDisponibilidadesExcel_vc_bb,
+  descargarDisponibilidadesExcel_vc_bb,
 } from "../api/controllers/excel.controller.js";
 
 const routerProfesoresExcel_vc_bb = Router();
@@ -21,6 +23,7 @@ const routerGradosExcel_vc_bb = Router();
 const routerSeccionesExcel_vc_bb = Router();
 const routerPensumExcel_vc_bb = Router();
 const routerAsignaturasExcel_vc_bb = Router();
+const routerDisponibilidadesExcel_vc_bb = Router();
 
 // Configuración de Multer (carpeta temporal)
 const upload_vc_bb = multer({ dest: "uploads/" });
@@ -56,5 +59,9 @@ routerPensumExcel_vc_bb.get("/download", descargarGradosSeccionesExcel_vc_bb);
 routerAsignaturasExcel_vc_bb.post("/upload", upload_vc_bb.single("archivo"), subirAsignaturasGradosExcel_vc_bb);
 routerAsignaturasExcel_vc_bb.get("/download", descargarAsignaturasGradosExcel_vc_bb);
 
-export { routerEspaciosExcel_vc_bb, routerGradosExcel_vc_bb, routerSeccionesExcel_vc_bb, routerPensumExcel_vc_bb, routerAsignaturasExcel_vc_bb };
+// --- Disponibilidades (Profesor + Espacio en un solo .xlsx con dos hojas) ---
+routerDisponibilidadesExcel_vc_bb.post("/upload", upload_vc_bb.single("archivo"), subirDisponibilidadesExcel_vc_bb);
+routerDisponibilidadesExcel_vc_bb.get("/download", descargarDisponibilidadesExcel_vc_bb);
+
+export { routerEspaciosExcel_vc_bb, routerGradosExcel_vc_bb, routerSeccionesExcel_vc_bb, routerPensumExcel_vc_bb, routerAsignaturasExcel_vc_bb, routerDisponibilidadesExcel_vc_bb };
 export default routerProfesoresExcel_vc_bb;

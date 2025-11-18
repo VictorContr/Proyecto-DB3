@@ -3,6 +3,7 @@ import { admin_vc_bb, ExcelHandler_vc_bb } from "./excelProfesor.js";
 import { ExcelEspaciosHandler_vc_bb } from "./excelEspacios.js";
 import { ExcelAsignaturaHandler_vc_bb } from "./excelAsignatura.js";
 import { ExcelSeccionesGradosHandler_vc_bb } from "./excelSeccionesGrados.js";
+import { ExcelDisponibilidadHandler_vc_bb } from "./excelDisponibilidad.js";
 import { GestorSesion_vc_bb, loginForm_vc_bb, logoutButton_vc_bb } from "./login.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -85,6 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const excelEspaciosHandler_vc_bb = new ExcelEspaciosHandler_vc_bb();
     const excelAsignaturaHandler_vc_bb = new ExcelAsignaturaHandler_vc_bb();
     const excelSeccionesGradosHandler_vc_bb = new ExcelSeccionesGradosHandler_vc_bb();
+    const excelDisponibilidadHandler_vc_bb = new ExcelDisponibilidadHandler_vc_bb();
     
     // Evento para subir (submit o click)
     const btnUpload = document.getElementById('btnUploadProfesores');
@@ -194,6 +196,31 @@ document.addEventListener("DOMContentLoaded", () => {
       btnDownloadAsignaturas_vc_bb.addEventListener('click', async () => {
         console.log('[App] Click btnDownloadAsignaturas: iniciando descarga');
         await excelAsignaturaHandler_vc_bb.downloadExcel_vc_bb();
+      });
+    }
+
+    // ====== Disponibilidades: Upload/Download ======
+    const formDisponibilidad_vc_bb = document.getElementById('formUploadDisponibilidad');
+    const btnUploadDisponibilidad_vc_bb = document.getElementById('btnUploadDisponibilidad');
+    const btnDownloadDisponibilidad_vc_bb = document.getElementById('btnDownloadReporteDisponibilidad');
+
+    if (formDisponibilidad_vc_bb) {
+      formDisponibilidad_vc_bb.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const file_vc_bb = excelDisponibilidadHandler_vc_bb.getCurrentFile_vc_bb();
+        await excelDisponibilidadHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
+      });
+    } else if (btnUploadDisponibilidad_vc_bb) {
+      btnUploadDisponibilidad_vc_bb.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const file_vc_bb = excelDisponibilidadHandler_vc_bb.getCurrentFile_vc_bb();
+        await excelDisponibilidadHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
+      });
+    }
+
+    if (btnDownloadDisponibilidad_vc_bb) {
+      btnDownloadDisponibilidad_vc_bb.addEventListener('click', async () => {
+        await excelDisponibilidadHandler_vc_bb.downloadExcel_vc_bb();
       });
     }
   }
