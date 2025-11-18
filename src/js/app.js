@@ -172,21 +172,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnDownloadAsignaturas_vc_bb = document.getElementById('btnDownloadReporteAsignaturas');
 
     if (formAsignaturas_vc_bb) {
+      console.log('[App] Bind submit -> Asignaturas upload');
       formAsignaturas_vc_bb.addEventListener('submit', async (e) => {
         e.preventDefault();
         const file_vc_bb = excelAsignaturaHandler_vc_bb.getCurrentFile_vc_bb();
+        console.log('[App] Click submit Asignaturas: preparando subida');
         await excelAsignaturaHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
       });
     } else if (btnUploadAsignaturas_vc_bb) {
+      console.log('[App] Bind click -> Asignaturas upload');
       btnUploadAsignaturas_vc_bb.addEventListener('click', async (e) => {
         e.preventDefault();
         const file_vc_bb = excelAsignaturaHandler_vc_bb.getCurrentFile_vc_bb();
+        console.log('[App] Click btnUploadAsignaturas: preparando subida');
         await excelAsignaturaHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
       });
     }
 
     if (btnDownloadAsignaturas_vc_bb) {
+      console.log('[App] Bind click -> Asignaturas download');
       btnDownloadAsignaturas_vc_bb.addEventListener('click', async () => {
+        console.log('[App] Click btnDownloadAsignaturas: iniciando descarga');
         await excelAsignaturaHandler_vc_bb.downloadExcel_vc_bb();
       });
     }

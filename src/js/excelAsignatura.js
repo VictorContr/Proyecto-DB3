@@ -23,13 +23,14 @@ export class ExcelAsignaturaHandler_vc_bb {
   async uploadExcel_vc_bb(file_vc_bb) {
     const confirm_vc_bb = await modal_vc_bb.showConfirm_vc_bb(
       "Subir Asignaturas",
-      "Se procesará una hoja con columnas: Asignatura (obligatoria), Horas Semanales (opcional), Grado (opcional, 1–5). ¿Deseas continuar?"
+      "Se procesará una hoja 'Asignaturas' con columnas: Asignatura (obligatoria), Horas Semanales (opcional), Descripción (opcional), Duración Bloque Min (opcional), Duración Bloque Max (opcional), Tipo de Espacio Requerido (opcional), Grado (opcional, 1–5). ¿Deseas continuar?"
     );
     if (!confirm_vc_bb) return false;
 
     this.toggleUploadState_vc_bb(true);
 
     try {
+      console.log("[ExcelAsignaturas] Subida: llamando a /api/asignaturas/excel/upload");
       const result_vc_bb = await this.excelManager_vc_bb.subir_vc_bb({
         file_vc_bb,
         uploadPath_vc_bb: "/api/asignaturas/excel/upload",
@@ -73,13 +74,14 @@ export class ExcelAsignaturaHandler_vc_bb {
   async downloadExcel_vc_bb() {
     const confirm_vc_bb = await modal_vc_bb.showConfirm_vc_bb(
       "Descargar Asignaturas",
-      "Se descargará un Excel con la hoja 'Asignaturas' (Asignatura, Horas Semanales, Grado)."
+      "Se descargará un Excel con la hoja 'Asignaturas' (Asignatura, Horas Semanales, Descripción, Duración Bloque Min, Duración Bloque Max, Tipo de Espacio Requerido, Grado)."
     );
     if (!confirm_vc_bb) return false;
 
     this.toggleDownloadState_vc_bb(true);
 
     try {
+      console.log("[ExcelAsignaturas] Descarga: llamando a /api/asignaturas/excel/download");
       const result_vc_bb = await this.excelManager_vc_bb.descargar_vc_bb({
         downloadPath_vc_bb: "/api/asignaturas/excel/download",
         fileNamePrefix_vc_bb: "asignaturas",

@@ -446,14 +446,27 @@ export const descargarAsignaturasGradosExcel_vc_bb = async (req, res) => {
       { title_vc_bb: "ID Asignatura", key_vc_bb: "ID_asignatura_bb_vc" },
       { title_vc_bb: "Asignatura", key_vc_bb: "nombre_bb_vc" },
       { title_vc_bb: "Horas Semanales", key_vc_bb: "horas_academicas_bb_vc" },
+      { title_vc_bb: "Descripción", key_vc_bb: "descripcion_bb_vc" },
+      { title_vc_bb: "Duración Bloque Min", key_vc_bb: "duracion_bloque_min_bb_vc" },
+      { title_vc_bb: "Duración Bloque Max", key_vc_bb: "duracion_bloque_max_bb_vc" },
+      { title_vc_bb: "Tipo Espacio Requerido", key_vc_bb: "tipo_espacio_requerido_bb_vc" },
       { title_vc_bb: "Grado", key_vc_bb: "nro_grado_bb_vc" },
     ],
     fetchRows_vc_bb: async () => {
       const rows_vc_bb = await db_vc_bb.all_vc_bb(
-        `SELECT a.ID_asignatura_bb_vc, a.nombre_bb_vc, a.horas_academicas_bb_vc, g.nro_grado_bb_vc
+        `SELECT 
+            a.ID_asignatura_bb_vc,
+            a.nombre_bb_vc,
+            a.horas_academicas_bb_vc,
+            a.descripcion_bb_vc,
+            a.duracion_bloque_min_bb_vc,
+            a.duracion_bloque_max_bb_vc,
+            te.tipo_bb_vc AS tipo_espacio_requerido_bb_vc,
+            g.nro_grado_bb_vc
          FROM td_Asignaturas_bb_vc a
          LEFT JOIN td_GradosAsignaturas_bb_vc ga ON ga.ID_asignatura_gradoAsig_bb_vc = a.ID_asignatura_bb_vc
          LEFT JOIN td_Grados_bb_vc g ON ga.ID_grado_gradoAsig_bb_vc = g.ID_grado_bb_vc
+         LEFT JOIN td_TipoEspacio_bb_vc te ON a.ID_TipoEspacio_requerido_bb_vc = te.ID_TipoEspacio_bb_vc
          ORDER BY a.nombre_bb_vc ASC, g.nro_grado_bb_vc ASC`
       );
       return rows_vc_bb;
@@ -479,11 +492,19 @@ export const subirAsignaturasGradosExcel_vc_bb = async (req, res) => {
       columns_vc_bb: [
         { key_vc_bb: "nombre_bb_vc", required_vc_bb: true },
         { key_vc_bb: "horas_academicas_bb_vc", required_vc_bb: false },
+        { key_vc_bb: "descripcion_bb_vc", required_vc_bb: false },
+        { key_vc_bb: "duracion_bloque_min_bb_vc", required_vc_bb: false },
+        { key_vc_bb: "duracion_bloque_max_bb_vc", required_vc_bb: false },
+        { key_vc_bb: "tipo_espacio_requerido_bb_vc", required_vc_bb: false },
         { key_vc_bb: "nro_grado_bb_vc", required_vc_bb: false },
       ],
       processRow_vc_bb: async (rowMap_vc_bb) => {
         const nombre_vc_bb = String(rowMap_vc_bb.nombre_bb_vc || "").trim();
         const horasRaw_vc_bb = rowMap_vc_bb.horas_academicas_bb_vc;
+        const descripcionRaw_vc_bb = rowMap_vc_bb.descripcion_bb_vc;
+        const durMinRaw_vc_bb = rowMap_vc_bb.duracion_bloque_min_bb_vc;
+        const durMaxRaw_vc_bb = rowMap_vc_bb.duracion_bloque_max_bb_vc;
+        const tipoEspacioNombre_vc_bb = String(rowMap_vc_bb.tipo_espacio_requerido_bb_vc || "").trim();
         const gradoRaw_vc_bb = rowMap_vc_bb.nro_grado_bb_vc;
 
         if (!nombre_vc_bb) throw new Error("Nombre de asignatura vacío");
@@ -495,16 +516,57 @@ export const subirAsignaturasGradosExcel_vc_bb = async (req, res) => {
           throw new Error("Horas académicas inválidas");
         }
 
+        const durMin_vc_bb = durMinRaw_vc_bb != null && durMinRaw_vc_bb !== ""
+          ? parseInt(String(durMinRaw_vc_bb).trim(), 10)
+          : null;
+        const durMax_vc_bb = durMaxRaw_vc_bb != null && durMaxRaw_vc_bb !== ""
+          ? parseInt(String(durMaxRaw_vc_bb).trim(), 10)
+          : null;
+        if (durMin_vc_bb != null && (!Number.isInteger(durMin_vc_bb) || durMin_vc_bb < 1)) {
+          throw new Error("Duración mínima inválida (entero >= 1)");
+        }
+        if (durMax_vc_bb != null && (!Number.isInteger(durMax_vc_bb) || durMax_vc_bb < 1)) {
+          throw new Error("Duración máxima inválida (entero >= 1)");
+        }
+        if (durMin_vc_bb != null && durMax_vc_bb != null && durMin_vc_bb > durMax_vc_bb) {
+          throw new Error("Duración mínima no puede ser mayor que máxima");
+        }
+
         // Upsert asignatura por nombre (evitar duplicados de nombre)
         let asignatura_vc_bb = await db_vc_bb.get_vc_bb(
-          "SELECT ID_asignatura_bb_vc, horas_academicas_bb_vc FROM td_Asignaturas_bb_vc WHERE nombre_bb_vc = ?",
+          "SELECT ID_asignatura_bb_vc, horas_academicas_bb_vc, descripcion_bb_vc, duracion_bloque_min_bb_vc, duracion_bloque_max_bb_vc, ID_TipoEspacio_requerido_bb_vc FROM td_Asignaturas_bb_vc WHERE nombre_bb_vc = ?",
           [nombre_vc_bb]
         );
 
         if (!asignatura_vc_bb) {
+          // Resolver tipo de espacio requerido si viene por nombre
+          let tipoEspacioId_vc_bb = null;
+          if (tipoEspacioNombre_vc_bb) {
+            const tipo_vc_bb = await db_vc_bb.get_vc_bb(
+              "SELECT ID_TipoEspacio_bb_vc FROM td_TipoEspacio_bb_vc WHERE tipo_bb_vc = ?",
+              [tipoEspacioNombre_vc_bb]
+            );
+            if (!tipo_vc_bb) {
+              const insertedTipo_vc_bb = await db_vc_bb.run_vc_bb(
+                `INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) VALUES (?)`,
+                [tipoEspacioNombre_vc_bb]
+              );
+              tipoEspacioId_vc_bb = insertedTipo_vc_bb.lastID;
+            } else {
+              tipoEspacioId_vc_bb = tipo_vc_bb.ID_TipoEspacio_bb_vc;
+            }
+          }
+
           const insert_vc_bb = await db_vc_bb.run_vc_bb(
-            `INSERT INTO td_Asignaturas_bb_vc (nombre_bb_vc, horas_academicas_bb_vc) VALUES (?, ?)`,
-            [nombre_vc_bb, horas_vc_bb ?? null]
+            `INSERT INTO td_Asignaturas_bb_vc (nombre_bb_vc, horas_academicas_bb_vc, descripcion_bb_vc, duracion_bloque_min_bb_vc, duracion_bloque_max_bb_vc, ID_TipoEspacio_requerido_bb_vc) VALUES (?, ?, ?, ?, ?, ?)`,
+            [
+              nombre_vc_bb,
+              horas_vc_bb ?? null,
+              descripcionRaw_vc_bb != null ? String(descripcionRaw_vc_bb).trim() : null,
+              durMin_vc_bb ?? null,
+              durMax_vc_bb ?? null,
+              tipoEspacioId_vc_bb ?? null,
+            ]
           );
           asignatura_vc_bb = { ID_asignatura_bb_vc: insert_vc_bb.lastID };
         } else if (horas_vc_bb != null && horas_vc_bb !== asignatura_vc_bb.horas_academicas_bb_vc) {
@@ -512,6 +574,48 @@ export const subirAsignaturasGradosExcel_vc_bb = async (req, res) => {
           await db_vc_bb.run_vc_bb(
             `UPDATE td_Asignaturas_bb_vc SET horas_academicas_bb_vc = ? WHERE ID_asignatura_bb_vc = ?`,
             [horas_vc_bb, asignatura_vc_bb.ID_asignatura_bb_vc]
+          );
+        }
+
+        // Actualizar descripción si viene nueva
+        if (descripcionRaw_vc_bb != null) {
+          const nuevaDesc_vc_bb = String(descripcionRaw_vc_bb).trim();
+          await db_vc_bb.run_vc_bb(
+            `UPDATE td_Asignaturas_bb_vc SET descripcion_bb_vc = ? WHERE ID_asignatura_bb_vc = ?`,
+            [nuevaDesc_vc_bb, asignatura_vc_bb.ID_asignatura_bb_vc]
+          );
+        }
+
+        // Actualizar duraciones si vienen válidas
+        if (durMin_vc_bb != null) {
+          await db_vc_bb.run_vc_bb(
+            `UPDATE td_Asignaturas_bb_vc SET duracion_bloque_min_bb_vc = ? WHERE ID_asignatura_bb_vc = ?`,
+            [durMin_vc_bb, asignatura_vc_bb.ID_asignatura_bb_vc]
+          );
+        }
+        if (durMax_vc_bb != null) {
+          await db_vc_bb.run_vc_bb(
+            `UPDATE td_Asignaturas_bb_vc SET duracion_bloque_max_bb_vc = ? WHERE ID_asignatura_bb_vc = ?`,
+            [durMax_vc_bb, asignatura_vc_bb.ID_asignatura_bb_vc]
+          );
+        }
+
+        // Actualizar tipo de espacio requerido si viene nombre
+        if (tipoEspacioNombre_vc_bb) {
+          let tipo_vc_bb = await db_vc_bb.get_vc_bb(
+            "SELECT ID_TipoEspacio_bb_vc FROM td_TipoEspacio_bb_vc WHERE tipo_bb_vc = ?",
+            [tipoEspacioNombre_vc_bb]
+          );
+          if (!tipo_vc_bb) {
+            const insertedTipo_vc_bb = await db_vc_bb.run_vc_bb(
+              `INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) VALUES (?)`,
+              [tipoEspacioNombre_vc_bb]
+            );
+            tipo_vc_bb = { ID_TipoEspacio_bb_vc: insertedTipo_vc_bb.lastID };
+          }
+          await db_vc_bb.run_vc_bb(
+            `UPDATE td_Asignaturas_bb_vc SET ID_TipoEspacio_requerido_bb_vc = ? WHERE ID_asignatura_bb_vc = ?`,
+            [tipo_vc_bb.ID_TipoEspacio_bb_vc, asignatura_vc_bb.ID_asignatura_bb_vc]
           );
         }
 
@@ -532,14 +636,12 @@ export const subirAsignaturasGradosExcel_vc_bb = async (req, res) => {
             `SELECT ID_gradoAsignatura_bb_vc FROM td_GradosAsignaturas_bb_vc WHERE ID_grado_gradoAsig_bb_vc = ? AND ID_asignatura_gradoAsig_bb_vc = ?`,
             [grado_vc_bb.ID_grado_bb_vc, asignatura_vc_bb.ID_asignatura_bb_vc]
           );
-          if (existingRel_vc_bb) {
-            throw new Error(`La asignatura '${nombre_vc_bb}' ya está asociada al grado '${gradoNum_vc_bb}'`);
+          if (!existingRel_vc_bb) {
+            await db_vc_bb.run_vc_bb(
+              `INSERT INTO td_GradosAsignaturas_bb_vc (ID_grado_gradoAsig_bb_vc, ID_asignatura_gradoAsig_bb_vc) VALUES (?, ?)`,
+              [grado_vc_bb.ID_grado_bb_vc, asignatura_vc_bb.ID_asignatura_bb_vc]
+            );
           }
-
-          await db_vc_bb.run_vc_bb(
-            `INSERT INTO td_GradosAsignaturas_bb_vc (ID_grado_gradoAsig_bb_vc, ID_asignatura_gradoAsig_bb_vc) VALUES (?, ?)`,
-            [grado_vc_bb.ID_grado_bb_vc, asignatura_vc_bb.ID_asignatura_bb_vc]
-          );
         }
       },
     });
@@ -555,9 +657,9 @@ export const subirAsignaturasGradosExcel_vc_bb = async (req, res) => {
   }
 };
 
-// ===============================================
+
 // 📦 Excel combinado: Grados + Secciones (una sola .xlsx)
-// ===============================================
+
 
 // 📤 Descargar Grados y Secciones en un solo Excel (dos hojas)
 export const descargarGradosSeccionesExcel_vc_bb = async (req, res) => {
