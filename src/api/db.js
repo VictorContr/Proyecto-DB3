@@ -103,9 +103,6 @@ class Database_vc_bb {
                   '3:00 pm',
                   '4:00 pm'
                 )
-              ),
-              turno_bloque_bb_vc TEXT NOT NULL CHECK (
-                turno_bloque_bb_vc IN ('mañana', 'tarde')
               )
             );
 
@@ -225,12 +222,12 @@ class Database_vc_bb {
           } else {
             console.log("✅ Esquema de tablas verificado/creado exitosamente");
 
-            // Antes de sembrar, asegurar columna de turno y luego unicidad
-            this.ensureBloqueTurnoColumn_vc_bb()
+            // Migrar eliminación de columna 'turno' en Bloque si existe, aplicar unicidad y sembrar
+            this.migrateRemoveBloqueTurno_vc_bb()
               .then(() => this.enforceUniqueness_vc_bb())
               .then(() => this.seedInitialData_vc_bb())
               .catch((err_vc_bb) => {
-                console.error("❌ Error aplicando unicidad antes del seed:", err_vc_bb.message);
+                console.error("❌ Error en migración/unicidad antes del seed:", err_vc_bb.message);
                 // Aun así intentamos el seed para no bloquear el arranque
                 this.seedInitialData_vc_bb();
               });
@@ -308,29 +305,44 @@ class Database_vc_bb {
           WHERE ID_usuario_usuarioRol_bb_vc = (SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'profe1')
           AND ID_rol_usuarioRol_bb_vc = (SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Profesor');
         `);
-        // (Se omiten inserciones de días, bloques, grados y secciones según requerimiento)
+        // 4. Insertar Días
+        await this.run_vc_bb(`INSERT OR IGNORE INTO td_Dia_bb_vc (dia_bb_vc) VALUES 
+          ('lunes'), ('martes'), ('miércoles'), ('jueves'), ('viernes');`);
+        // 5. Insertar Bloques (solo hora; sin turno)
+        await this.run_vc_bb(`INSERT OR IGNORE INTO td_Bloque_bb_vc (hora_bloque_bb_vc) VALUES 
+          ('7:00 am'), ('8:00 am'), ('9:00 am'), ('10:00 am'), ('11:00 am'),
+          ('12:00 pm'), ('1:00 pm'), ('2:00 pm'), ('3:00 pm'), ('4:00 pm');`);
         console.log("✅ Datos iniciales (admin, profesor, roles, etc.) insertados/verificados correctamente.");
       } catch (err) {
         console.error("❌ Error insertando datos iniciales:", err.message);
       }
     }
 
-    async ensureBloqueTurnoColumn_vc_bb() {
+    async migrateRemoveBloqueTurno_vc_bb() {
       try {
         const cols_vc_bb = await this.all_vc_bb(`PRAGMA table_info(td_Bloque_bb_vc);`);
         const hasTurno_vc_bb = cols_vc_bb.some((c_vc_bb) => c_vc_bb.name === 'turno_bloque_bb_vc');
-        if (!hasTurno_vc_bb) {
-          console.log("[DB] Añadiendo columna 'turno_bloque_bb_vc' a td_Bloque_bb_vc...");
-          await this.run_vc_bb(`ALTER TABLE td_Bloque_bb_vc ADD COLUMN turno_bloque_bb_vc TEXT;`);
-          await this.run_vc_bb(`UPDATE td_Bloque_bb_vc
-            SET turno_bloque_bb_vc = CASE
-              WHEN hora_bloque_bb_vc IN ('1:00 pm','2:00 pm','3:00 pm','4:00 pm') THEN 'tarde'
-              ELSE 'mañana'
-            END;`);
-          console.log("[DB] Columna 'turno_bloque_bb_vc' añadida y poblada.");
+        if (hasTurno_vc_bb) {
+          console.log("[DB] Migrando td_Bloque_bb_vc para eliminar columna 'turno_bloque_bb_vc'...");
+          await this.run_vc_bb(`PRAGMA foreign_keys = OFF;`);
+          await this.run_vc_bb(`CREATE TABLE IF NOT EXISTS td_Bloque_bb_vc_new (
+              ID_bloque_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+              hora_bloque_bb_vc TEXT NOT NULL UNIQUE CHECK (
+                hora_bloque_bb_vc IN (
+                  '7:00 am','8:00 am','9:00 am','10:00 am','11:00 am',
+                  '12:00 pm','1:00 pm','2:00 pm','3:00 pm','4:00 pm'
+                )
+              )
+            );`);
+          await this.run_vc_bb(`INSERT INTO td_Bloque_bb_vc_new (ID_bloque_bb_vc, hora_bloque_bb_vc)
+                                 SELECT ID_bloque_bb_vc, hora_bloque_bb_vc FROM td_Bloque_bb_vc;`);
+          await this.run_vc_bb(`DROP TABLE td_Bloque_bb_vc;`);
+          await this.run_vc_bb(`ALTER TABLE td_Bloque_bb_vc_new RENAME TO td_Bloque_bb_vc;`);
+          await this.run_vc_bb(`PRAGMA foreign_keys = ON;`);
+          console.log("[DB] Migración completada: columna 'turno_bloque_bb_vc' eliminada.");
         }
       } catch (err_vc_bb) {
-        console.error("❌ Error asegurando columna turno_bloque_bb_vc:", err_vc_bb.message);
+        console.error("❌ Error migrando tabla Bloque para eliminar 'turno':", err_vc_bb.message);
       }
     }
 
