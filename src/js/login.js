@@ -110,7 +110,8 @@ export class GestorSesion_vc_bb {
     }
     
     setTimeout(() => {
-      location.href = "index.html";
+      // Redirigir a la vista de login usando ruta absoluta para evitar 404
+      location.href = "/views/index.html";
     }, 1000);
   }
 
@@ -147,7 +148,8 @@ export class GestorSesion_vc_bb {
       }
 
       setTimeout(() => {
-        location.href = "index.html"; // Ajuste de ruta para salir de /views/
+        // Usar ruta absoluta al login para evitar problemas de rutas relativas
+        location.href = "/views/index.html";
       }, 1000);
       return false;
     }

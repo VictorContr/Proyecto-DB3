@@ -4,7 +4,7 @@ import {fileURLToPath} from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 let ventana_vc_bb;
-export const crearVentana_vc_bb = () => {
+export const crearVentana_vc_bb = async () => {
   ventana_vc_bb = new BrowserWindow({
     width: 1600,
     height: 820,
@@ -14,7 +14,35 @@ export const crearVentana_vc_bb = () => {
       devTools: true
     }
   });
-  ventana_vc_bb.loadFile(path.join(__dirname, '..','/','views','/' ,'index.html'));
+  // Intentar cargar la API/servidor si está disponible (desarrollo).
+  const port = process.env.PORT || 3000;
+  const serverUrl = `http://localhost:${port}`;
+  // Página que queremos cargar cuando el servidor HTTP esté arriba
+  const pagePath = `${serverUrl}/views/index.html`;
+
+  // Esperar un poco por si el servidor HTTP todavía está arrancando.
+  const waitForServer = async (url, attempts = 20, delay = 200) => {
+    for (let i = 0; i < attempts; i++) {
+      try {
+        const res = await fetch(url, { method: "HEAD" });
+        if (res && (res.ok || res.status === 200 || res.status === 204)) return true;
+      } catch (e) {
+        // Ignorar y hacer retry
+      }
+      await new Promise(r => setTimeout(r, delay));
+    }
+    return false;
+  };
+
+  const serverAvailable = await waitForServer(serverUrl, 20, 250);
+  if (serverAvailable) {
+    ventana_vc_bb.loadURL(pagePath);
+    return;
+  }
+  console.warn("Servidor HTTP no respondió tras esperar, cargando archivo local.");
+
+  // Fallback: cargar la vista local (file://) si no hay servidor HTTP disponible.
+  ventana_vc_bb.loadFile(path.join(__dirname, '..', '/', 'views', '/', 'index.html'));
 };
 
 // Handlers IPC

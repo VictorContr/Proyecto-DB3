@@ -5,9 +5,13 @@ import { ExcelAsignaturaHandler_vc_bb } from "./excelAsignatura.js";
 import { ExcelSeccionesGradosHandler_vc_bb } from "./excelSeccionesGrados.js";
 import { ExcelDisponibilidadHandler_vc_bb } from "./excelDisponibilidad.js";
 import { GestorSesion_vc_bb, loginForm_vc_bb, logoutButton_vc_bb } from "./login.js";
+import "../components/crudTable.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("cargado el app_vc_bb");
+  // Inicializar toggle de tema siempre para que páginas sin login/logout también funcionen
+  setupThemeToggle_vc_bb();
+
   if (GestorSesion_vc_bb.verificarAcceso_vc_bb()) {
   // El método ya maneja la redirección automáticamente
   console.log("Verificando ...")

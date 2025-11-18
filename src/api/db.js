@@ -44,175 +44,273 @@ class Database_vc_bb {
     createTable_vc_bb() {
         // Script SQL completo para crear el esquema de la base de datos
         const sql_vc_bb = `
-            PRAGMA foreign_keys = ON;
+          PRAGMA foreign_keys = ON;
 
-            -- -----------------------------------------------------
-            -- Tablas de Estructura Básica (Usuarios y Roles)
-            -- -----------------------------------------------------
-            CREATE TABLE IF NOT EXISTS td_Usuarios_bb_vc (
-              ID_usuario_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              nombre_bb_vc TEXT NOT NULL,
-              apellido_bb_vc TEXT NOT NULL,
-              userName_bb_vc VARCHAR(80) UNIQUE NOT NULL,
-              correo_bb_vc TEXT NOT NULL,
-              telefono_bb_vc TEXT NOT NULL,
-              password_bb_vc VARCHAR(250) NOT NULL 
-            );
+          -- -----------------------------------------------------
+          -- Tablas de Estructura Básica (Usuarios y Roles)
+          -- -----------------------------------------------------
+          CREATE TABLE IF NOT EXISTS td_Usuarios_bb_vc (
+            ID_usuario_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre_bb_vc TEXT NOT NULL,
+            apellido_bb_vc TEXT NOT NULL,
+            userName_bb_vc VARCHAR(80) UNIQUE NOT NULL,
+            correo_bb_vc TEXT NOT NULL,
+            telefono_bb_vc TEXT NOT NULL,
+            password_bb_vc VARCHAR(250) NOT NULL
+          );
 
-            CREATE TABLE IF NOT EXISTS td_Rol_bb_vc (
-              ID_rol_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              rol_bb_vc TEXT
-            );
-            
-            CREATE TABLE IF NOT EXISTS td_UsuarioRol_bb_vc (
-              ID_usuarioRol_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              ID_usuario_usuarioRol_bb_vc INTEGER NOT NULL,
-              ID_rol_usuarioRol_bb_vc INTEGER NOT NULL,
-              FOREIGN KEY (ID_usuario_usuarioRol_bb_vc) REFERENCES td_Usuarios_bb_vc(ID_usuario_bb_vc),
-              FOREIGN KEY (ID_rol_usuarioRol_bb_vc) REFERENCES td_Rol_bb_vc(ID_rol_bb_vc)
-            );
+          CREATE TABLE IF NOT EXISTS td_Rol_bb_vc (
+            ID_rol_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            rol_bb_vc TEXT UNIQUE
+          );
 
-            -- Tablas de especialización de usuarios
-            CREATE TABLE IF NOT EXISTS td_Administradores_bb_vc(
-              ID_administradores_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              ID_usuarioRol_admin_bb_vc INTEGER NOT NULL,
-              FOREIGN KEY (ID_usuarioRol_admin_bb_vc) REFERENCES td_UsuarioRol_bb_vc(ID_usuarioRol_bb_vc)
-            );
+          CREATE TABLE IF NOT EXISTS td_UsuarioRol_bb_vc (
+            ID_usuarioRol_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            ID_usuario_usuarioRol_bb_vc INTEGER NOT NULL,
+            ID_rol_usuarioRol_bb_vc INTEGER NOT NULL,
+            FOREIGN KEY (ID_usuario_usuarioRol_bb_vc) REFERENCES td_Usuarios_bb_vc(ID_usuario_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_rol_usuarioRol_bb_vc) REFERENCES td_Rol_bb_vc(ID_rol_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            UNIQUE (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
+          );
 
-            CREATE TABLE IF NOT EXISTS td_Profesores_bb_vc(
-              ID_profesor_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              ID_usuarioRol_profesor_bb_vc INTEGER NOT NULL,
-              FOREIGN KEY (ID_usuarioRol_profesor_bb_vc) REFERENCES td_UsuarioRol_bb_vc(ID_usuarioRol_bb_vc)
-            );
+          -- Tablas de especialización de usuarios
+          CREATE TABLE IF NOT EXISTS td_Administradores_bb_vc(
+            ID_administradores_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            ID_usuarioRol_admin_bb_vc INTEGER NOT NULL,
+            FOREIGN KEY (ID_usuarioRol_admin_bb_vc) REFERENCES td_UsuarioRol_bb_vc(ID_usuarioRol_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            UNIQUE (ID_usuarioRol_admin_bb_vc)
+          );
 
-            -- -----------------------------------------------------
-            -- Tablas de Recursos Temporales y Espaciales
-            -- -----------------------------------------------------
-            CREATE TABLE IF NOT EXISTS td_Bloque_bb_vc(
-              ID_bloque_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              hora_bloque_bb_vc TEXT NOT NULL UNIQUE CHECK (
+          CREATE TABLE IF NOT EXISTS td_Profesores_bb_vc(
+            ID_profesor_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            ID_usuarioRol_profesor_bb_vc INTEGER NOT NULL,
+            FOREIGN KEY (ID_usuarioRol_profesor_bb_vc) REFERENCES td_UsuarioRol_bb_vc(ID_usuarioRol_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            UNIQUE (ID_usuarioRol_profesor_bb_vc)
+          );
+
+          -- -----------------------------------------------------
+          -- Tablas de Recursos Temporales y Espaciales
+          -- -----------------------------------------------------
+          CREATE TABLE IF NOT EXISTS td_Bloque_bb_vc(
+            ID_bloque_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            hora_bloque_bb_vc TEXT NOT NULL UNIQUE CHECK (
               hora_bloque_bb_vc IN (
-                  '7:00 am',
-                  '8:00 am',
-                  '9:00 am',
-                  '10:00 am',
-                  '11:00 am',
-                  '12:00 pm',
-                  '1:00 pm',
-                  '2:00 pm',
-                  '3:00 pm',
-                  '4:00 pm'
-                )
+                '7:00 am','8:00 am','9:00 am','10:00 am','11:00 am',
+                '12:00 pm','1:00 pm','2:00 pm','3:00 pm','4:00 pm'
               )
-            );
+            )
+          );
 
-            CREATE TABLE IF NOT EXISTS td_Dia_bb_vc (
-              ID_dia_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              dia_bb_vc TEXT NOT NULL UNIQUE CHECK (
-                dia_bb_vc IN ('lunes', 'martes', 'miércoles', 'jueves', 'viernes')
-              )
-            );
+          CREATE TABLE IF NOT EXISTS td_Dia_bb_vc (
+            ID_dia_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            dia_bb_vc TEXT NOT NULL UNIQUE CHECK (
+              dia_bb_vc IN ('lunes', 'martes', 'miércoles', 'jueves', 'viernes')
+            )
+          );
 
-            CREATE TABLE IF NOT EXISTS td_TipoEspacio_bb_vc (
-              ID_TipoEspacio_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              tipo_bb_vc TEXT -- Ej: "Aula Genérica", "Laboratorio", "Cancha"
-            );
+          CREATE TABLE IF NOT EXISTS td_TipoEspacio_bb_vc (
+            ID_TipoEspacio_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            tipo_bb_vc TEXT
+          );
 
-            CREATE TABLE IF NOT EXISTS td_Espacios_bb_vc (
-              ID_espacio_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              nombre_bb_vc TEXT,
-              capacidad_bb_vc INTEGER,
-              ID_TipoEspacio_espacio_bb_vc INTEGER,
-              FOREIGN KEY (ID_TipoEspacio_espacio_bb_vc) REFERENCES td_TipoEspacio_bb_vc(ID_TipoEspacio_bb_vc)
-            );
+          CREATE TABLE IF NOT EXISTS td_Espacios_bb_vc (
+            ID_espacio_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre_bb_vc TEXT NOT NULL,
+            capacidad_bb_vc INTEGER,
+            ID_TipoEspacio_espacio_bb_vc INTEGER,
+            FOREIGN KEY (ID_TipoEspacio_espacio_bb_vc) REFERENCES td_TipoEspacio_bb_vc(ID_TipoEspacio_bb_vc) ON DELETE SET NULL ON UPDATE CASCADE
+          );
 
-            -- -----------------------------------------------------
-            -- Tablas de Estructura Académica (Pensum)
-            -- -----------------------------------------------------
-            CREATE TABLE IF NOT EXISTS td_Grados_bb_vc (
-              ID_grado_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              nro_grado_bb_vc INTEGER UNIQUE,
-              CHECK (nro_grado_bb_vc >= 1 AND nro_grado_bb_vc <= 5)
-            );
+          -- -----------------------------------------------------
+          -- Tablas de Estructura Académica (Pensum)
+          -- -----------------------------------------------------
+          CREATE TABLE IF NOT EXISTS td_Grados_bb_vc (
+            ID_grado_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            nro_grado_bb_vc INTEGER UNIQUE NOT NULL CHECK (nro_grado_bb_vc >= 1 AND nro_grado_bb_vc <= 5)
+          );
 
-            CREATE TABLE IF NOT EXISTS td_Secciones_bb_vc (
-              ID_seccion_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              letra_seccion_bb_vc TEXT UNIQUE -- Ej: 'A', 'B'
-            );
+          CREATE TABLE IF NOT EXISTS td_Secciones_bb_vc (
+            ID_seccion_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            letra_seccion_bb_vc TEXT UNIQUE NOT NULL
+          );
 
-            CREATE TABLE IF NOT EXISTS td_Asignaturas_bb_vc (
-              ID_asignatura_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              nombre_bb_vc TEXT NOT NULL,
-              horas_academicas_bb_vc INTEGER, -- Horas *semanales* requeridas para el pensum
-              descripcion_bb_vc TEXT,
-              duracion_bloque_min_bb_vc INTEGER DEFAULT 1,
-              duracion_bloque_max_bb_vc INTEGER DEFAULT 1,
-              ID_TipoEspacio_requerido_bb_vc INTEGER NULL,
-              FOREIGN KEY (ID_TipoEspacio_requerido_bb_vc) REFERENCES td_TipoEspacio_bb_vc(ID_TipoEspacio_bb_vc)
-            );
+          -- Tabla "Clases" (grado + seccion)
+          CREATE TABLE IF NOT EXISTS td_Clases_bb_vc (
+            ID_clase_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            ID_grado_clase_bb_vc INTEGER NOT NULL,
+            ID_seccion_clase_bb_vc INTEGER NOT NULL,
+            FOREIGN KEY (ID_grado_clase_bb_vc) REFERENCES td_Grados_bb_vc(ID_grado_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_seccion_clase_bb_vc) REFERENCES td_Secciones_bb_vc(ID_seccion_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            UNIQUE (ID_grado_clase_bb_vc, ID_seccion_clase_bb_vc)
+          );
 
-            CREATE TABLE IF NOT EXISTS td_GradosAsignaturas_bb_vc (
-              ID_gradoAsignatura_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              ID_grado_gradoAsig_bb_vc INTEGER,
-              ID_asignatura_gradoAsig_bb_vc INTEGER,
-              FOREIGN KEY (ID_grado_gradoAsig_bb_vc) REFERENCES td_Grados_bb_vc(ID_grado_bb_vc),
-              FOREIGN KEY (ID_asignatura_gradoAsig_bb_vc) REFERENCES td_Asignaturas_bb_vc(ID_asignatura_bb_vc)
-            );
+          CREATE TABLE IF NOT EXISTS td_Asignaturas_bb_vc (
+            ID_asignatura_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre_bb_vc TEXT NOT NULL,
+            horas_academicas_bb_vc INTEGER,
+            descripcion_bb_vc TEXT,
+            duracion_bloque_min_bb_vc INTEGER DEFAULT 1,
+            duracion_bloque_max_bb_vc INTEGER DEFAULT 1,
+            ID_TipoEspacio_requerido_bb_vc INTEGER NULL,
+            FOREIGN KEY (ID_TipoEspacio_requerido_bb_vc) REFERENCES td_TipoEspacio_bb_vc(ID_TipoEspacio_bb_vc) ON DELETE SET NULL ON UPDATE CASCADE,
+            UNIQUE (nombre_bb_vc)
+          );
 
-            -- -----------------------------------------------------
-            -- Tabla de Idoneidad de Profesores (R3.4)
-            -- -----------------------------------------------------
-            CREATE TABLE IF NOT EXISTS td_ProfesorAsignaturas_bb_vc (
-              ID_profesorAsig_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              ID_profesor_profAsig_bb_vc INTEGER,
-              ID_asignatura_profAsig_bb_vc INTEGER,
-              FOREIGN KEY (ID_profesor_profAsig_bb_vc) REFERENCES td_Profesores_bb_vc(ID_profesor_bb_vc),
-              FOREIGN KEY (ID_asignatura_profAsig_bb_vc) REFERENCES td_Asignaturas_bb_vc(ID_asignatura_bb_vc)
-            );
+          CREATE TABLE IF NOT EXISTS td_GradosAsignaturas_bb_vc (
+            ID_gradoAsignatura_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            ID_grado_gradoAsig_bb_vc INTEGER NOT NULL,
+            ID_asignatura_gradoAsig_bb_vc INTEGER NOT NULL,
+            FOREIGN KEY (ID_grado_gradoAsig_bb_vc) REFERENCES td_Grados_bb_vc(ID_grado_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_asignatura_gradoAsig_bb_vc) REFERENCES td_Asignaturas_bb_vc(ID_asignatura_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            UNIQUE (ID_grado_gradoAsig_bb_vc, ID_asignatura_gradoAsig_bb_vc)
+          );
 
-            -- -----------------------------------------------------
-            -- Tablas de Disponibilidad (Restricciones de Entrada)
-            -- -----------------------------------------------------
-            CREATE TABLE IF NOT EXISTS td_DisponibilidadProfesor_bb_vc (
-              ID_DisponibilidadProfesor_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              ID_dia_DispProfesor_bb_vc INTEGER,
-              ID_bloque_DispProfesor_bb_vc INTEGER,
-              ID_profesor_DispProfesor_bb_vc INTEGER,
-              FOREIGN KEY (ID_dia_DispProfesor_bb_vc) REFERENCES td_Dia_bb_vc(ID_dia_bb_vc),
-              FOREIGN KEY (ID_bloque_DispProfesor_bb_vc) REFERENCES td_Bloque_bb_vc(ID_bloque_bb_vc),
-              FOREIGN KEY (ID_profesor_DispProfesor_bb_vc) REFERENCES td_Profesores_bb_vc(ID_profesor_bb_vc)
-            );
+          -- -----------------------------------------------------
+          -- Tabla de Idoneidad de Profesores (R3.4)
+          -- -----------------------------------------------------
+          CREATE TABLE IF NOT EXISTS td_ProfesorAsignaturas_bb_vc (
+            ID_profesorAsig_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            ID_profesor_profAsig_bb_vc INTEGER NOT NULL,
+            ID_asignatura_profAsig_bb_vc INTEGER NOT NULL,
+            FOREIGN KEY (ID_profesor_profAsig_bb_vc) REFERENCES td_Profesores_bb_vc(ID_profesor_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_asignatura_profAsig_bb_vc) REFERENCES td_Asignaturas_bb_vc(ID_asignatura_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            UNIQUE (ID_profesor_profAsig_bb_vc, ID_asignatura_profAsig_bb_vc)
+          );
 
-            CREATE TABLE IF NOT EXISTS td_DisponibilidadEspacio_bb_vc (
-              ID_DisponibilidadEspacio_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              ID_dia_DispEspacio_bb_vc INTEGER,
-              ID_bloque_DispEspacio_bb_vc INTEGER,
-              ID_espacio_DispEspacio_bb_vc INTEGER,
-              FOREIGN KEY (ID_dia_DispEspacio_bb_vc) REFERENCES td_Dia_bb_vc(ID_dia_bb_vc),
-              FOREIGN KEY (ID_bloque_DispEspacio_bb_vc) REFERENCES td_Bloque_bb_vc(ID_bloque_bb_vc),
-              FOREIGN KEY (ID_espacio_DispEspacio_bb_vc) REFERENCES td_Espacios_bb_vc(ID_espacio_bb_vc)
-            );
+          -- -----------------------------------------------------
+          -- Tablas de Disponibilidad (Restricciones de Entrada)
+          -- -----------------------------------------------------
+          CREATE TABLE IF NOT EXISTS td_DisponibilidadProfesor_bb_vc (
+            ID_DisponibilidadProfesor_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            ID_dia_DispProfesor_bb_vc INTEGER NOT NULL,
+            ID_bloque_DispProfesor_bb_vc INTEGER NOT NULL,
+            ID_profesor_DispProfesor_bb_vc INTEGER NOT NULL,
+            FOREIGN KEY (ID_dia_DispProfesor_bb_vc) REFERENCES td_Dia_bb_vc(ID_dia_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_bloque_DispProfesor_bb_vc) REFERENCES td_Bloque_bb_vc(ID_bloque_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_profesor_DispProfesor_bb_vc) REFERENCES td_Profesores_bb_vc(ID_profesor_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            UNIQUE (ID_dia_DispProfesor_bb_vc, ID_bloque_DispProfesor_bb_vc, ID_profesor_DispProfesor_bb_vc)
+          );
 
-            -- -----------------------------------------------------
-            -- Tabla Central: El Horario (Resultado del Algoritmo)
-            -- -----------------------------------------------------
-            CREATE TABLE IF NOT EXISTS td_Horario_bb_vc (
-              ID_Horario_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-              ID_dia_horario_bb_vc INTEGER,
-              ID_bloque_horario_bb_vc INTEGER,
-              ID_asignatura_horario_bb_vc INTEGER,
-              ID_espacio_horario_bb_vc INTEGER,
-              ID_profesor_horario_bb_vc INTEGER,
-              ID_grado_horario_bb_vc INTEGER,
-              ID_seccion_horario_bb_vc INTEGER,
-              FOREIGN KEY (ID_dia_horario_bb_vc) REFERENCES td_Dia_bb_vc(ID_dia_bb_vc),
-              FOREIGN KEY (ID_bloque_horario_bb_vc) REFERENCES td_Bloque_bb_vc(ID_bloque_bb_vc),
-              FOREIGN KEY (ID_asignatura_horario_bb_vc) REFERENCES td_Asignaturas_bb_vc(ID_asignatura_bb_vc),
-              FOREIGN KEY (ID_espacio_horario_bb_vc) REFERENCES td_Espacios_bb_vc(ID_espacio_bb_vc),
-              FOREIGN KEY (ID_profesor_horario_bb_vc) REFERENCES td_Profesores_bb_vc(ID_profesor_bb_vc),
-              FOREIGN KEY (ID_grado_horario_bb_vc) REFERENCES td_Grados_bb_vc(ID_grado_bb_vc),
-              FOREIGN KEY (ID_seccion_horario_bb_vc) REFERENCES td_Secciones_bb_vc(ID_seccion_bb_vc)
-            );
+          CREATE TABLE IF NOT EXISTS td_DisponibilidadEspacio_bb_vc (
+            ID_DisponibilidadEspacio_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            ID_dia_DispEspacio_bb_vc INTEGER NOT NULL,
+            ID_bloque_DispEspacio_bb_vc INTEGER NOT NULL,
+            ID_espacio_DispEspacio_bb_vc INTEGER NOT NULL,
+            FOREIGN KEY (ID_dia_DispEspacio_bb_vc) REFERENCES td_Dia_bb_vc(ID_dia_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_bloque_DispEspacio_bb_vc) REFERENCES td_Bloque_bb_vc(ID_bloque_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_espacio_DispEspacio_bb_vc) REFERENCES td_Espacios_bb_vc(ID_espacio_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            UNIQUE (ID_dia_DispEspacio_bb_vc, ID_bloque_DispEspacio_bb_vc, ID_espacio_DispEspacio_bb_vc)
+          );
+
+          -- -----------------------------------------------------
+          -- Tabla Central: El Horario (Resultado del Algoritmo)
+          -- -----------------------------------------------------
+          CREATE TABLE IF NOT EXISTS td_Horario_bb_vc (
+            ID_Horario_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            ID_dia_horario_bb_vc INTEGER NOT NULL,
+            ID_bloque_horario_bb_vc INTEGER NOT NULL,
+            ID_asignatura_horario_bb_vc INTEGER NOT NULL,
+            ID_espacio_horario_bb_vc INTEGER NOT NULL,
+            ID_profesor_horario_bb_vc INTEGER NOT NULL,
+            ID_grado_horario_bb_vc INTEGER NOT NULL,
+            ID_seccion_horario_bb_vc INTEGER NOT NULL,
+            FOREIGN KEY (ID_dia_horario_bb_vc) REFERENCES td_Dia_bb_vc(ID_dia_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_bloque_horario_bb_vc) REFERENCES td_Bloque_bb_vc(ID_bloque_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_asignatura_horario_bb_vc) REFERENCES td_Asignaturas_bb_vc(ID_asignatura_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_espacio_horario_bb_vc) REFERENCES td_Espacios_bb_vc(ID_espacio_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_profesor_horario_bb_vc) REFERENCES td_Profesores_bb_vc(ID_profesor_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_grado_horario_bb_vc) REFERENCES td_Grados_bb_vc(ID_grado_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_seccion_horario_bb_vc) REFERENCES td_Secciones_bb_vc(ID_seccion_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            UNIQUE (ID_dia_horario_bb_vc, ID_bloque_horario_bb_vc, ID_espacio_horario_bb_vc, ID_profesor_horario_bb_vc)
+          );
+
+          -- -----------------------------------------------------
+          -- Índices recomendados
+          -- -----------------------------------------------------
+          CREATE UNIQUE INDEX IF NOT EXISTS idx_td_Rol_unq_rol ON td_Rol_bb_vc(rol_bb_vc);
+          CREATE UNIQUE INDEX IF NOT EXISTS idx_td_Usuario_userName_unq ON td_Usuarios_bb_vc(userName_bb_vc);
+          CREATE UNIQUE INDEX IF NOT EXISTS idx_td_Grados_nro_unq ON td_Grados_bb_vc(nro_grado_bb_vc);
+          CREATE UNIQUE INDEX IF NOT EXISTS idx_td_Secciones_letra_unq ON td_Secciones_bb_vc(letra_seccion_bb_vc);
+
+          CREATE INDEX IF NOT EXISTS idx_td_UsuarioRol_usuario ON td_UsuarioRol_bb_vc(ID_usuario_usuarioRol_bb_vc);
+          CREATE INDEX IF NOT EXISTS idx_td_UsuarioRol_rol ON td_UsuarioRol_bb_vc(ID_rol_usuarioRol_bb_vc);
+          CREATE INDEX IF NOT EXISTS idx_td_Profesores_userrol ON td_Profesores_bb_vc(ID_usuarioRol_profesor_bb_vc);
+          CREATE INDEX IF NOT EXISTS idx_td_Clases_grado ON td_Clases_bb_vc(ID_grado_clase_bb_vc);
+          CREATE INDEX IF NOT EXISTS idx_td_Clases_seccion ON td_Clases_bb_vc(ID_seccion_clase_bb_vc);
+          CREATE INDEX IF NOT EXISTS idx_td_Asignaturas_nombre ON td_Asignaturas_bb_vc(nombre_bb_vc);
+
+          -- -----------------------------------------------------
+          -- TRIGGERS: Sincronizar td_Clases_bb_vc al insertar grados o secciones
+          -- -----------------------------------------------------
+          CREATE TRIGGER IF NOT EXISTS trg_after_insert_grado_vc
+          AFTER INSERT ON td_Grados_bb_vc
+          BEGIN
+            INSERT OR IGNORE INTO td_Clases_bb_vc (ID_grado_clase_bb_vc, ID_seccion_clase_bb_vc)
+            SELECT NEW.ID_grado_bb_vc, s.ID_seccion_bb_vc FROM td_Secciones_bb_vc s;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_after_insert_seccion_vc
+          AFTER INSERT ON td_Secciones_bb_vc
+          BEGIN
+            INSERT OR IGNORE INTO td_Clases_bb_vc (ID_grado_clase_bb_vc, ID_seccion_clase_bb_vc)
+            SELECT g.ID_grado_bb_vc, NEW.ID_seccion_bb_vc FROM td_Grados_bb_vc g;
+          END;
+
+          -- Cuando se elimina un grado o sección, las FKs con ON DELETE CASCADE eliminarán las clases,
+          -- pero dejamos triggers para limpiar o ejecutar lógica adicional si fuera necesario (a modo informativo)
+          CREATE TRIGGER IF NOT EXISTS trg_after_delete_grado_vc
+          AFTER DELETE ON td_Grados_bb_vc
+          BEGIN
+            DELETE FROM td_Clases_bb_vc WHERE ID_grado_clase_bb_vc = OLD.ID_grado_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_after_delete_seccion_vc
+          AFTER DELETE ON td_Secciones_bb_vc
+          BEGIN
+            DELETE FROM td_Clases_bb_vc WHERE ID_seccion_clase_bb_vc = OLD.ID_seccion_bb_vc;
+          END;
+
+          -- -----------------------------------------------------
+          -- Seed inicial (roles, admin, profesor, dias, bloques)
+          -- -----------------------------------------------------
+          INSERT OR IGNORE INTO td_Rol_bb_vc (rol_bb_vc) VALUES ('Administrador'), ('Profesor');
+
+          INSERT OR IGNORE INTO td_Usuarios_bb_vc (
+            userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc
+          ) VALUES ('admin', 'admin@colegio.com', '0000000000', 'Admin', 'Principal', '123456');
+
+          INSERT OR IGNORE INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
+          SELECT u.ID_usuario_bb_vc, r.ID_rol_bb_vc
+          FROM td_Usuarios_bb_vc u, td_Rol_bb_vc r
+          WHERE u.userName_bb_vc = 'admin' AND r.rol_bb_vc = 'Administrador';
+
+          INSERT OR IGNORE INTO td_Administradores_bb_vc (ID_usuarioRol_admin_bb_vc)
+          SELECT ID_usuarioRol_bb_vc FROM td_UsuarioRol_bb_vc
+          WHERE ID_usuario_usuarioRol_bb_vc = (SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'admin')
+          AND ID_rol_usuarioRol_bb_vc = (SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Administrador');
+
+          -- Profesor de ejemplo
+          INSERT OR IGNORE INTO td_Usuarios_bb_vc (
+            userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc
+          ) VALUES ('profe1', 'profesor@colegio.com', '04121234567', 'Carlos', 'Docente', '123456');
+
+          INSERT OR IGNORE INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
+          SELECT u.ID_usuario_bb_vc, r.ID_rol_bb_vc
+          FROM td_Usuarios_bb_vc u, td_Rol_bb_vc r
+          WHERE u.userName_bb_vc = 'profe1' AND r.rol_bb_vc = 'Profesor';
+
+          INSERT OR IGNORE INTO td_Profesores_bb_vc (ID_usuarioRol_profesor_bb_vc)
+          SELECT ID_usuarioRol_bb_vc FROM td_UsuarioRol_bb_vc
+          WHERE ID_usuario_usuarioRol_bb_vc = (SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'profe1')
+          AND ID_rol_usuarioRol_bb_vc = (SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Profesor');
+
+          -- Días y Bloques
+          INSERT OR IGNORE INTO td_Dia_bb_vc (dia_bb_vc) VALUES ('lunes'), ('martes'), ('miércoles'), ('jueves'), ('viernes');
+
+          INSERT OR IGNORE INTO td_Bloque_bb_vc (hora_bloque_bb_vc) VALUES
+          ('7:00 am'), ('8:00 am'), ('9:00 am'), ('10:00 am'), ('11:00 am'),
+          ('12:00 pm'), ('1:00 pm'), ('2:00 pm'), ('3:00 pm'), ('4:00 pm');
+
         `;
         
         // Usar .exec() para correr múltiples sentencias SQL a la vez

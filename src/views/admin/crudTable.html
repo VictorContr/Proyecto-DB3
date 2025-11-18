@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administrador | U.E Colegio Dr. Jacinto Convit</title>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/public/img/icon-colegio.png">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/public/css/login-register.css">
+    <link rel="stylesheet" href="/public/css/modal.css">
+</head>
+
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center px-4 transition-colors duration-300 font-poppins">
+
+    <!-- Botón para cambiar tema -->
+    <button id="cambio-color"
+        class="fixed top-6 right-6 z-50 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
+        <i class="fas fa-moon text-gray-700 dark:text-yellow-400 text-lg"></i>
+    </button>
+
+    <!-- Contenedor principal -->
+    <main id="admin"
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl p-8 grid gap-6 transition-colors duration-300 animate-fade-in">
+
+        <!-- Logo y título -->
+        <div class="flex flex-col items-center text-center mb-6">
+            <img src="/public/img/logoColegio-blanco.png" alt="Logo Colegio" class="w-80 h-80 object-contain">
+            <h1 class="text-xl text-gray-700 dark:text-gray-300 mt-4">
+                Bienvenido al Panel de Administrador
+            </h1>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                Desde aquí puedes gestionar todas las configuraciones de la plataforma.
+            </p>
+        </div>
+
+        <!-- Sección: cerrar sesión + volver -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors duration-300">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Administrador</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Último acceso: Hoy</p>
+            </div>
+            <div class="flex gap-3">
+                <a id="backToAdmin" href="/views/admin/adminCrud.html" class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center">Regresar</a>
+                <button id="logoutButton_vc_bb" class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">Cerrar Sesión</button>
+            </div>
+        </div>
+
+        <crud-table-vc-bb></crud-table-vc-bb>
+
+    </main>
+
+    <!-- Modal -->
+    <div id="modalContainer" class="modal-container" aria-hidden="true" role="dialog">
+        <div id="modalContent" class="modal-content bg-white dark:bg-gray-800 transition-colors duration-300">
+
+            <div id="modalHeader" class="modal-header bg-colegio-blue dark:bg-colegio-darkblue">
+                <div class="flex items-center">
+                    <i id="modalIcon" class="modal-icon"></i>
+                    <h2 id="modalTitle" class="text-xl font-bold text-white"></h2>
+                </div>
+
+                <button id="modalClose" class="text-white hover:text-gray-200 text-xl transition-colors duration-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div id="modalBody" class="modal-body">
+                <p id="modalMessage" class="text-gray-700 dark:text-gray-300"></p>
+            </div>
+
+            <div class="modal-footer">
+                <button id="modalAction"
+                    class="px-4 py-2 rounded-lg font-medium text-white bg-colegio-blue hover:bg-colegio-darkblue transition">
+                    Aceptar
+                </button>
+
+                <button id="modalCancel"
+                    class="px-4 py-2 rounded-lg font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 transition"
+                    style="display: none;">
+                    Cancelar
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module" src="../../js/app.js"></script>
+
+</body>
+</html>
