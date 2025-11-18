@@ -121,6 +121,44 @@
                         </button>
                     </div>
                 </div>
+                
+                                <!-- Tarjeta 5: Carga de Datos de Espacios -->
+                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-file-upload text-colegio-blue text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Espacios</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Importa o exporta la lista de Espacios usando un archivo Excel.
+                    </p>
+                    
+                    <!-- FORMULARIO DE CARGA -->
+                    <form id="formUploadEspacios" class="space-y-3 mt-4">
+                        <label for="archivoExcelEspacios" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
+                        <input type="file" id="archivoExcelEspacios" name="archivoExcelEspacios" 
+                               accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                               class="block w-full text-sm text-gray-500 dark:text-gray-400 file:cursor-pointer">
+                        
+                        <button type="submit" id="btnUploadEspacios"
+                                class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+                            <span id="uploadTextEspacios">Subir Archivo</span>
+                            <i id="uploadSpinnerEspacios" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+                        </button>
+                    </form>
+
+                    <!-- DIVISOR Y DESCARGA -->
+                    <div class="mt-4 border-t border-gray-200 dark:border-gray-600 pt-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descargar reporte</label>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Descarga la lista actualizada de Espacios.</p>
+                        
+                        <button id="btnDownloadReporteEspacios"
+                                class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+                            <span id="downloadTextEspacios">Descargar Reporte</span>
+                            <i id="downloadSpinnerEspacios" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+                        </button>
+                    </div>
+                </div>
+
              <!-- Tarjeta 3: Carga de Datos Asignaturas-->
                 <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
                     <div class="flex items-center mb-3">
@@ -194,42 +232,7 @@
                         </button>
                     </div>
                 </div>
-                <!-- Tarjeta 5: Carga de Datos de Espacios -->
-                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
-                    <div class="flex items-center mb-3">
-                        <i class="fas fa-file-upload text-colegio-blue text-xl mr-3"></i>
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Espacios</h3>
-                    </div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                        Importa o exporta la lista de Espacios usando un archivo Excel.
-                    </p>
-                    
-                    <!-- FORMULARIO DE CARGA -->
-                    <form id="formUploadEspacios" class="space-y-3 mt-4">
-                        <label for="archivoExcelEspacios" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
-                        <input type="file" id="archivoExcelEspacios" name="archivoExcelEspacios" 
-                               accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                               class="block w-full text-sm text-gray-500 dark:text-gray-400 file:cursor-pointer">
-                        
-                        <button type="submit" id="btnUploadEspacios"
-                                class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
-                            <span id="uploadTextEspacios">Subir Archivo</span>
-                            <i id="uploadSpinnerEspacios" class="fas fa-spinner fa-spin ml-2 hidden"></i>
-                        </button>
-                    </form>
 
-                    <!-- DIVISOR Y DESCARGA -->
-                    <div class="mt-4 border-t border-gray-200 dark:border-gray-600 pt-4">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descargar reporte</label>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Descarga la lista actualizada de Espacios.</p>
-                        
-                        <button id="btnDownloadReporteEspacios"
-                                class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
-                            <span id="downloadTextEspacios">Descargar Reporte</span>
-                            <i id="downloadSpinnerEspacios" class="fas fa-spinner fa-spin ml-2 hidden"></i>
-                        </button>
-                    </div>
-                </div>
                 <!-- Tarjeta 6: Carga de Disponibilidades (Profesor y Espacio) -->
                 <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
                     <div class="flex items-center mb-3">

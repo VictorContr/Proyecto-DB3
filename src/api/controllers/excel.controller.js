@@ -17,13 +17,23 @@ export const descargarProfesoresExcel_vc_bb = async (req, res) => {
       { title_vc_bb: "Apellido", key_vc_bb: "apellido_bb_vc" },
       { title_vc_bb: "Correo", key_vc_bb: "correo_bb_vc" },
       { title_vc_bb: "Teléfono", key_vc_bb: "telefono_bb_vc" },
+      { title_vc_bb: "Asignaturas", key_vc_bb: "asignaturas" },
     ],
     fetchRows_vc_bb: async () => {
       const profesores_vc_bb = await db_vc_bb.all_vc_bb(`
-        SELECT p.ID_profesor_bb_vc, u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc
+        SELECT 
+          p.ID_profesor_bb_vc,
+          u.nombre_bb_vc,
+          u.apellido_bb_vc,
+          u.correo_bb_vc,
+          u.telefono_bb_vc,
+          COALESCE(GROUP_CONCAT(a.nombre_bb_vc, ' | '), '') AS asignaturas
         FROM td_Profesores_bb_vc p
         JOIN td_UsuarioRol_bb_vc ur ON p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc
         JOIN td_Usuarios_bb_vc u ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc
+        LEFT JOIN td_ProfesorAsignaturas_bb_vc pa ON pa.ID_profesor_profAsig_bb_vc = p.ID_profesor_bb_vc
+        LEFT JOIN td_Asignaturas_bb_vc a ON pa.ID_asignatura_profAsig_bb_vc = a.ID_asignatura_bb_vc
+        GROUP BY p.ID_profesor_bb_vc, u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc
       `);
       return profesores_vc_bb;
     },
@@ -32,6 +42,7 @@ export const descargarProfesoresExcel_vc_bb = async (req, res) => {
 // 📥 Subir profesores desde un Excel
 export const subirProfesoresExcel_vc_bb = async (req, res) => {
   const filePath_vc_bb = req.file?.path;
+  const warningsAsign_vc_bb = [];
 
   try {
     if (!req.file) {
@@ -72,12 +83,15 @@ export const subirProfesoresExcel_vc_bb = async (req, res) => {
         { key_vc_bb: "apellido_bb_vc", required_vc_bb: true },
         { key_vc_bb: "correo_bb_vc", required_vc_bb: true },
         { key_vc_bb: "telefono_bb_vc", required_vc_bb: false },
+        // Nueva columna opcional para asignaturas del profesor (separadas por coma, punto y coma o |)
+        { key_vc_bb: "asignaturas", required_vc_bb: false },
       ],
       processRow_vc_bb: async (rowMap_vc_bb) => {
         const nombre_vc_bb = rowMap_vc_bb.nombre_bb_vc;
         const apellido_vc_bb = rowMap_vc_bb.apellido_bb_vc;
         const correo_vc_bb = rowMap_vc_bb.correo_bb_vc;
         const telefono_vc_bb = rowMap_vc_bb.telefono_bb_vc;
+        const asignaturasRaw_vc_bb = rowMap_vc_bb.asignaturas;
 
         // Dedupe por correo
         const existingUser_vc_bb = await db_vc_bb.get_vc_bb(
@@ -125,18 +139,54 @@ export const subirProfesoresExcel_vc_bb = async (req, res) => {
           throw new Error(`Error al crear rol para usuario ID ${newUserId_vc_bb}`);
         }
 
-        await db_vc_bb.run_vc_bb(
+        const profInsert_vc_bb = await db_vc_bb.run_vc_bb(
           `
           INSERT INTO td_Profesores_bb_vc (ID_usuarioRol_profesor_bb_vc) VALUES (?)
         `,
           [newUserRolId_vc_bb]
         );
+
+        const newProfId_vc_bb = profInsert_vc_bb.lastID;
+        // Si viene la columna de asignaturas, relacionarlas con el profesor recién creado
+        if (newProfId_vc_bb && asignaturasRaw_vc_bb != null && asignaturasRaw_vc_bb !== "") {
+          const list_vc_bb = String(asignaturasRaw_vc_bb)
+            .split(/[,;|]+/)
+            .map((s_vc_bb) => s_vc_bb.trim())
+            .filter((s_vc_bb) => s_vc_bb.length > 0);
+
+          for (const nombreAsig_vc_bb of list_vc_bb) {
+            // Buscar asignatura por nombre
+            const asig_vc_bb = await db_vc_bb.get_vc_bb(
+              `SELECT ID_asignatura_bb_vc FROM td_Asignaturas_bb_vc WHERE nombre_bb_vc = ?`,
+              [nombreAsig_vc_bb]
+            );
+            if (!asig_vc_bb) {
+              // Aviso no bloqueante: la asignatura no existe; se ignora
+              warningsAsign_vc_bb.push(
+                `Fila profesor '${nombre_vc_bb} ${apellido_vc_bb}': asignatura inexistente '${nombreAsig_vc_bb}'`
+              );
+              continue;
+            }
+
+            // Evitar duplicados
+            const existsRel_vc_bb = await db_vc_bb.get_vc_bb(
+              `SELECT ID_profesorAsig_bb_vc FROM td_ProfesorAsignaturas_bb_vc WHERE ID_profesor_profAsig_bb_vc = ? AND ID_asignatura_profAsig_bb_vc = ?`,
+              [newProfId_vc_bb, asig_vc_bb.ID_asignatura_bb_vc]
+            );
+            if (!existsRel_vc_bb) {
+              await db_vc_bb.run_vc_bb(
+                `INSERT INTO td_ProfesorAsignaturas_bb_vc (ID_profesor_profAsig_bb_vc, ID_asignatura_profAsig_bb_vc) VALUES (?, ?)`,
+                [newProfId_vc_bb, asig_vc_bb.ID_asignatura_bb_vc]
+              );
+            }
+          }
+        }
       },
     });
 
     res.status(200).json({
       message: `Proceso finalizado. Importados: ${successfulImports_vc_bb}.`,
-      errors: errors_vc_bb,
+      errors: [...errors_vc_bb, ...warningsAsign_vc_bb],
       exito: successfulImports_vc_bb > 0,
     });
   } catch (error_vc_bb) {

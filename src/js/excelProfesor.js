@@ -31,7 +31,7 @@ export class ExcelHandler_vc_bb {
 
         const confirm_vc_bb = await modal_vc_bb.showConfirm_vc_bb(
             "Confirmar carga",
-            "¿Estás seguro de que deseas importar la lista de profesores? Esto podría sobrescribir registros existentes."
+            "¿Estás seguro de importar profesores y (opcional) sus asignaturas?\n\nFormato esperado de columnas: Nombre, Apellido, Correo, Teléfono, Asignaturas.\n\nNota: 'Asignaturas' puede ir separada por coma, punto y coma o '|'."
         );
 
         if (!confirm_vc_bb) return false;
