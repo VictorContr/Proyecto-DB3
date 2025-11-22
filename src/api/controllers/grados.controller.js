@@ -25,13 +25,14 @@ export const getGradoById_vc_bb = async (req, res) => {
 
 export const createGrado_vc_bb = async (req, res) => {
   try {
-    const { nro_grado_bb_vc } = req.body;
-    if (!Number.isInteger(nro_grado_bb_vc) || nro_grado_bb_vc < 1) {
+    let { nro_grado_bb_vc } = req.body;
+    const parsed_vc_bb = parseInt(String(nro_grado_bb_vc).trim(), 10);
+    if (!Number.isInteger(parsed_vc_bb) || parsed_vc_bb < 1 || parsed_vc_bb > 5) {
       return res.status(400).json({ message: "nro_grado_bb_vc inválido" });
     }
     const result = await db_vc_bb.run_vc_bb(
       `INSERT INTO td_Grados_bb_vc (nro_grado_bb_vc) VALUES (?);`,
-      [nro_grado_bb_vc]
+      [parsed_vc_bb]
     );
     res.status(201).json({ id: result.lastID });
   } catch (err_vc_bb) {
@@ -43,13 +44,14 @@ export const createGrado_vc_bb = async (req, res) => {
 export const updateGrado_vc_bb = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nro_grado_bb_vc } = req.body;
-    if (!Number.isInteger(nro_grado_bb_vc) || nro_grado_bb_vc < 1) {
+    let { nro_grado_bb_vc } = req.body;
+    const parsed_vc_bb = parseInt(String(nro_grado_bb_vc).trim(), 10);
+    if (!Number.isInteger(parsed_vc_bb) || parsed_vc_bb < 1 || parsed_vc_bb > 5) {
       return res.status(400).json({ message: "nro_grado_bb_vc inválido" });
     }
     const result = await db_vc_bb.run_vc_bb(
       `UPDATE td_Grados_bb_vc SET nro_grado_bb_vc = ? WHERE ID_grado_bb_vc = ?;`,
-      [nro_grado_bb_vc, id]
+      [parsed_vc_bb, id]
     );
     if (result.changes === 0) return res.status(404).json({ message: "Grado no encontrado" });
     res.json({ message: "Grado actualizado" });

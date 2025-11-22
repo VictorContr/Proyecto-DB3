@@ -244,10 +244,7 @@ export const subirTipoEspacioExcel_vc_bb = async (req, res) => {
           throw new Error(`El tipo de espacio '${tipo_vc_bb}' ya existe`);
         }
 
-        await db_vc_bb.run_vc_bb(
-          `INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) VALUES (?)`,
-          [tipo_vc_bb]
-        );
+        throw new Error("No permitido insertar tipos de espacio por Excel");
       },
     });
 
@@ -318,17 +315,12 @@ export const subirEspaciosExcel_vc_bb = async (req, res) => {
           ? parseInt(capacidadRaw_vc_bb, 10)
           : null;
 
-        // Buscar o crear el tipo de espacio
         let tipo_vc_bb = await db_vc_bb.get_vc_bb(
           "SELECT ID_TipoEspacio_bb_vc FROM td_TipoEspacio_bb_vc WHERE tipo_bb_vc = ?",
           [tipoNombre_vc_bb]
         );
         if (!tipo_vc_bb) {
-          const inserted_vc_bb = await db_vc_bb.run_vc_bb(
-            `INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) VALUES (?)`,
-            [tipoNombre_vc_bb]
-          );
-          tipo_vc_bb = { ID_TipoEspacio_bb_vc: inserted_vc_bb.lastID };
+          throw new Error(`Tipo de espacio no existe: '${tipoNombre_vc_bb}'`);
         }
 
         // Insertar espacio
@@ -597,11 +589,7 @@ export const subirAsignaturasGradosExcel_vc_bb = async (req, res) => {
               [tipoEspacioNombre_vc_bb]
             );
             if (!tipo_vc_bb) {
-              const insertedTipo_vc_bb = await db_vc_bb.run_vc_bb(
-                `INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) VALUES (?)`,
-                [tipoEspacioNombre_vc_bb]
-              );
-              tipoEspacioId_vc_bb = insertedTipo_vc_bb.lastID;
+              throw new Error(`Tipo de espacio no existe: '${tipoEspacioNombre_vc_bb}'`);
             } else {
               tipoEspacioId_vc_bb = tipo_vc_bb.ID_TipoEspacio_bb_vc;
             }
@@ -657,11 +645,7 @@ export const subirAsignaturasGradosExcel_vc_bb = async (req, res) => {
             [tipoEspacioNombre_vc_bb]
           );
           if (!tipo_vc_bb) {
-            const insertedTipo_vc_bb = await db_vc_bb.run_vc_bb(
-              `INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) VALUES (?)`,
-              [tipoEspacioNombre_vc_bb]
-            );
-            tipo_vc_bb = { ID_TipoEspacio_bb_vc: insertedTipo_vc_bb.lastID };
+            throw new Error(`Tipo de espacio no existe: '${tipoEspacioNombre_vc_bb}'`);
           }
           await db_vc_bb.run_vc_bb(
             `UPDATE td_Asignaturas_bb_vc SET ID_TipoEspacio_requerido_bb_vc = ? WHERE ID_asignatura_bb_vc = ?`,

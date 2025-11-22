@@ -94,7 +94,32 @@ class CrudTable_vc_bb extends HTMLElement {
       let url = `${this.apiBase_vc_bb}/${this.table_vc_bb}`;
       if (this.subTable_vc_bb) url = `${url}/${this.subTable_vc_bb}`;
       const res = await fetch(url);
-      const data = await res.json();
+      let data = await res.json();
+
+      // Enriquecer filas con nombre de tipo de espacio para mostrar en tabla
+      if (Array.isArray(data) && (this.table_vc_bb === 'espacios' || this.table_vc_bb === 'asignaturas')) {
+        try {
+          const tiposRes = await fetch('/api/espacios/tipos');
+          const tipos = tiposRes.ok ? await tiposRes.json() : [];
+          const mapTipos = {};
+          tipos.forEach(t => { mapTipos[String(t.ID_TipoEspacio_bb_vc)] = t.tipo_bb_vc; });
+          data = data.map(row => {
+            const newRow = { ...row };
+            if (this.table_vc_bb === 'espacios') {
+              const idTipo = row.ID_TipoEspacio_espacio_bb_vc ?? row.id_tipoespacio_espacio_bb_vc ?? null;
+              if (idTipo != null && mapTipos[String(idTipo)]) {
+                newRow.tipo_espacio_bb_vc = mapTipos[String(idTipo)];
+              }
+            } else if (this.table_vc_bb === 'asignaturas') {
+              const idTipoReq = row.ID_TipoEspacio_requerido_bb_vc ?? row.id_tipoespacio_requerido_bb_vc ?? null;
+              if (idTipoReq != null && mapTipos[String(idTipoReq)]) {
+                newRow.tipo_espacio_requerido_bb_vc = mapTipos[String(idTipoReq)];
+              }
+            }
+            return newRow;
+          });
+        } catch (_) { /* ignore */ }
+      }
       await this.renderTable_vc_bb(data);
     } catch (err) {
       console.error("Error cargando datos:", err);
@@ -432,7 +457,11 @@ class CrudTable_vc_bb extends HTMLElement {
       return;
     }
 
-    const createCols = cols.filter(col => !/^id/i.test(col));
+    const pkNames_vc_bb = [
+      'ID_usuario_bb_vc','ID_espacio_bb_vc','ID_asignatura_bb_vc','ID_grado_bb_vc','ID_seccion_bb_vc','ID_DisponibilidadProfesor_bb_vc','ID_DisponibilidadEspacio_bb_vc','ID_clase_bb_vc'
+    ];
+    const isPk_vc_bb = (c) => pkNames_vc_bb.includes(c) || /^id$/i.test(c) || (this.table_vc_bb && c.toLowerCase() === (`id_${this.table_vc_bb}_bb_vc`).toLowerCase());
+    const createCols = cols.filter(col => !isPk_vc_bb(col));
     createCols.forEach(col => {
       const keyLower = col.toLowerCase();
       let field;
@@ -458,6 +487,26 @@ class CrudTable_vc_bb extends HTMLElement {
           opt.textContent = o.t;
           field.appendChild(opt);
         });
+      } else if (this.table_vc_bb === 'espacios' && (keyLower === 'id_tipoespacio_espacio_bb_vc' || keyLower.includes('tipoespacio'))) {
+        field = document.createElement('select');
+        field.name = col;
+        field.className = "border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300";
+        fetch('/api/espacios/tipos')
+          .then(r => r.ok ? r.json() : [])
+          .then(rows => {
+            rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_TipoEspacio_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.tipo_bb_vc ?? Object.values(rw)[1] ?? opt.value; field.appendChild(opt); });
+          })
+          .catch(() => {});
+      } else if (this.table_vc_bb === 'asignaturas' && (keyLower === 'id_tipoespacio_requerido_bb_vc' || keyLower.includes('tipoespacio'))) {
+        field = document.createElement('select');
+        field.name = col;
+        field.className = "border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300";
+        fetch('/api/espacios/tipos')
+          .then(r => r.ok ? r.json() : [])
+          .then(rows => {
+            rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_TipoEspacio_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.tipo_bb_vc ?? Object.values(rw)[1] ?? opt.value; field.appendChild(opt); });
+          })
+          .catch(() => {});
       } else {
         field = document.createElement("input");
         field.name = col;
@@ -471,6 +520,26 @@ class CrudTable_vc_bb extends HTMLElement {
       form.appendChild(wrapper);
     });
 
+    if (this.table_vc_bb === 'asignaturas') {
+      const wrapGrado = document.createElement('div');
+      wrapGrado.className = 'flex flex-col gap-2 w-full sm:w-auto';
+      const labelGrado = document.createElement('label');
+      labelGrado.className = 'text-sm font-medium text-gray-600 dark:text-gray-200';
+      labelGrado.textContent = 'Grado';
+      const selectGrado = document.createElement('select');
+      selectGrado.name = 'nro_grado_bb_vc';
+      selectGrado.className = 'border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300';
+      fetch('/api/grados')
+        .then(r => r.ok ? r.json() : [])
+        .then(rows => {
+          rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.nro_grado_bb_vc ?? Object.values(rw)[1]; opt.textContent = String(opt.value); selectGrado.appendChild(opt); });
+        })
+        .catch(() => {});
+      wrapGrado.appendChild(labelGrado);
+      wrapGrado.appendChild(selectGrado);
+      form.appendChild(wrapGrado);
+    }
+
     const btnSubmit = document.createElement("button");
     btnSubmit.type = "submit";
     btnSubmit.textContent = "Crear";
@@ -483,6 +552,9 @@ class CrudTable_vc_bb extends HTMLElement {
       createCols.forEach(col => {
         body[col] = form[col].value;
       });
+      if (this.table_vc_bb === 'asignaturas' && form['nro_grado_bb_vc']) {
+        body['nro_grado_bb_vc'] = form['nro_grado_bb_vc'].value;
+      }
 
       // Decide endpoint (soporta subTable para entidades como disponibilidad)
       let postUrl = `${this.apiBase_vc_bb}/${this.table_vc_bb}`;
@@ -658,21 +730,68 @@ class CrudTable_vc_bb extends HTMLElement {
       })();
     }
 
-    const editableKeys = Object.keys(row_vc_bb).filter(k => !/^id/i.test(k));
-    editableKeys.forEach(col => {
+    const pkNames2_vc_bb = [
+      'ID_usuario_bb_vc','ID_espacio_bb_vc','ID_asignatura_bb_vc','ID_grado_bb_vc','ID_seccion_bb_vc','ID_DisponibilidadProfesor_bb_vc','ID_DisponibilidadEspacio_bb_vc','ID_clase_bb_vc'
+    ];
+    const isPk2_vc_bb = (c) => pkNames2_vc_bb.includes(c) || /^id$/i.test(c) || (this.table_vc_bb && c.toLowerCase() === (`id_${this.table_vc_bb}_bb_vc`).toLowerCase());
+    const editableKeys = Object.keys(row_vc_bb).filter(k => !isPk2_vc_bb(k));
+    editableKeys.forEach(async col => {
       const wrapper = document.createElement('div');
       wrapper.className = 'flex flex-col gap-2';
       const label = document.createElement('label');
       label.className = 'text-sm font-medium text-gray-600 dark:text-gray-200';
       label.textContent = this.prettyLabel_vc_bb(col);
-      const input = document.createElement('input');
-      input.name = col;
-      input.value = row_vc_bb[col] != null ? String(row_vc_bb[col]) : '';
-      input.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
-      wrapper.appendChild(label);
-      wrapper.appendChild(input);
+      const keyLower = col.toLowerCase();
+      if ((this.table_vc_bb === 'espacios' && (keyLower === 'id_tipoespacio_espacio_bb_vc' || keyLower.includes('tipoespacio'))) || (this.table_vc_bb === 'asignaturas' && (keyLower === 'id_tipoespacio_requerido_bb_vc' || keyLower.includes('tipoespacio')))) {
+        const select = document.createElement('select');
+        select.name = col;
+        select.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
+        try {
+          const r = await fetch('/api/espacios/tipos');
+          if (r.ok) {
+            const rows = await r.json();
+            rows.forEach(rw => {
+              const opt = document.createElement('option');
+              opt.value = rw.ID_TipoEspacio_bb_vc ?? Object.values(rw)[0];
+              opt.textContent = rw.tipo_bb_vc ?? Object.values(rw)[1] ?? opt.value;
+              select.appendChild(opt);
+            });
+            const currentVal = row_vc_bb[col];
+            Array.from(select.options).forEach(o => { if (String(o.value) === String(currentVal)) o.selected = true; });
+          }
+        } catch (_) {}
+        wrapper.appendChild(label);
+        wrapper.appendChild(select);
+      } else {
+        const input = document.createElement('input');
+        input.name = col;
+        input.value = row_vc_bb[col] != null ? String(row_vc_bb[col]) : '';
+        input.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+      }
       form_vc_bb.appendChild(wrapper);
     });
+
+    if (this.table_vc_bb === 'asignaturas') {
+      (async () => {
+        const wrapGrado = document.createElement('div');
+        wrapGrado.className = 'flex flex-col gap-2';
+        const labelGrado = document.createElement('label');
+        labelGrado.className = 'text-sm font-medium text-gray-600 dark:text-gray-200';
+        labelGrado.textContent = 'Grado';
+        const selectGrado = document.createElement('select');
+        selectGrado.name = 'nro_grado_bb_vc';
+        selectGrado.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
+        try {
+          const r = await fetch('/api/grados');
+          if (r.ok) (await r.json()).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.nro_grado_bb_vc ?? Object.values(rw)[1]; opt.textContent = String(opt.value); selectGrado.appendChild(opt); });
+        } catch (_) {}
+        wrapGrado.appendChild(labelGrado);
+        wrapGrado.appendChild(selectGrado);
+        form_vc_bb.appendChild(wrapGrado);
+      })();
+    }
 
     modalInstance.open(modalTitleText, form_vc_bb);
     modalInstance.onConfirm(async () => {
@@ -680,6 +799,9 @@ class CrudTable_vc_bb extends HTMLElement {
       const updated_vc_bb = {};
       for (let [key_vc_bb, value_vc_bb] of formData_vc_bb.entries()) {
         updated_vc_bb[key_vc_bb] = value_vc_bb;
+      }
+      if (this.table_vc_bb === 'asignaturas' && form_vc_bb['nro_grado_bb_vc']) {
+        updated_vc_bb['nro_grado_bb_vc'] = form_vc_bb['nro_grado_bb_vc'].value;
       }
       const resolvedId_vc_bb = row_vc_bb._pk_vc_bb || this.findIdValue_vc_bb(row_vc_bb);
       let putUrl = `${this.apiBase_vc_bb}/${this.table_vc_bb}`;
