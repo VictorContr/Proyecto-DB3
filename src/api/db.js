@@ -305,7 +305,7 @@ class Database_vc_bb {
           WHERE ID_usuario_usuarioRol_bb_vc = (SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'profe1')
           AND ID_rol_usuarioRol_bb_vc = (SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Profesor');
 
-          INSERT OR IGNORE INTO td_TipoEspacio_bb_vc (tipo_bb_vc) VALUES ('Aula Generica'), ('Espacio Especializado');
+          INSERT OR IGNORE INTO td_TipoEspacio_bb_vc (tipo_bb_vc) VALUES ('Aula Genérica'), ('Espacio Especializado');
 
           -- Días y Bloques
           INSERT OR IGNORE INTO td_Dia_bb_vc (dia_bb_vc) VALUES ('lunes'), ('martes'), ('miércoles'), ('jueves'), ('viernes');
@@ -414,7 +414,7 @@ class Database_vc_bb {
         await this.run_vc_bb(`INSERT OR IGNORE INTO td_Bloque_bb_vc (hora_bloque_bb_vc) VALUES 
           ('7:00 am'), ('8:00 am'), ('9:00 am'), ('10:00 am'), ('11:00 am'),
           ('12:00 pm'), ('1:00 pm'), ('2:00 pm'), ('3:00 pm'), ('4:00 pm');`);
-        await this.run_vc_bb(`INSERT OR IGNORE INTO td_TipoEspacio_bb_vc (tipo_bb_vc) VALUES ('Aula Generica'), ('Espacio Especializado');`);
+        await this.run_vc_bb(`INSERT OR IGNORE INTO td_TipoEspacio_bb_vc (tipo_bb_vc) VALUES ('Aula Genérica'), ('Espacio Especializado');`);
         console.log("✅ Datos iniciales (admin, profesor, roles, etc.) insertados/verificados correctamente.");
       } catch (err) {
         console.error("❌ Error insertando datos iniciales:", err.message);
