@@ -52,3 +52,13 @@ export const deleteEspacio_vc_bb = async (req, res) => {
     res.status(500).json({ message: "Error al eliminar espacio" });
   }
 };
+
+export const getAllTipoEspacio_vc_bb = async (req, res) => {
+  try {
+    const rows = await db_vc_bb.all_vc_bb(`SELECT ID_TipoEspacio_bb_vc, tipo_bb_vc FROM td_TipoEspacio_bb_vc ORDER BY tipo_bb_vc;`);
+    res.json(rows);
+  } catch (err_vc_bb) {
+    console.error(err_vc_bb);
+    res.status(500).json({ message: "Error al obtener tipos de espacio" });
+  }
+};
