@@ -471,6 +471,24 @@ class CrudTable_vc_bb extends HTMLElement {
       form.appendChild(wrapper);
     });
 
+    if (this.table_vc_bb === 'asignaturas') {
+      const wrapGrado = document.createElement('div');
+      wrapGrado.className = 'flex flex-col gap-2 w-full sm:w-auto';
+      const labelGrado = document.createElement('label');
+      labelGrado.className = 'text-sm font-medium text-gray-600 dark:text-gray-200';
+      labelGrado.textContent = 'Grado';
+      const selectGrado = document.createElement('select');
+      selectGrado.name = 'nro_grado_bb_vc';
+      selectGrado.className = 'border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300';
+      try {
+        const r = await fetch('/api/grados');
+        if (r.ok) (await r.json()).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.nro_grado_bb_vc ?? Object.values(rw)[1]; opt.textContent = String(opt.value); selectGrado.appendChild(opt); });
+      } catch (_) {}
+      wrapGrado.appendChild(labelGrado);
+      wrapGrado.appendChild(selectGrado);
+      form.appendChild(wrapGrado);
+    }
+
     const btnSubmit = document.createElement("button");
     btnSubmit.type = "submit";
     btnSubmit.textContent = "Crear";
@@ -483,6 +501,9 @@ class CrudTable_vc_bb extends HTMLElement {
       createCols.forEach(col => {
         body[col] = form[col].value;
       });
+      if (this.table_vc_bb === 'asignaturas' && form['nro_grado_bb_vc']) {
+        body['nro_grado_bb_vc'] = form['nro_grado_bb_vc'].value;
+      }
 
       // Decide endpoint (soporta subTable para entidades como disponibilidad)
       let postUrl = `${this.apiBase_vc_bb}/${this.table_vc_bb}`;
@@ -674,12 +695,35 @@ class CrudTable_vc_bb extends HTMLElement {
       form_vc_bb.appendChild(wrapper);
     });
 
+    if (this.table_vc_bb === 'asignaturas') {
+      (async () => {
+        const wrapGrado = document.createElement('div');
+        wrapGrado.className = 'flex flex-col gap-2';
+        const labelGrado = document.createElement('label');
+        labelGrado.className = 'text-sm font-medium text-gray-600 dark:text-gray-200';
+        labelGrado.textContent = 'Grado';
+        const selectGrado = document.createElement('select');
+        selectGrado.name = 'nro_grado_bb_vc';
+        selectGrado.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
+        try {
+          const r = await fetch('/api/grados');
+          if (r.ok) (await r.json()).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.nro_grado_bb_vc ?? Object.values(rw)[1]; opt.textContent = String(opt.value); selectGrado.appendChild(opt); });
+        } catch (_) {}
+        wrapGrado.appendChild(labelGrado);
+        wrapGrado.appendChild(selectGrado);
+        form_vc_bb.appendChild(wrapGrado);
+      })();
+    }
+
     modalInstance.open(modalTitleText, form_vc_bb);
     modalInstance.onConfirm(async () => {
       const formData_vc_bb = new FormData(form_vc_bb);
       const updated_vc_bb = {};
       for (let [key_vc_bb, value_vc_bb] of formData_vc_bb.entries()) {
         updated_vc_bb[key_vc_bb] = value_vc_bb;
+      }
+      if (this.table_vc_bb === 'asignaturas' && form_vc_bb['nro_grado_bb_vc']) {
+        updated_vc_bb['nro_grado_bb_vc'] = form_vc_bb['nro_grado_bb_vc'].value;
       }
       const resolvedId_vc_bb = row_vc_bb._pk_vc_bb || this.findIdValue_vc_bb(row_vc_bb);
       let putUrl = `${this.apiBase_vc_bb}/${this.table_vc_bb}`;
