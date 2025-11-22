@@ -1,11 +1,14 @@
+import { ModalCrud_vc_bb } from "./modalCrud.js";
+
 class CrudTable_vc_bb extends HTMLElement {
   constructor() {
     super();
     this.shadow = this.attachShadow({ mode: "open" });
     this.apiBase_vc_bb = "/api";
+    this.modalCrud = new ModalCrud_vc_bb();
 
     this.shadow.innerHTML = `
-      <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../public/css/tailwind.css">
       <div class="p-6 bg-white dark:bg-gray-800 rounded shadow text-gray-800 dark:text-gray-600">
         <h2 id="title_vc_bb" class="text-2xl font-bold mb-4"></h2>
         <div id="formWrap_vc_bb" class="mb-6">
@@ -30,7 +33,7 @@ class CrudTable_vc_bb extends HTMLElement {
       const isDark = document.documentElement.classList.contains('dark');
       this.shadow.host.setAttribute('data-theme', isDark ? 'dark' : 'light');
 
-      const modalMessage = document.getElementById('modalMessage');
+      const modalMessage = document.getElementById('crudModalMessage');
       if (modalMessage) {
         // Ajustar colores de labels e inputs dentro del modal para buen contraste
         modalMessage.querySelectorAll('label').forEach(l => {
@@ -58,18 +61,24 @@ class CrudTable_vc_bb extends HTMLElement {
   }
 
   async init_vc_bb() {
-    // Soportar rutas con subtabla, p.ej. /admin/disponibilidad/profesor
-    const parts = location.pathname.split('/').filter(Boolean);
-    // parts ejemplo: ['admin','disponibilidad','profesor'] o ['admin','grados']
-    if (parts.length >= 3 && parts[0] === 'admin') {
-      this.table_vc_bb = parts[1];
-      this.subTable_vc_bb = parts[2];
-    } else if (parts.length >= 2 && parts[0] === 'admin') {
-      this.table_vc_bb = parts[1];
-      this.subTable_vc_bb = null;
+    const params = new URLSearchParams(location.search);
+    const qTable = params.get('table');
+    const qSub = params.get('subTable');
+    if (qTable) {
+      this.table_vc_bb = qTable;
+      this.subTable_vc_bb = qSub || null;
     } else {
-      this.table_vc_bb = location.pathname.split("/").pop();
-      this.subTable_vc_bb = null;
+      const parts = location.pathname.split('/').filter(Boolean);
+      if (parts.length >= 3 && parts[0] === 'admin') {
+        this.table_vc_bb = parts[1];
+        this.subTable_vc_bb = parts[2];
+      } else if (parts.length >= 2 && parts[0] === 'admin') {
+        this.table_vc_bb = parts[1];
+        this.subTable_vc_bb = null;
+      } else {
+        this.table_vc_bb = null;
+        this.subTable_vc_bb = null;
+      }
     }
     if (!this.table_vc_bb) {
       this.shadow.getElementById("title_vc_bb").innerText = "Error: tabla no definida.";
@@ -511,15 +520,8 @@ class CrudTable_vc_bb extends HTMLElement {
   }
 
   openEditModal_vc_bb(row_vc_bb) {
-    const modalContainer_vc_bb = document.getElementById("modalContainer");
-    const modalTitle_vc_bb = document.getElementById("modalTitle");
-    const modalMessage_vc_bb = document.getElementById("modalMessage");
-    const modalAction_vc_bb = document.getElementById("modalAction");
-    const modalCancel_vc_bb = document.getElementById("modalCancel");
-    const modalClose_vc_bb = document.getElementById("modalClose");
-
-    modalTitle_vc_bb.textContent = `Editar ${this.table_vc_bb}`;
-    modalMessage_vc_bb.innerHTML = "";
+    const modalInstance = this.modalCrud;
+    const modalTitleText = `Editar ${this.table_vc_bb}`;
 
     const form_vc_bb = document.createElement("form");
     form_vc_bb.id = "editForm_vc_bb";
@@ -582,12 +584,8 @@ class CrudTable_vc_bb extends HTMLElement {
         form_vc_bb.appendChild(wrapperFor('Profesor', selectProfesor));
 
         // modal action will send proper ID fields
-        modalMessage_vc_bb.appendChild(form_vc_bb);
-        modalContainer_vc_bb.setAttribute("aria-hidden", "false");
-        modalContainer_vc_bb.classList.add("active");
-        modalCancel_vc_bb.classList.add('inline-block');
-
-        modalAction_vc_bb.addEventListener('click', async () => {
+        modalInstance.open(modalTitleText, form_vc_bb);
+        modalInstance.onConfirm(async () => {
           const body = {
             ID_dia_DispProfesor_bb_vc: selectDia.value,
             ID_bloque_DispProfesor_bb_vc: selectBloque.value,
@@ -599,13 +597,9 @@ class CrudTable_vc_bb extends HTMLElement {
             headers: Object.assign({ 'Content-Type': 'application/json' }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})),
             body: JSON.stringify(body)
           });
-          modalContainer_vc_bb.setAttribute("aria-hidden", "true");
-          modalContainer_vc_bb.classList.remove("active");
-          modalMessage_vc_bb.innerHTML = '';
+          modalInstance.close();
           this.loadData_vc_bb();
-        }, { once: true });
-        modalClose_vc_bb.addEventListener('click', () => { modalContainer_vc_bb.setAttribute("aria-hidden", "true"); modalContainer_vc_bb.classList.remove("active"); modalMessage_vc_bb.innerHTML = ''; }, { once: true });
-        modalCancel_vc_bb.addEventListener('click', () => { modalContainer_vc_bb.setAttribute("aria-hidden", "true"); modalContainer_vc_bb.classList.remove("active"); modalMessage_vc_bb.innerHTML = ''; }, { once: true });
+        });
         return;
       })();
     }
@@ -644,12 +638,8 @@ class CrudTable_vc_bb extends HTMLElement {
         if (row_vc_bb.ID_espacio_bb_vc) Array.from(selectEspacio.options).forEach(o=>{ if (String(o.value) === String(row_vc_bb.ID_espacio_bb_vc)) o.selected = true; });
         form_vc_bb.appendChild(wrapperFor('Espacio', selectEspacio));
 
-        modalMessage_vc_bb.appendChild(form_vc_bb);
-        modalContainer_vc_bb.setAttribute("aria-hidden", "false");
-        modalContainer_vc_bb.classList.add("active");
-        modalCancel_vc_bb.classList.add('inline-block');
-
-        modalAction_vc_bb.addEventListener('click', async () => {
+        modalInstance.open(modalTitleText, form_vc_bb);
+        modalInstance.onConfirm(async () => {
           const body = {
             ID_dia_DispEspacio_bb_vc: selectDia.value,
             ID_bloque_DispEspacio_bb_vc: selectBloque.value,
@@ -661,55 +651,48 @@ class CrudTable_vc_bb extends HTMLElement {
             headers: Object.assign({ 'Content-Type': 'application/json' }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})),
             body: JSON.stringify(body)
           });
-          modalContainer_vc_bb.setAttribute("aria-hidden", "true");
-          modalContainer_vc_bb.classList.remove("active");
-          modalMessage_vc_bb.innerHTML = '';
+          modalInstance.close();
           this.loadData_vc_bb();
-        }, { once: true });
-        modalClose_vc_bb.addEventListener('click', () => { modalContainer_vc_bb.setAttribute("aria-hidden", "true"); modalContainer_vc_bb.classList.remove("active"); modalMessage_vc_bb.innerHTML = ''; }, { once: true });
-        modalCancel_vc_bb.addEventListener('click', () => { modalContainer_vc_bb.setAttribute("aria-hidden", "true"); modalContainer_vc_bb.classList.remove("active"); modalMessage_vc_bb.innerHTML = ''; }, { once: true });
+        });
         return;
       })();
     }
 
-    modalMessage_vc_bb.appendChild(form_vc_bb);
-    modalContainer_vc_bb.setAttribute("aria-hidden", "false");
-    modalContainer_vc_bb.classList.add("active");
-    // Usar clases Tailwind en lugar de estilos en línea para mostrar el botón
-    modalCancel_vc_bb.classList.add('inline-block');
+    const editableKeys = Object.keys(row_vc_bb).filter(k => !/^id/i.test(k));
+    editableKeys.forEach(col => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'flex flex-col gap-2';
+      const label = document.createElement('label');
+      label.className = 'text-sm font-medium text-gray-600 dark:text-gray-200';
+      label.textContent = this.prettyLabel_vc_bb(col);
+      const input = document.createElement('input');
+      input.name = col;
+      input.value = row_vc_bb[col] != null ? String(row_vc_bb[col]) : '';
+      input.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
+      wrapper.appendChild(label);
+      wrapper.appendChild(input);
+      form_vc_bb.appendChild(wrapper);
+    });
 
-    const closeModal_vc_bb = () => {
-      modalContainer_vc_bb.setAttribute("aria-hidden", "true");
-      modalContainer_vc_bb.classList.remove("active");
-      modalMessage_vc_bb.innerHTML = "";
-    };
-
-    modalClose_vc_bb.addEventListener("click", closeModal_vc_bb, { once: true });
-    modalCancel_vc_bb.addEventListener("click", closeModal_vc_bb, { once: true });
-
-    modalAction_vc_bb.addEventListener("click", async () => {
+    modalInstance.open(modalTitleText, form_vc_bb);
+    modalInstance.onConfirm(async () => {
       const formData_vc_bb = new FormData(form_vc_bb);
       const updated_vc_bb = {};
       for (let [key_vc_bb, value_vc_bb] of formData_vc_bb.entries()) {
         updated_vc_bb[key_vc_bb] = value_vc_bb;
       }
-
       const resolvedId_vc_bb = row_vc_bb._pk_vc_bb || this.findIdValue_vc_bb(row_vc_bb);
-
-      // Construir endpoint PUT soportando subTable (p.ej. /api/disponibilidad/profesor/:id)
       let putUrl = `${this.apiBase_vc_bb}/${this.table_vc_bb}`;
       if (this.subTable_vc_bb) putUrl += `/${this.subTable_vc_bb}`;
       putUrl += `/${resolvedId_vc_bb}`;
-
       await fetch(putUrl, {
         method: "PUT",
         headers: Object.assign({ "Content-Type": "application/json" }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})),
         body: JSON.stringify(updated_vc_bb)
       });
-
-      closeModal_vc_bb();
+      modalInstance.close();
       this.loadData_vc_bb();
-    }, { once: true });
+    });
   }
 
   findIdValue_vc_bb(obj) {

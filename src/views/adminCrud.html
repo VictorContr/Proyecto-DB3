@@ -6,22 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administrador | U.E Colegio Dr. Jacinto Convit</title>
-
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="/public/img/icon-colegio.png">
-
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Fonts -->
+    <link rel="shortcut icon" href="../public/img/icon-colegio.png">
+    <link rel="stylesheet" href="../public/css/tailwind.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Styles -->
-    <link rel="stylesheet" href="/public/css/login-register.css">
-    <link rel="stylesheet" href="/public/css/modal.css">
+    <link rel="stylesheet" href="../public/css/login-register.css">
+    <link rel="stylesheet" href="../public/css/modal.css">
 </head>
 
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center px-4 transition-colors duration-300 font-poppins">
@@ -38,7 +28,7 @@
 
         <!-- Logo y título -->
         <div class="flex flex-col items-center text-center mb-6">
-            <img src="/public/img/logoColegio-blanco.png" alt="Logo Colegio" class="w-80 h-80 object-contain">
+            <img src="../public/img/logoColegio-blanco.png" alt="Logo Colegio" class="w-80 h-80 object-contain">
             <h1 class="text-xl text-gray-700 dark:text-gray-300 mt-4">
                 Bienvenido al Panel de Administrador
             </h1>
@@ -62,7 +52,7 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Último acceso: Hoy</p>
             </div>
             <div class="flex gap-3">
-                <a id="backToAdmin" href="/views/admin.html" class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center">Regresar</a>
+                <a id="backToAdmin" href="./admin.html" class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center">Regresar</a>
                 <button id="logoutButton_vc_bb" class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">Cerrar Sesión</button>
             </div>
         </div>
@@ -71,7 +61,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
                     <!-- Usuarios -->
-                    <a href="/admin/usuarios"
+                    <a href="./crudTable.html?table=usuarios"
                    class="block p-6 rounded-xl shadow-md bg-white dark:bg-slate-800
                           hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
                     <div class="flex items-center space-x-4">
@@ -88,7 +78,7 @@
                 </a>
 
                 <!-- Asignaturas -->
-                <a href="/admin/asignaturas"
+                <a href="./crudTable.html?table=asignaturas"
                    class="block p-6 rounded-xl shadow-md bg-white dark:bg-slate-800
                           hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
                     <div class="flex items-center space-x-4">
@@ -105,7 +95,7 @@
                 </a>
 
                 <!-- Espacios -->
-                <a href="/admin/espacios"
+                <a href="./crudTable.html?table=espacios"
                    class="block p-6 rounded-xl shadow-md bg-white dark:bg-slate-800
                           hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
                     <div class="flex items-center space-x-4">
@@ -122,7 +112,7 @@
                 </a>
 
                 <!-- Secciones -->
-                <a href="/admin/secciones"
+                <a href="./crudTable.html?table=secciones"
                    class="block p-6 rounded-xl shadow-md bg-white dark:bg-slate-800
                           hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
                     <div class="flex items-center space-x-4">
@@ -139,7 +129,7 @@
                 </a>
 
                 <!-- Grados -->
-                <a href="/admin/grados"
+                <a href="./crudTable.html?table=grados"
                    class="block p-6 rounded-xl shadow-md bg-white dark:bg-slate-800
                           hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
                     <div class="flex items-center space-x-4">
@@ -156,7 +146,7 @@
                 </a>
 
                 <!-- Disponibilidad Profesores -->
-                <a href="/admin/disponibilidad/profesor"
+                <a href="./crudTable.html?table=disponibilidad&subTable=profesor"
                    class="block p-6 rounded-xl shadow-md bg-white dark:bg-slate-800
                           hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
                     <div class="flex items-center space-x-4">
@@ -173,7 +163,7 @@
                 </a>
 
                 <!-- Disponibilidad Espacios -->
-                <a href="/admin/disponibilidad/espacio"
+                <a href="./crudTable.html?table=disponibilidad&subTable=espacio"
                    class="block p-6 rounded-xl shadow-md bg-white dark:bg-slate-800
                           hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer">
                     <div class="flex items-center space-x-4">
@@ -229,7 +219,7 @@
         </div>
     </div>
 
-    <script type="module" src="/js/app.js"></script>
+    <script type="module" src="../js/app.js"></script>
 
 </body>
 </html>

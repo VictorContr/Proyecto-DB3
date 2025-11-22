@@ -111,7 +111,7 @@ export class GestorSesion_vc_bb {
     
     setTimeout(() => {
       // Redirigir a la vista de login usando ruta absoluta para evitar 404
-      location.href = "/views/index.html";
+      location.href = "index.html";
     }, 1000);
   }
 
@@ -129,9 +129,9 @@ export class GestorSesion_vc_bb {
       // Si ya hay sesión iniciada y está en el login, redirigir a su dashboard
       if (usuarioActual_vc_bb) {
         if (usuarioActual_vc_bb.rol_vc_bb === "Administrador")
-          location.href = "./views/admin.html"; // Asegúrate de la ruta correcta
+          location.href = "admin.html"; // Asegúrate de la ruta correcta
         if (usuarioActual_vc_bb.rol_vc_bb === "Profesor")
-          location.href = "./views/teacher.html"; // Asegúrate de la ruta correcta
+          location.href = "teacher.html"; // Asegúrate de la ruta correcta
       }
       return true;
     }
@@ -149,7 +149,7 @@ export class GestorSesion_vc_bb {
 
       setTimeout(() => {
         // Usar ruta absoluta al login para evitar problemas de rutas relativas
-        location.href = "/views/index.html";
+        location.href = "index.html";
       }, 1000);
       return false;
     }

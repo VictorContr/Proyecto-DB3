@@ -6,22 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administrador | U.E Colegio Dr. Jacinto Convit</title>
-
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="/public/img/icon-colegio.png">
-
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Fonts -->
+    <link rel="shortcut icon" href="../public/img/icon-colegio.png">
+    <link rel="stylesheet" href="../public/css/tailwind.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Styles -->
-    <link rel="stylesheet" href="/public/css/login-register.css">
-    <link rel="stylesheet" href="/public/css/modal.css">
+    <link rel="stylesheet" href="../public/css/login-register.css">
+    <link rel="stylesheet" href="../public/css/modal.css">
 </head>
 
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center px-4 transition-colors duration-300 font-poppins">
@@ -38,7 +28,7 @@
 
         <!-- Logo y título -->
         <div class="flex flex-col items-center text-center mb-6">
-            <img src="/public/img/logoColegio-blanco.png" alt="Logo Colegio" class="w-80 h-80 object-contain">
+            <img src="../public/img/logoColegio-blanco.png" alt="Logo Colegio" class="w-80 h-80 object-contain">
             <h1 class="text-xl text-gray-700 dark:text-gray-300 mt-4">
                 Bienvenido al Panel de Administrador
             </h1>
@@ -54,7 +44,7 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Último acceso: Hoy</p>
             </div>
             <div class="flex gap-3">
-                <a id="backToAdmin" href="/views/admin/adminCrud.html" class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center">Regresar</a>
+                <a id="backToAdmin" href="./adminCrud.html" class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center">Regresar</a>
                 <button id="logoutButton_vc_bb" class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">Cerrar Sesión</button>
             </div>
         </div>
@@ -95,10 +85,31 @@
                 </button>
             </div>
 
-        </div>
     </div>
+  </div>
 
-    <script type="module" src="../../js/app.js"></script>
+  <div id="crudModalContainer" class="hidden fixed inset-0 z-50 bg-black/40 items-center justify-center" aria-hidden="true" role="dialog">
+    <div id="crudModalContent" class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg mx-4 transition-colors duration-300">
+      <div id="crudModalHeader" class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-colegio-blue dark:bg-colegio-darkblue">
+        <div class="flex items-center gap-2">
+          <i id="crudModalIcon" class="fas fa-edit text-white"></i>
+          <h2 id="crudModalTitle" class="text-lg font-bold text-white"></h2>
+        </div>
+        <button id="crudModalClose" class="text-white hover:text-gray-200 text-xl">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div id="crudModalBody" class="p-4">
+        <div id="crudModalMessage" class="space-y-3"></div>
+      </div>
+      <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-2">
+        <button id="crudModalCancel" class="px-4 py-2 rounded-lg font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500">Cancelar</button>
+        <button id="crudModalAction" class="px-4 py-2 rounded-lg font-medium text-white bg-colegio-blue hover:bg-colegio-darkblue">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+    <script type="module" src="../js/app.js"></script>
 
 </body>
 </html>
