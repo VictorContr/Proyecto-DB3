@@ -1,11 +1,12 @@
 import { setupThemeToggle_vc_bb } from "./dark-mode.js";
-import { admin_vc_bb, ExcelHandler_vc_bb } from "./excelProfesor.js";
+import { ExcelHandler_vc_bb } from "./excelProfesor.js";
 import { ExcelEspaciosHandler_vc_bb } from "./excelEspacios.js";
 import { ExcelAsignaturaHandler_vc_bb } from "./excelAsignatura.js";
 import { ExcelSeccionesGradosHandler_vc_bb } from "./excelSeccionesGrados.js";
 import { ExcelDisponibilidadHandler_vc_bb } from "./excelDisponibilidad.js";
 import { GestorSesion_vc_bb, loginForm_vc_bb, logoutButton_vc_bb } from "./login.js";
 import "../components/crudTable.js";
+import { initStepAndStep_vc_bb } from "./step&step.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("cargado el app_vc_bb");
@@ -35,7 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (admin_vc_bb) {
+  const cargaMasiva_vc_bb = document.getElementById('cargaMasiva');
+  if (cargaMasiva_vc_bb) {
+    initStepAndStep_vc_bb();
     const excelHandler = new ExcelHandler_vc_bb();
     const excelEspaciosHandler_vc_bb = new ExcelEspaciosHandler_vc_bb();
     const excelAsignaturaHandler_vc_bb = new ExcelAsignaturaHandler_vc_bb();
