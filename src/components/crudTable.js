@@ -9,14 +9,14 @@ class CrudTable_vc_bb extends HTMLElement {
 
     this.shadow.innerHTML = `
     <link rel="stylesheet" href="../public/css/tailwind.css">
-      <div class="p-6 bg-white dark:bg-gray-800 rounded shadow text-gray-800 dark:text-gray-600">
-        <h2 id="title_vc_bb" class="text-2xl font-bold mb-4"></h2>
-        <div id="formWrap_vc_bb" class="mb-6">
+      <div class="p-6  dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200">
+        <h2 id="title_vc_bb" class="text-2xl font-bold mb-4 text-white"></h2>
+        <div id="formWrap_vc_bb" class="mb-6 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded p-4">
           <form id="form_vc_bb" class="mb-6 flex flex-wrap gap-4"></form>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full border-collapse table-fixed">
-            <thead class="bg-gray-200 dark:bg-gray-700" id="thead_vc_bb"></thead>
+          <table class="w-full border-collapse table-fixed text-gray-800 dark:text-gray-200">
+            <thead class="bg-gray-100 dark:bg-gray-700" id="thead_vc_bb"></thead>
             <tbody id="tbody_vc_bb"></tbody>
           </table>
         </div>
@@ -32,6 +32,8 @@ class CrudTable_vc_bb extends HTMLElement {
     const apply = () => {
       const isDark = document.documentElement.classList.contains('dark');
       this.shadow.host.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      const rootBox = this.shadow.querySelector('div');
+      if (rootBox) rootBox.classList.toggle('dark', isDark);
 
       const modalMessage = document.getElementById('crudModalMessage');
       if (modalMessage) {
@@ -149,7 +151,7 @@ class CrudTable_vc_bb extends HTMLElement {
           const colsFromSchema = schema.columns || [];
           // Mostrar encabezados basados en schema (omitiendo id)
           const visibleColsFromSchema = colsFromSchema.filter(c => !/^id/i.test(c));
-          thead.innerHTML = `\n      <tr>\n        ${visibleColsFromSchema.map(col => `<th class=\"border px-3 py-2 text-sm text-left\">${this.prettyLabel_vc_bb(col)}</th>`).join("")}\n        <th class=\"border px-3 py-2 text-sm text-left\">Acciones</th>\n      </tr>\n    `;
+          thead.innerHTML = `\n      <tr>\n        ${visibleColsFromSchema.map(col => `<th class=\"border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm text-left bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200\">${this.prettyLabel_vc_bb(col)}</th>`).join("")}\n        <th class=\"border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm text-left bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200\">Acciones</th>\n      </tr>\n    `;
           // Renderizar formulario de creación usando columnas del schema
           await this.renderForm_vc_bb(colsFromSchema);
           tbody.innerHTML = "";
@@ -159,7 +161,7 @@ class CrudTable_vc_bb extends HTMLElement {
         console.warn('No se pudo obtener schema:', errSchema);
       }
 
-      thead.innerHTML = "<tr><th class='p-2'>No hay datos</th></tr>";
+      thead.innerHTML = "<tr><th class='p-2 border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'>No hay datos</th></tr>";
       tbody.innerHTML = "";
       return;
     }
@@ -168,15 +170,15 @@ class CrudTable_vc_bb extends HTMLElement {
     const visibleCols = cols.filter(c => !/^id/i.test(c));
 
     if (visibleCols.length === 0) {
-      thead.innerHTML = "<tr><th class='p-2'>No hay campos para mostrar</th></tr>";
+      thead.innerHTML = "<tr><th class='p-2 border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'>No hay campos para mostrar</th></tr>";
       tbody.innerHTML = "";
       return;
     }
 
     thead.innerHTML = `
       <tr>
-        ${visibleCols.map(col => `<th class=\"border px-3 py-2 text-sm text-left\">${this.prettyLabel_vc_bb(col)}</th>`).join("")}
-        <th class=\"border px-3 py-2 text-sm text-left\">Acciones</th>
+        ${visibleCols.map(col => `<th class=\"border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm text-left bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200\">${this.prettyLabel_vc_bb(col)}</th>`).join("")}
+        <th class=\"border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm text-left bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200\">Acciones</th>
       </tr>
     `;
 
@@ -188,27 +190,27 @@ class CrudTable_vc_bb extends HTMLElement {
       tr.className = 'group';
       visibleCols.forEach(col => {
         const td = document.createElement("td");
-        td.className = "border px-3 py-2 text-sm align-top truncate transition-all group-hover:py-4";
+        td.className = "border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm align-top truncate transition-all group-hover:py-4 text-gray-700 dark:text-gray-300";
         td.title = row_vc_bb[col] != null ? String(row_vc_bb[col]) : "";
         td.textContent = row_vc_bb[col] != null ? String(row_vc_bb[col]) : "";
         tr.appendChild(td);
       });
 
       const tdActions = document.createElement("td");
-      tdActions.className = "border px-3 py-2 text-sm whitespace-nowrap";
+      tdActions.className = "border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm whitespace-nowrap";
 
       const actionsWrap = document.createElement('div');
       actionsWrap.className = 'flex flex-col gap-2 items-end';
 
       const btnEdit = document.createElement("button");
       btnEdit.textContent = "Editar";
-      btnEdit.className = "bg-blue-500 text-white px-3 py-1 rounded min-w-[64px] whitespace-nowrap flex-shrink-0";
+      btnEdit.className = "bg-colegio-blue hover:bg-colegio-darkblue text-white px-3 py-1 rounded min-w-[64px] whitespace-nowrap flex-shrink-0 transition-colors duration-200";
       const pkId_vc_bb = this.findIdValue_vc_bb(row_vc_bb);
       btnEdit.dataset.id = pkId_vc_bb;
 
       const btnDelete = document.createElement("button");
       btnDelete.textContent = "Eliminar";
-      btnDelete.className = "bg-red-500 text-white px-3 py-1 rounded min-w-[64px] whitespace-nowrap flex-shrink-0";
+      btnDelete.className = "bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded min-w-[64px] whitespace-nowrap flex-shrink-0 transition-colors duration-200";
       btnDelete.dataset.id = pkId_vc_bb;
 
       // Deshabilitar eliminar solo cuando estemos en la tabla `usuarios`
