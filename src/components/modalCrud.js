@@ -1,43 +1,43 @@
 export class ModalCrud_vc_bb {
   constructor() {
-    this.container = document.getElementById('crudModalContainer');
-    this.title = document.getElementById('crudModalTitle');
-    this.message = document.getElementById('crudModalMessage');
-    this.btnAction = document.getElementById('crudModalAction');
-    this.btnCancel = document.getElementById('crudModalCancel');
-    this.btnClose = document.getElementById('crudModalClose');
-    this._onConfirm = null;
-    const close = () => this.close();
-    if (this.btnClose) this.btnClose.addEventListener('click', close);
-    if (this.btnCancel) this.btnCancel.addEventListener('click', close);
-    if (this.container) this.container.addEventListener('click', (e) => { if (e.target === this.container) this.close(); });
-    if (this.btnAction) this.btnAction.addEventListener('click', async () => {
-      if (this._onConfirm) await this._onConfirm();
+    this.container_vc_bb = document.getElementById('crudModalContainer');
+    this.title_vc_bb = document.getElementById('crudModalTitle');
+    this.message_vc_bb = document.getElementById('crudModalMessage');
+    this.btnAction_vc_bb = document.getElementById('crudModalAction');
+    this.btnCancel_vc_bb = document.getElementById('crudModalCancel');
+    this.btnClose_vc_bb = document.getElementById('crudModalClose');
+    this._onConfirm_vc_bb = null;
+    const close_vc_bb = () => this.close_vc_bb();
+    if (this.btnClose_vc_bb) this.btnClose_vc_bb.addEventListener('click', close_vc_bb);
+    if (this.btnCancel_vc_bb) this.btnCancel_vc_bb.addEventListener('click', close_vc_bb);
+    if (this.container_vc_bb) this.container_vc_bb.addEventListener('click', (e_vc_bb) => { if (e_vc_bb.target === this.container_vc_bb) this.close_vc_bb(); });
+    if (this.btnAction_vc_bb) this.btnAction_vc_bb.addEventListener('click', async () => {
+      if (this._onConfirm_vc_bb) await this._onConfirm_vc_bb();
     });
   }
 
-  open(title, contentNode) {
-    if (this.title) this.title.textContent = title || '';
-    if (this.message) {
-      this.message.innerHTML = '';
-      if (contentNode) this.message.appendChild(contentNode);
+  open_vc_bb(title_vc_bb, contentNode_vc_bb) {
+    if (this.title_vc_bb) this.title_vc_bb.textContent = title_vc_bb || '';
+    if (this.message_vc_bb) {
+      this.message_vc_bb.innerHTML = '';
+      if (contentNode_vc_bb) this.message_vc_bb.appendChild(contentNode_vc_bb);
     }
-    if (this.container) {
-      this.container.classList.remove('hidden');
-      this.container.classList.add('flex');
+    if (this.container_vc_bb) {
+      this.container_vc_bb.classList.remove('hidden');
+      this.container_vc_bb.classList.add('flex');
     }
   }
 
-  close() {
-    if (this.container) {
-      this.container.classList.add('hidden');
-      this.container.classList.remove('flex');
+  close_vc_bb() {
+    if (this.container_vc_bb) {
+      this.container_vc_bb.classList.add('hidden');
+      this.container_vc_bb.classList.remove('flex');
     }
-    if (this.message) this.message.innerHTML = '';
-    this._onConfirm = null;
+    if (this.message_vc_bb) this.message_vc_bb.innerHTML = '';
+    this._onConfirm_vc_bb = null;
   }
 
-  onConfirm(handler) {
-    this._onConfirm = handler;
+  onConfirm_vc_bb(handler_vc_bb) {
+    this._onConfirm_vc_bb = handler_vc_bb;
   }
 }

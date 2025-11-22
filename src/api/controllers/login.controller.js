@@ -1,8 +1,8 @@
 import db_vc_bb from "../db.js";
 
 // Controlador para inicio de sesión (admin o profesor)
-export const login_vc_bb = async (req, res) => {
-  const { userName_bb_vc, password_bb_vc } = req.body;
+export const login_vc_bb = async (req_vc_bb, res_vc_bb) => {
+  const { userName_bb_vc, password_bb_vc } = req_vc_bb.body;
 
   try {
     const user_vc_bb = await db_vc_bb.get_vc_bb(
@@ -17,10 +17,10 @@ export const login_vc_bb = async (req, res) => {
     );
 
     if (!user_vc_bb) {
-      return res.status(401).json({ message: "Credenciales inválidas" });
+      return res_vc_bb.status(401).json({ message: "Credenciales inválidas" });
     }
 
-    res.json({
+    res_vc_bb.json({
       ID_usuario: user_vc_bb.ID_usuario_bb_vc,
       nombre: user_vc_bb.nombre_bb_vc,
       apellido: user_vc_bb.apellido_bb_vc,
@@ -31,6 +31,6 @@ export const login_vc_bb = async (req, res) => {
     });
   } catch (error_vc_bb) {
     console.error("Error en login:", error_vc_bb);
-    res.status(500).json({ message: "Error en el servidor" });
+    res_vc_bb.status(500).json({ message: "Error en el servidor" });
   }
 };

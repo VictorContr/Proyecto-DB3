@@ -39,37 +39,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const cargaMasiva_vc_bb = document.getElementById('cargaMasiva');
   if (cargaMasiva_vc_bb) {
     initStepAndStep_vc_bb();
-    const excelHandler = new ExcelHandler_vc_bb();
+    const excelHandler_vc_bb = new ExcelHandler_vc_bb();
     const excelEspaciosHandler_vc_bb = new ExcelEspaciosHandler_vc_bb();
     const excelAsignaturaHandler_vc_bb = new ExcelAsignaturaHandler_vc_bb();
     const excelSeccionesGradosHandler_vc_bb = new ExcelSeccionesGradosHandler_vc_bb();
     const excelDisponibilidadHandler_vc_bb = new ExcelDisponibilidadHandler_vc_bb();
     
     // Evento para subir (submit o click)
-    const btnUpload = document.getElementById('btnUploadProfesores');
-    const formExcel = document.getElementById('formUploadProfesores');
+    const btnUpload_vc_bb = document.getElementById('btnUploadProfesores');
+    const formExcel_vc_bb = document.getElementById('formUploadProfesores');
     
-    if (formExcel) {
-        formExcel.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const file = excelHandler.getCurrentFile_vc_bb();
-            await excelHandler.uploadExcel_vc_bb(file);
+    if (formExcel_vc_bb) {
+        formExcel_vc_bb.addEventListener('submit', async (e_vc_bb) => {
+            e_vc_bb.preventDefault();
+            const file_vc_bb = excelHandler_vc_bb.getCurrentFile_vc_bb();
+            await excelHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
         });
-    } else if (btnUpload) {
+    } else if (btnUpload_vc_bb) {
         
-        btnUpload.addEventListener('click', async (e) => {
-            e.preventDefault();
+        btnUpload_vc_bb.addEventListener('click', async (e_vc_bb) => {
+            e_vc_bb.preventDefault();
             console.log("subir")
-            const file = excelHandler.getCurrentFile_vc_bb();
-            await excelHandler.uploadExcel_vc_bb(file);
+            const file_vc_bb = excelHandler_vc_bb.getCurrentFile_vc_bb();
+            await excelHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
         });
     }
     
     // Evento para descargar (click)
-    const btnDownload = document.getElementById('btnDownloadReporteProfesores');
-    if (btnDownload) {
-        btnDownload.addEventListener('click', async () => {
-            await excelHandler.downloadExcel_vc_bb();
+    const btnDownload_vc_bb = document.getElementById('btnDownloadReporteProfesores');
+    if (btnDownload_vc_bb) {
+        btnDownload_vc_bb.addEventListener('click', async () => {
+            await excelHandler_vc_bb.downloadExcel_vc_bb();
         });
     }
 
@@ -79,14 +79,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnDownloadEspacios_vc_bb = document.getElementById('btnDownloadReporteEspacios');
 
     if (formEspacios_vc_bb) {
-      formEspacios_vc_bb.addEventListener('submit', async (e) => {
-        e.preventDefault();
+      formEspacios_vc_bb.addEventListener('submit', async (e_vc_bb) => {
+        e_vc_bb.preventDefault();
         const file_vc_bb = excelEspaciosHandler_vc_bb.getCurrentFile_vc_bb();
         await excelEspaciosHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
       });
     } else if (btnUploadEspacios_vc_bb) {
-      btnUploadEspacios_vc_bb.addEventListener('click', async (e) => {
-        e.preventDefault();
+      btnUploadEspacios_vc_bb.addEventListener('click', async (e_vc_bb) => {
+        e_vc_bb.preventDefault();
         const file_vc_bb = excelEspaciosHandler_vc_bb.getCurrentFile_vc_bb();
         await excelEspaciosHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
       });
@@ -106,14 +106,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnDownloadSecciones_vc_bb = document.getElementById('btnDownloadReporteSecciones');
 
     if (formSecciones_vc_bb) {
-      formSecciones_vc_bb.addEventListener('submit', async (e) => {
-        e.preventDefault();
+      formSecciones_vc_bb.addEventListener('submit', async (e_vc_bb) => {
+        e_vc_bb.preventDefault();
         const file_vc_bb = excelSeccionesGradosHandler_vc_bb.getCurrentFile_vc_bb();
         await excelSeccionesGradosHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
       });
     } else if (btnUploadSecciones_vc_bb) {
-      btnUploadSecciones_vc_bb.addEventListener('click', async (e) => {
-        e.preventDefault();
+      btnUploadSecciones_vc_bb.addEventListener('click', async (e_vc_bb) => {
+        e_vc_bb.preventDefault();
         const file_vc_bb = excelSeccionesGradosHandler_vc_bb.getCurrentFile_vc_bb();
         await excelSeccionesGradosHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
       });
@@ -132,16 +132,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (formAsignaturas_vc_bb) {
       console.log('[App] Bind submit -> Asignaturas upload');
-      formAsignaturas_vc_bb.addEventListener('submit', async (e) => {
-        e.preventDefault();
+      formAsignaturas_vc_bb.addEventListener('submit', async (e_vc_bb) => {
+        e_vc_bb.preventDefault();
         const file_vc_bb = excelAsignaturaHandler_vc_bb.getCurrentFile_vc_bb();
         console.log('[App] Click submit Asignaturas: preparando subida');
         await excelAsignaturaHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
       });
     } else if (btnUploadAsignaturas_vc_bb) {
       console.log('[App] Bind click -> Asignaturas upload');
-      btnUploadAsignaturas_vc_bb.addEventListener('click', async (e) => {
-        e.preventDefault();
+      btnUploadAsignaturas_vc_bb.addEventListener('click', async (e_vc_bb) => {
+        e_vc_bb.preventDefault();
         const file_vc_bb = excelAsignaturaHandler_vc_bb.getCurrentFile_vc_bb();
         console.log('[App] Click btnUploadAsignaturas: preparando subida');
         await excelAsignaturaHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
@@ -162,14 +162,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnDownloadDisponibilidad_vc_bb = document.getElementById('btnDownloadReporteDisponibilidad');
 
     if (formDisponibilidad_vc_bb) {
-      formDisponibilidad_vc_bb.addEventListener('submit', async (e) => {
-        e.preventDefault();
+      formDisponibilidad_vc_bb.addEventListener('submit', async (e_vc_bb) => {
+        e_vc_bb.preventDefault();
         const file_vc_bb = excelDisponibilidadHandler_vc_bb.getCurrentFile_vc_bb();
         await excelDisponibilidadHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
       });
     } else if (btnUploadDisponibilidad_vc_bb) {
-      btnUploadDisponibilidad_vc_bb.addEventListener('click', async (e) => {
-        e.preventDefault();
+      btnUploadDisponibilidad_vc_bb.addEventListener('click', async (e_vc_bb) => {
+        e_vc_bb.preventDefault();
         const file_vc_bb = excelDisponibilidadHandler_vc_bb.getCurrentFile_vc_bb();
         await excelDisponibilidadHandler_vc_bb.uploadExcel_vc_bb(file_vc_bb);
       });

@@ -3,11 +3,11 @@ import { ModalCrud_vc_bb } from "./modalCrud.js";
 class CrudTable_vc_bb extends HTMLElement {
   constructor() {
     super();
-    this.shadow = this.attachShadow({ mode: "open" });
+    this.shadow_vc_bb = this.attachShadow({ mode: "open" });
     this.apiBase_vc_bb = "/api";
-    this.modalCrud = new ModalCrud_vc_bb();
+    this.modalCrud_vc_bb = new ModalCrud_vc_bb();
 
-    this.shadow.innerHTML = `
+    this.shadow_vc_bb.innerHTML = `
     <link rel="stylesheet" href="../public/css/tailwind.css">
       <div class="p-6  dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200">
         <h2 id="title_vc_bb" class="text-2xl font-bold mb-4 text-white"></h2>
@@ -31,8 +31,8 @@ class CrudTable_vc_bb extends HTMLElement {
   observeTheme_vc_bb() {
     const apply = () => {
       const isDark = document.documentElement.classList.contains('dark');
-      this.shadow.host.setAttribute('data-theme', isDark ? 'dark' : 'light');
-      const rootBox = this.shadow.querySelector('div');
+      this.shadow_vc_bb.host.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      const rootBox = this.shadow_vc_bb.querySelector('div');
       if (rootBox) rootBox.classList.toggle('dark', isDark);
 
       const modalMessage = document.getElementById('crudModalMessage');
@@ -83,10 +83,10 @@ class CrudTable_vc_bb extends HTMLElement {
       }
     }
     if (!this.table_vc_bb) {
-      this.shadow.getElementById("title_vc_bb").innerText = "Error: tabla no definida.";
+      this.shadow_vc_bb.getElementById("title_vc_bb").innerText = "Error: tabla no definida.";
       return;
     }
-    this.shadow.getElementById("title_vc_bb").innerText = `Administrar ${this.table_vc_bb}`;
+    this.shadow_vc_bb.getElementById("title_vc_bb").innerText = `Administrar ${this.table_vc_bb}`;
     this.observeTheme_vc_bb();
     await this.loadData_vc_bb();
   }
@@ -139,8 +139,8 @@ class CrudTable_vc_bb extends HTMLElement {
   }
 
   async renderTable_vc_bb (data) {
-    const thead = this.shadow.getElementById("thead_vc_bb");
-    const tbody = this.shadow.getElementById("tbody_vc_bb");
+    const thead_vc_bb = this.shadow_vc_bb.getElementById("thead_vc_bb");
+    const tbody_vc_bb = this.shadow_vc_bb.getElementById("tbody_vc_bb");
 
     if (!Array.isArray(data) || data.length === 0) {
       // Si no hay datos, intentar obtener el esquema de la tabla para mostrar el formulario de creación
@@ -161,8 +161,8 @@ class CrudTable_vc_bb extends HTMLElement {
         console.warn('No se pudo obtener schema:', errSchema);
       }
 
-      thead.innerHTML = "<tr><th class='p-2 border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'>No hay datos</th></tr>";
-      tbody.innerHTML = "";
+      thead_vc_bb.innerHTML = "<tr><th class='p-2 border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'>No hay datos</th></tr>";
+      tbody_vc_bb.innerHTML = "";
       return;
     }
 
@@ -170,12 +170,12 @@ class CrudTable_vc_bb extends HTMLElement {
     const visibleCols = cols.filter(c => !/^id/i.test(c));
 
     if (visibleCols.length === 0) {
-      thead.innerHTML = "<tr><th class='p-2 border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'>No hay campos para mostrar</th></tr>";
-      tbody.innerHTML = "";
+      thead_vc_bb.innerHTML = "<tr><th class='p-2 border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'>No hay campos para mostrar</th></tr>";
+      tbody_vc_bb.innerHTML = "";
       return;
     }
 
-    thead.innerHTML = `
+    thead_vc_bb.innerHTML = `
       <tr>
         ${visibleCols.map(col => `<th class=\"border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm text-left bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200\">${this.prettyLabel_vc_bb(col)}</th>`).join("")}
         <th class=\"border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm text-left bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200\">Acciones</th>
@@ -183,7 +183,7 @@ class CrudTable_vc_bb extends HTMLElement {
     `;
 
     await this.renderForm_vc_bb(cols);
-    tbody.innerHTML = "";
+    tbody_vc_bb.innerHTML = "";
 
     data.forEach(row_vc_bb => {
       const tr = document.createElement("tr");
@@ -242,12 +242,12 @@ class CrudTable_vc_bb extends HTMLElement {
       actionsWrap.appendChild(btnDelete);
       tdActions.appendChild(actionsWrap);
       tr.appendChild(tdActions);
-      tbody.appendChild(tr);
+      tbody_vc_bb.appendChild(tr);
     });
   }
 
   async renderForm_vc_bb(cols) {
-    const form = this.shadow.getElementById("form_vc_bb");
+    const form = this.shadow_vc_bb.getElementById("form_vc_bb");
     form.innerHTML = "";
     // Clear any previous submit handler to avoid duplicates
     try { form.onsubmit = null; } catch (e) { /* ignore */ }
@@ -594,7 +594,7 @@ class CrudTable_vc_bb extends HTMLElement {
   }
 
   openEditModal_vc_bb(row_vc_bb) {
-    const modalInstance = this.modalCrud;
+    const modalInstance = this.modalCrud_vc_bb;
     const modalTitleText = `Editar ${this.table_vc_bb}`;
 
     const form_vc_bb = document.createElement("form");
@@ -658,8 +658,8 @@ class CrudTable_vc_bb extends HTMLElement {
         form_vc_bb.appendChild(wrapperFor('Profesor', selectProfesor));
 
         // modal action will send proper ID fields
-        modalInstance.open(modalTitleText, form_vc_bb);
-        modalInstance.onConfirm(async () => {
+        modalInstance.open_vc_bb(modalTitleText, form_vc_bb);
+        modalInstance.onConfirm_vc_bb(async () => {
           const body = {
             ID_dia_DispProfesor_bb_vc: selectDia.value,
             ID_bloque_DispProfesor_bb_vc: selectBloque.value,
@@ -671,7 +671,7 @@ class CrudTable_vc_bb extends HTMLElement {
             headers: Object.assign({ 'Content-Type': 'application/json' }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})),
             body: JSON.stringify(body)
           });
-          modalInstance.close();
+          modalInstance.close_vc_bb();
           this.loadData_vc_bb();
         });
         return;
@@ -712,8 +712,8 @@ class CrudTable_vc_bb extends HTMLElement {
         if (row_vc_bb.ID_espacio_bb_vc) Array.from(selectEspacio.options).forEach(o=>{ if (String(o.value) === String(row_vc_bb.ID_espacio_bb_vc)) o.selected = true; });
         form_vc_bb.appendChild(wrapperFor('Espacio', selectEspacio));
 
-        modalInstance.open(modalTitleText, form_vc_bb);
-        modalInstance.onConfirm(async () => {
+        modalInstance.open_vc_bb(modalTitleText, form_vc_bb);
+        modalInstance.onConfirm_vc_bb(async () => {
           const body = {
             ID_dia_DispEspacio_bb_vc: selectDia.value,
             ID_bloque_DispEspacio_bb_vc: selectBloque.value,
@@ -725,7 +725,7 @@ class CrudTable_vc_bb extends HTMLElement {
             headers: Object.assign({ 'Content-Type': 'application/json' }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})),
             body: JSON.stringify(body)
           });
-          modalInstance.close();
+          modalInstance.close_vc_bb();
           this.loadData_vc_bb();
         });
         return;
@@ -795,8 +795,8 @@ class CrudTable_vc_bb extends HTMLElement {
       })();
     }
 
-    modalInstance.open(modalTitleText, form_vc_bb);
-    modalInstance.onConfirm(async () => {
+    modalInstance.open_vc_bb(modalTitleText, form_vc_bb);
+    modalInstance.onConfirm_vc_bb(async () => {
       const formData_vc_bb = new FormData(form_vc_bb);
       const updated_vc_bb = {};
       for (let [key_vc_bb, value_vc_bb] of formData_vc_bb.entries()) {
@@ -814,7 +814,7 @@ class CrudTable_vc_bb extends HTMLElement {
         headers: Object.assign({ "Content-Type": "application/json" }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})),
         body: JSON.stringify(updated_vc_bb)
       });
-      modalInstance.close();
+      modalInstance.close_vc_bb();
       this.loadData_vc_bb();
     });
   }
