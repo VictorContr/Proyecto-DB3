@@ -42,7 +42,9 @@ export class UsuarioRolModel_vc_bb {
       VALUES (?, ?)
     `;
     const result_vc_bb = await db_vc_bb.run_vc_bb(sql_vc_bb, [idUsuario_vc_bb, idRol_vc_bb]);
-    return result_vc_bb.lastID;
+    if (result_vc_bb.lastID && result_vc_bb.lastID > 0) return result_vc_bb.lastID;
+    const existing_vc_bb = await this.obtenerPorUsuarioYRol_vc_bb(idUsuario_vc_bb, idRol_vc_bb);
+    return existing_vc_bb ? existing_vc_bb.ID_usuarioRol_bb_vc : 0;
   }
 
   async eliminar_vc_bb(idUsuarioRol_vc_bb) {

@@ -68,9 +68,9 @@ class UsuarioController_vc_bb {
       } = req_vc_bb.body;
 
       // Validación básica
-      if (!userName_bb_vc || !nombre_bb_vc || !apellido_bb_vc) {
+      if (!userName_bb_vc || !nombre_bb_vc || !apellido_bb_vc || !password_bb_vc) {
         return res_vc_bb.status(400).json({ 
-          mensaje_vc_bb: 'Los campos userName_bb_vc, nombre_bb_vc y apellido_bb_vc son requeridos' 
+          mensaje_vc_bb: 'Los campos userName_bb_vc, nombre_bb_vc, apellido_bb_vc y password_bb_vc son requeridos' 
         });
       }
 
@@ -89,7 +89,7 @@ class UsuarioController_vc_bb {
         apellido_bb_vc,
         correo_bb_vc,
         telefono_bb_vc,
-        password_bb_vc: password_bb_vc || '123456'
+        password_bb_vc
       });
 
       // Asignar rol si se proporciona
@@ -116,7 +116,11 @@ class UsuarioController_vc_bb {
       const datosActualizar_vc_bb = {};
       
       // Filtrar solo los campos que se envían
-      const camposPermitidos_vc_bb = ['userName_bb_vc', 'nombre_bb_vc', 'apellido_bb_vc', 'correo_bb_vc', 'telefono_bb_vc'];
+      const camposPermitidos_vc_bb = ['userName_bb_vc', 'nombre_bb_vc', 'apellido_bb_vc', 'correo_bb_vc', 'telefono_bb_vc', 'password_bb_vc'];
+      // No actualizar password si se envía vacío
+      if (typeof req_vc_bb.body.password_bb_vc === 'string' && req_vc_bb.body.password_bb_vc.trim() === '') {
+        delete req_vc_bb.body.password_bb_vc;
+      }
       camposPermitidos_vc_bb.forEach(campo_vc_bb => {
         if (req_vc_bb.body[campo_vc_bb] !== undefined) {
           datosActualizar_vc_bb[campo_vc_bb] = req_vc_bb.body[campo_vc_bb];
@@ -192,15 +196,15 @@ class UsuarioController_vc_bb {
         throw new Error(`Rol '${nombreRol_vc_bb}' no encontrado`);
       }
 
-      // Crear relación usuario-rol
-      const idUsuarioRol_vc_bb = await this.usuarioRolModel_vc_bb.crear_vc_bb({
-        ID_usuario_usuarioRol_bb_vc: idUsuario_vc_bb,
-        ID_rol_usuarioRol_bb_vc: rolDb_vc_bb.ID_rol_bb_vc
-      });
+      // Crear relación usuario-rol (o recuperar si ya existía)
+      const idUsuarioRol_vc_bb = await this.usuarioRolModel_vc_bb.crear_vc_bb(idUsuario_vc_bb, rolDb_vc_bb.ID_rol_bb_vc);
 
       // Si es profesor, crear registro en tabla profesores
       if (nombreRol_vc_bb === 'Profesor') {
-        await this.profesorModel_vc_bb.crear_vc_bb(idUsuarioRol_vc_bb);
+        const existeProfesor_vc_bb = await this.profesorModel_vc_bb.obtenerPorIdUsuario_vc_bb(idUsuario_vc_bb);
+        if (!existeProfesor_vc_bb) {
+          await this.profesorModel_vc_bb.crear_vc_bb(idUsuarioRol_vc_bb);
+        }
       }
 
       return idUsuarioRol_vc_bb;
@@ -225,8 +229,7 @@ class UsuarioController_vc_bb {
 
       // Eliminar rol anterior si existe
       if (rolActual_vc_bb) {
-        await this.usuarioRolModel_vc_bb.eliminar_vc_bb(idUsuario_vc_bb, rolActual_vc_bb.ID_rol_bb_vc);
-        
+        await this.usuarioRolModel_vc_bb.eliminar_vc_bb(rolActual_vc_bb.ID_usuarioRol_bb_vc);
         // Si era profesor, eliminar de tabla profesores
         if (rolActual_vc_bb.rol_bb_vc === 'Profesor') {
           await this.profesorModel_vc_bb.eliminarPorUsuarioRol_vc_bb(rolActual_vc_bb.ID_usuarioRol_bb_vc);

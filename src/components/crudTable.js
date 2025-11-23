@@ -514,6 +514,10 @@ class CrudTable_vc_bb extends HTMLElement {
         field.name = col;
         field.placeholder = this.prettyLabel_vc_bb(col);
         field.required = true;
+        if (this.table_vc_bb === 'usuarios' && keyLower.includes('password')) {
+          field.type = 'password';
+          field.placeholder = 'Clave';
+        }
         field.className = "border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300";
       }
 
@@ -764,10 +768,25 @@ class CrudTable_vc_bb extends HTMLElement {
         } catch (_) {}
         wrapper.appendChild(label);
         wrapper.appendChild(select);
+      } else if (this.table_vc_bb === 'usuarios' && (keyLower.includes('rol') || keyLower.includes('role'))) {
+        const select = document.createElement('select');
+        select.name = col;
+        select.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
+        const opciones = [ 'Administrador', 'Profesor' ];
+        opciones.forEach(t => { const opt = document.createElement('option'); opt.value = t; opt.textContent = t; select.appendChild(opt); });
+        const currentVal = row_vc_bb[col];
+        Array.from(select.options).forEach(o => { if (String(o.value).toLowerCase() === String(currentVal || '').toLowerCase()) o.selected = true; });
+        wrapper.appendChild(label);
+        wrapper.appendChild(select);
       } else {
         const input = document.createElement('input');
         input.name = col;
         input.value = row_vc_bb[col] != null ? String(row_vc_bb[col]) : '';
+        if (this.table_vc_bb === 'usuarios' && keyLower.includes('password')) {
+          input.type = 'password';
+          input.placeholder = 'Nueva clave';
+          input.value = '';
+        }
         input.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
         wrapper.appendChild(label);
         wrapper.appendChild(input);
@@ -846,6 +865,7 @@ class CrudTable_vc_bb extends HTMLElement {
       'correo_bb_vc': 'Correo',
       'telefono_bb_vc': 'Teléfono',
       'rol_bb_vc': 'Rol',
+      'password_bb_vc': 'Clave',
       'ID_usuario_bb_vc': 'ID',
       'ID_profesor_bb_vc': 'ID_profesor'
     };

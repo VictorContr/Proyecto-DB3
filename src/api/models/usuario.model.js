@@ -44,12 +44,12 @@ export class UsuarioModel_vc_bb {
     return await db_vc_bb.get_vc_bb(sql_vc_bb, [userName_vc_bb]);
   }
 
-  async crear_vc_bb({ nombre_vc_bb, apellido_vc_bb, userName_vc_bb, correo_vc_bb, telefono_vc_bb, password_vc_bb }) {
+  async crear_vc_bb({ nombre_bb_vc, apellido_bb_vc, userName_bb_vc, correo_bb_vc, telefono_bb_vc, password_bb_vc }) {
     const sql_vc_bb = `
       INSERT INTO td_Usuarios_bb_vc (nombre_bb_vc, apellido_bb_vc, userName_bb_vc, correo_bb_vc, telefono_bb_vc, password_bb_vc)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
-    const result_vc_bb = await db_vc_bb.run_vc_bb(sql_vc_bb, [nombre_vc_bb, apellido_vc_bb, userName_vc_bb, correo_vc_bb, telefono_vc_bb, password_vc_bb]);
+    const result_vc_bb = await db_vc_bb.run_vc_bb(sql_vc_bb, [nombre_bb_vc, apellido_bb_vc, userName_bb_vc, correo_bb_vc, telefono_bb_vc, password_bb_vc]);
     return result_vc_bb.lastID;
   }
 
@@ -80,13 +80,13 @@ export class UsuarioModel_vc_bb {
 
   async obtenerRol_vc_bb(id_vc_bb) {
     const sql_vc_bb = `
-      SELECT r.rol_bb_vc
+      SELECT ur.ID_usuarioRol_bb_vc, r.ID_rol_bb_vc, r.rol_bb_vc
       FROM td_UsuarioRol_bb_vc ur
       JOIN td_Rol_bb_vc r ON ur.ID_rol_usuarioRol_bb_vc = r.ID_rol_bb_vc
       WHERE ur.ID_usuario_usuarioRol_bb_vc = ?
     `;
     const row_vc_bb = await db_vc_bb.get_vc_bb(sql_vc_bb, [id_vc_bb]);
-    return row_vc_bb ? row_vc_bb.rol_bb_vc : null;
+    return row_vc_bb || null;
   }
 
   async asignarRol_vc_bb(id_vc_bb, rol_vc_bb) {
