@@ -1,140 +1,261 @@
-import db_vc_bb from "../db.js";
+import { UsuarioModel_vc_bb, RolModel_vc_bb, ProfesorModel_vc_bb, UsuarioRolModel_vc_bb } from "../models/index.js";
 
-export const getAllUsuarios_vc_bb = async (req_vc_bb, res_vc_bb) => {
-  try {
-    const rows_vc_bb = await db_vc_bb.all_vc_bb(`
-      SELECT u.ID_usuario_bb_vc AS ID_usuario_bb_vc,
-             u.userName_bb_vc,
-             u.nombre_bb_vc,
-             u.apellido_bb_vc,
-             u.correo_bb_vc,
-             u.telefono_bb_vc,
-             r.rol_bb_vc AS rol_bb_vc,
-             ur.ID_usuarioRol_bb_vc AS ID_usuarioRol_bb_vc
-      FROM td_Usuarios_bb_vc u
-      LEFT JOIN td_UsuarioRol_bb_vc ur ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc
-      LEFT JOIN td_Rol_bb_vc r ON r.ID_rol_bb_vc = ur.ID_rol_usuarioRol_bb_vc
-      ORDER BY u.ID_usuario_bb_vc;
-    `);
-    res_vc_bb.json(rows_vc_bb);
-  } catch (err_vc_bb) {
-    console.error(err_vc_bb);
-    res_vc_bb.status(500).json({ message: "Error al obtener usuarios" });
+class UsuarioController_vc_bb {
+  static #instancia_vc_bb = null;
+
+  constructor() {
+    if (UsuarioController_vc_bb.#instancia_vc_bb) {
+      return UsuarioController_vc_bb.#instancia_vc_bb;
+    }
+    this.usuarioModel_vc_bb = UsuarioModel_vc_bb.obtenerInstancia_vc_bb();
+    this.rolModel_vc_bb = RolModel_vc_bb.obtenerInstancia_vc_bb();
+    this.profesorModel_vc_bb = ProfesorModel_vc_bb.obtenerInstancia_vc_bb();
+    this.usuarioRolModel_vc_bb = UsuarioRolModel_vc_bb.obtenerInstancia_vc_bb();
+    UsuarioController_vc_bb.#instancia_vc_bb = this;
   }
-};
 
-export const createUsuario_vc_bb = async (req_vc_bb, res_vc_bb) => {
-  try {
-    const {
-      userName_bb_vc = null,
-      nombre_bb_vc = null,
-      apellido_bb_vc = null,
-      correo_bb_vc = null,
-      telefono_bb_vc = null,
-      rol_bb_vc = null,
-      password_bb_vc = null
-    } = req_vc_bb.body;
+  static obtenerInstancia_vc_bb() {
+    if (!UsuarioController_vc_bb.#instancia_vc_bb) {
+      UsuarioController_vc_bb.#instancia_vc_bb = new UsuarioController_vc_bb();
+    }
+    return UsuarioController_vc_bb.#instancia_vc_bb;
+  }
 
-    // password_bb_vc es NOT NULL en el esquema; si no viene, usar contraseña por defecto '123456'
-    const insertPassword = password_bb_vc || '123456';
-    const insertUser = await db_vc_bb.run_vc_bb(
-      `INSERT INTO td_Usuarios_bb_vc (userName_bb_vc, nombre_bb_vc, apellido_bb_vc, correo_bb_vc, telefono_bb_vc, password_bb_vc) VALUES (?,?,?,?,?,?);`,
-      [userName_bb_vc, nombre_bb_vc, apellido_bb_vc, correo_bb_vc, telefono_bb_vc, insertPassword]
-    );
+  async obtenerTodos_vc_bb(req_vc_bb, res_vc_bb) {
+    try {
+      const usuarios_vc_bb = await this.usuarioModel_vc_bb.obtenerTodos_vc_bb();
+      res_vc_bb.json(usuarios_vc_bb);
+    } catch (error_vc_bb) {
+      console.error('Error al obtener usuarios:', error_vc_bb);
+      res_vc_bb.status(500).json({ 
+        mensaje_vc_bb: 'Error al obtener usuarios',
+        error_vc_bb: error_vc_bb.message 
+      });
+    }
+  }
 
-    const newUserId = insertUser.lastID;
+  async obtenerPorId_vc_bb(req_vc_bb, res_vc_bb) {
+    try {
+      const { id } = req_vc_bb.params;
+      const usuario_vc_bb = await this.usuarioModel_vc_bb.obtenerPorId_vc_bb(id);
+      
+      if (!usuario_vc_bb) {
+        return res_vc_bb.status(404).json({ 
+          mensaje_vc_bb: 'Usuario no encontrado' 
+        });
+      }
 
-    // Si enviaron rol, asociarlo
-    if (rol_bb_vc) {
-      // Map simple role values to DB rol text
-      let rolName = null;
-      if (String(rol_bb_vc).toLowerCase().includes('prof')) rolName = 'Profesor';
-      else if (String(rol_bb_vc).toLowerCase().includes('admin')) rolName = 'Administrador';
-      else rolName = String(rol_bb_vc);
+      res_vc_bb.json(usuario_vc_bb);
+    } catch (error_vc_bb) {
+      console.error('Error al obtener usuario por ID:', error_vc_bb);
+      res_vc_bb.status(500).json({ 
+        mensaje_vc_bb: 'Error al obtener usuario',
+        error_vc_bb: error_vc_bb.message 
+      });
+    }
+  }
 
-      const roleRow = await db_vc_bb.get_vc_bb(`SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = ? LIMIT 1;`, [rolName]);
-      if (roleRow) {
-        const userRoleIns = await db_vc_bb.run_vc_bb(`INSERT INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc) VALUES (?,?);`, [newUserId, roleRow.ID_rol_bb_vc]);
-        const newUserRoleId = userRoleIns.lastID;
+  async crear_vc_bb(req_vc_bb, res_vc_bb) {
+    try {
+      const {
+        userName_bb_vc = null,
+        nombre_bb_vc = null,
+        apellido_bb_vc = null,
+        correo_bb_vc = null,
+        telefono_bb_vc = null,
+        rol_bb_vc = null,
+        password_bb_vc = null
+      } = req_vc_bb.body;
 
-        if (rolName === 'Profesor') {
-          await db_vc_bb.run_vc_bb(`INSERT INTO td_Profesores_bb_vc (ID_usuarioRol_profesor_bb_vc) VALUES (?);`, [newUserRoleId]);
+      // Validación básica
+      if (!userName_bb_vc || !nombre_bb_vc || !apellido_bb_vc) {
+        return res_vc_bb.status(400).json({ 
+          mensaje_vc_bb: 'Los campos userName_bb_vc, nombre_bb_vc y apellido_bb_vc son requeridos' 
+        });
+      }
+
+      // Verificar si el username ya existe
+      const usuarioExistente_vc_bb = await this.usuarioModel_vc_bb.obtenerPorUsername_vc_bb(userName_bb_vc);
+      if (usuarioExistente_vc_bb) {
+        return res_vc_bb.status(409).json({ 
+          mensaje_vc_bb: 'El nombre de usuario ya existe' 
+        });
+      }
+
+      // Crear usuario
+      const idUsuario_vc_bb = await this.usuarioModel_vc_bb.crear_vc_bb({
+        userName_bb_vc,
+        nombre_bb_vc,
+        apellido_bb_vc,
+        correo_bb_vc,
+        telefono_bb_vc,
+        password_bb_vc: password_bb_vc || '123456'
+      });
+
+      // Asignar rol si se proporciona
+      if (rol_bb_vc) {
+        await this.#asignarRolUsuario_vc_bb(idUsuario_vc_bb, rol_bb_vc);
+      }
+
+      res_vc_bb.status(201).json({ 
+        mensaje_vc_bb: 'Usuario creado exitosamente',
+        id_usuario_vc_bb: idUsuario_vc_bb 
+      });
+    } catch (error_vc_bb) {
+      console.error('Error al crear usuario:', error_vc_bb);
+      res_vc_bb.status(500).json({ 
+        mensaje_vc_bb: 'Error al crear usuario',
+        error_vc_bb: error_vc_bb.message 
+      });
+    }
+  }
+
+  async actualizar_vc_bb(req_vc_bb, res_vc_bb) {
+    try {
+      const { id } = req_vc_bb.params;
+      const datosActualizar_vc_bb = {};
+      
+      // Filtrar solo los campos que se envían
+      const camposPermitidos_vc_bb = ['userName_bb_vc', 'nombre_bb_vc', 'apellido_bb_vc', 'correo_bb_vc', 'telefono_bb_vc'];
+      camposPermitidos_vc_bb.forEach(campo_vc_bb => {
+        if (req_vc_bb.body[campo_vc_bb] !== undefined) {
+          datosActualizar_vc_bb[campo_vc_bb] = req_vc_bb.body[campo_vc_bb];
+        }
+      });
+
+      // Verificar si el usuario existe
+      const usuarioExistente_vc_bb = await this.usuarioModel_vc_bb.obtenerPorId_vc_bb(id);
+      if (!usuarioExistente_vc_bb) {
+        return res_vc_bb.status(404).json({ 
+          mensaje_vc_bb: 'Usuario no encontrado' 
+        });
+      }
+
+      // Actualizar usuario
+      if (Object.keys(datosActualizar_vc_bb).length > 0) {
+        await this.usuarioModel_vc_bb.actualizar_vc_bb(id, datosActualizar_vc_bb);
+      }
+
+      // Actualizar rol si se proporciona
+      if (req_vc_bb.body.rol_bb_vc !== undefined) {
+        await this.#actualizarRolUsuario_vc_bb(id, req_vc_bb.body.rol_bb_vc);
+      }
+
+      res_vc_bb.json({ 
+        mensaje_vc_bb: 'Usuario actualizado exitosamente' 
+      });
+    } catch (error_vc_bb) {
+      console.error('Error al actualizar usuario:', error_vc_bb);
+      res_vc_bb.status(500).json({ 
+        mensaje_vc_bb: 'Error al actualizar usuario',
+        error_vc_bb: error_vc_bb.message 
+      });
+    }
+  }
+
+  async eliminar_vc_bb(req_vc_bb, res_vc_bb) {
+    try {
+      const { id } = req_vc_bb.params;
+
+      // Verificar si el usuario existe
+      const usuarioExistente_vc_bb = await this.usuarioModel_vc_bb.obtenerPorId_vc_bb(id);
+      if (!usuarioExistente_vc_bb) {
+        return res_vc_bb.status(404).json({ 
+          mensaje_vc_bb: 'Usuario no encontrado' 
+        });
+      }
+
+      // Eliminar usuario (las relaciones se manejan por FK)
+      await this.usuarioModel_vc_bb.eliminar_vc_bb(id);
+
+      res_vc_bb.json({ 
+        mensaje_vc_bb: 'Usuario eliminado exitosamente' 
+      });
+    } catch (error_vc_bb) {
+      console.error('Error al eliminar usuario:', error_vc_bb);
+      res_vc_bb.status(500).json({ 
+        mensaje_vc_bb: 'Error al eliminar usuario',
+        error_vc_bb: error_vc_bb.message 
+      });
+    }
+  }
+
+  // Métodos privados para manejar la lógica de roles
+  async #asignarRolUsuario_vc_bb(idUsuario_vc_bb, rol_vc_bb) {
+    try {
+      // Determinar el nombre del rol
+      let nombreRol_vc_bb = this.#determinarNombreRol_vc_bb(rol_vc_bb);
+      
+      // Obtener el ID del rol
+      const rolDb_vc_bb = await this.rolModel_vc_bb.obtenerPorNombre_vc_bb(nombreRol_vc_bb);
+      if (!rolDb_vc_bb) {
+        throw new Error(`Rol '${nombreRol_vc_bb}' no encontrado`);
+      }
+
+      // Crear relación usuario-rol
+      const idUsuarioRol_vc_bb = await this.usuarioRolModel_vc_bb.crear_vc_bb({
+        ID_usuario_usuarioRol_bb_vc: idUsuario_vc_bb,
+        ID_rol_usuarioRol_bb_vc: rolDb_vc_bb.ID_rol_bb_vc
+      });
+
+      // Si es profesor, crear registro en tabla profesores
+      if (nombreRol_vc_bb === 'Profesor') {
+        await this.profesorModel_vc_bb.crear_vc_bb(idUsuarioRol_vc_bb);
+      }
+
+      return idUsuarioRol_vc_bb;
+    } catch (error_vc_bb) {
+      console.error('Error al asignar rol:', error_vc_bb);
+      throw error_vc_bb;
+    }
+  }
+
+  async #actualizarRolUsuario_vc_bb(idUsuario_vc_bb, rol_vc_bb) {
+    try {
+      // Obtener rol actual del usuario
+      const rolActual_vc_bb = await this.usuarioModel_vc_bb.obtenerRol_vc_bb(idUsuario_vc_bb);
+      
+      // Determinar nuevo nombre de rol
+      const nuevoNombreRol_vc_bb = this.#determinarNombreRol_vc_bb(rol_vc_bb);
+      
+      // Si el rol no cambia, no hacer nada
+      if (rolActual_vc_bb && rolActual_vc_bb.rol_bb_vc === nuevoNombreRol_vc_bb) {
+        return;
+      }
+
+      // Eliminar rol anterior si existe
+      if (rolActual_vc_bb) {
+        await this.usuarioRolModel_vc_bb.eliminar_vc_bb(idUsuario_vc_bb, rolActual_vc_bb.ID_rol_bb_vc);
+        
+        // Si era profesor, eliminar de tabla profesores
+        if (rolActual_vc_bb.rol_bb_vc === 'Profesor') {
+          await this.profesorModel_vc_bb.eliminarPorUsuarioRol_vc_bb(rolActual_vc_bb.ID_usuarioRol_bb_vc);
         }
       }
+
+      // Asignar nuevo rol
+      await this.#asignarRolUsuario_vc_bb(idUsuario_vc_bb, nuevoNombreRol_vc_bb);
+    } catch (error_vc_bb) {
+      console.error('Error al actualizar rol:', error_vc_bb);
+      throw error_vc_bb;
     }
-
-    res_vc_bb.status(201).json({ id_usuario: newUserId });
-  } catch (err_vc_bb) {
-    console.error(err_vc_bb);
-    res_vc_bb.status(500).json({ message: "Error al crear usuario" });
   }
-};
 
-export const updateUsuario_vc_bb = async (req_vc_bb, res_vc_bb) => {
-  try {
-    const { id } = req_vc_bb.params;
-    const {
-      userName_bb_vc = null,
-      nombre_bb_vc = null,
-      apellido_bb_vc = null,
-      correo_bb_vc = null,
-      telefono_bb_vc = null,
-      rol_bb_vc = null,
-    } = req_vc_bb.body;
-
-    // Actualizar campos básicos (solo los que vienen)
-    const updates = [];
-    const params = [];
-    if (userName_bb_vc !== null) { updates.push('userName_bb_vc = ?'); params.push(userName_bb_vc); }
-    if (nombre_bb_vc !== null) { updates.push('nombre_bb_vc = ?'); params.push(nombre_bb_vc); }
-    if (apellido_bb_vc !== null) { updates.push('apellido_bb_vc = ?'); params.push(apellido_bb_vc); }
-    if (correo_bb_vc !== null) { updates.push('correo_bb_vc = ?'); params.push(correo_bb_vc); }
-    if (telefono_bb_vc !== null) { updates.push('telefono_bb_vc = ?'); params.push(telefono_bb_vc); }
-
-    if (updates.length > 0) {
-      params.push(id);
-      await db_vc_bb.run_vc_bb(`UPDATE td_Usuarios_bb_vc SET ${updates.join(', ')} WHERE ID_usuario_bb_vc = ?;`, params);
-    }
-
-    if (rol_bb_vc !== null) {
-      let rolName = null;
-      if (String(rol_bb_vc).toLowerCase().includes('prof')) rolName = 'Profesor';
-      else if (String(rol_bb_vc).toLowerCase().includes('admin')) rolName = 'Administrador';
-      else rolName = String(rol_bb_vc);
-
-      const roleRow = await db_vc_bb.get_vc_bb(`SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = ? LIMIT 1;`, [rolName]);
-      if (roleRow) {
-        // Verificar si existe una entrada en td_UsuarioRol_bb_vc
-        const existingUR = await db_vc_bb.get_vc_bb(`SELECT ID_usuarioRol_bb_vc FROM td_UsuarioRol_bb_vc WHERE ID_usuario_usuarioRol_bb_vc = ? LIMIT 1;`, [id]);
-        if (existingUR) {
-          await db_vc_bb.run_vc_bb(`UPDATE td_UsuarioRol_bb_vc SET ID_rol_usuarioRol_bb_vc = ? WHERE ID_usuarioRol_bb_vc = ?;`, [roleRow.ID_rol_bb_vc, existingUR.ID_usuarioRol_bb_vc]);
-        } else {
-          const ins = await db_vc_bb.run_vc_bb(`INSERT INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc) VALUES (?,?);`, [id, roleRow.ID_rol_bb_vc]);
-          if (rolName === 'Profesor') {
-            await db_vc_bb.run_vc_bb(`INSERT INTO td_Profesores_bb_vc (ID_usuarioRol_profesor_bb_vc) VALUES (?);`, [ins.lastID]);
-          }
-        }
-      }
-    }
-
-    res_vc_bb.json({ message: 'Usuario actualizado' });
-  } catch (err_vc_bb) {
-    console.error(err_vc_bb);
-    res_vc_bb.status(500).json({ message: 'Error al actualizar usuario' });
+  #determinarNombreRol_vc_bb(rol_vc_bb) {
+    const rolLower_vc_bb = String(rol_vc_bb).toLowerCase();
+    if (rolLower_vc_bb.includes('prof')) return 'Profesor';
+    if (rolLower_vc_bb.includes('admin')) return 'Administrador';
+    return String(rol_vc_bb);
   }
-};
+}
 
-export const deleteUsuario_vc_bb = async (req_vc_bb, res_vc_bb) => {
-  try {
-    const { id } = req_vc_bb.params;
-    // Borrar el usuario; las relaciones por FK gestionan la integridad
-    await db_vc_bb.run_vc_bb(`DELETE FROM td_Usuarios_bb_vc WHERE ID_usuario_bb_vc = ?;`, [id]);
-    res_vc_bb.json({ message: 'Usuario eliminado' });
-  } catch (err_vc_bb) {
-    console.error(err_vc_bb);
-    res_vc_bb.status(500).json({ message: 'Error al eliminar usuario' });
-  }
-};
+// Exportar funciones para mantener compatibilidad con rutas existentes
+const controlador_vc_bb = UsuarioController_vc_bb.obtenerInstancia_vc_bb();
+
+export const getAllUsuarios_vc_bb = (req_vc_bb, res_vc_bb) => controlador_vc_bb.obtenerTodos_vc_bb(req_vc_bb, res_vc_bb);
+export const createUsuario_vc_bb = (req_vc_bb, res_vc_bb) => controlador_vc_bb.crear_vc_bb(req_vc_bb, res_vc_bb);
+export const updateUsuario_vc_bb = (req_vc_bb, res_vc_bb) => controlador_vc_bb.actualizar_vc_bb(req_vc_bb, res_vc_bb);
+export const deleteUsuario_vc_bb = (req_vc_bb, res_vc_bb) => controlador_vc_bb.eliminar_vc_bb(req_vc_bb, res_vc_bb);
 
 export default {
   getAllUsuarios_vc_bb,

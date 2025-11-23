@@ -1,5 +1,5 @@
 import db_vc_bb from "../db.js";
-import { ExcelModel_vc_bb } from "../services/excel.model.js";
+import { ExcelModel_vc_bb } from "../models/excel.model.js";
 import XlsxPopulate_vc_bb from "xlsx-populate";
 import xl_vc_bb from "excel4node";
 import fs_vc_bb from "fs";

@@ -6,7 +6,7 @@ import { ExcelSeccionesGradosHandler_vc_bb } from "./excelSeccionesGrados.js";
 import { ExcelDisponibilidadHandler_vc_bb } from "./excelDisponibilidad.js";
 import { GestorSesion_vc_bb, loginForm_vc_bb, logoutButton_vc_bb } from "./login.js";
 import "../components/crudTable.js";
-import { initStepAndStep_vc_bb } from "./step&step.js";
+import { StepAndStep_vc_bb } from "./step&step.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("cargado el app_vc_bb");
@@ -38,7 +38,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const cargaMasiva_vc_bb = document.getElementById('cargaMasiva');
   if (cargaMasiva_vc_bb) {
-    initStepAndStep_vc_bb();
+    const wizard_vc_bb = new StepAndStep_vc_bb();
+    wizard_vc_bb.init_vc_bb();
     const excelHandler_vc_bb = new ExcelHandler_vc_bb();
     const excelEspaciosHandler_vc_bb = new ExcelEspaciosHandler_vc_bb();
     const excelAsignaturaHandler_vc_bb = new ExcelAsignaturaHandler_vc_bb();

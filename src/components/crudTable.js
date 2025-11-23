@@ -4,7 +4,7 @@ class CrudTable_vc_bb extends HTMLElement {
   constructor() {
     super();
     this.shadow_vc_bb = this.attachShadow({ mode: "open" });
-    this.apiBase_vc_bb = "/api";
+    this.apiBase_vc_bb = "http://localhost:3000/api";
     this.modalCrud_vc_bb = new ModalCrud_vc_bb();
 
     this.shadow_vc_bb.innerHTML = `
@@ -101,7 +101,7 @@ class CrudTable_vc_bb extends HTMLElement {
       // Enriquecer filas con nombre de tipo de espacio para mostrar en tabla
       if (Array.isArray(data) && (this.table_vc_bb === 'espacios' || this.table_vc_bb === 'asignaturas')) {
         try {
-          const tiposRes = await fetch('/api/espacios/tipos');
+          const tiposRes = await fetch('http://localhost:3000/api/espacios/tipos');
           const tipos = tiposRes.ok ? await tiposRes.json() : [];
           const mapTipos = {};
           tipos.forEach(t => { mapTipos[String(t.ID_TipoEspacio_bb_vc)] = t.tipo_bb_vc; });
@@ -493,7 +493,7 @@ class CrudTable_vc_bb extends HTMLElement {
         field = document.createElement('select');
         field.name = col;
         field.className = "border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300";
-        fetch('/api/espacios/tipos')
+        fetch('http://localhost:3000/api/espacios/tipos')
           .then(r => r.ok ? r.json() : [])
           .then(rows => {
             rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_TipoEspacio_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.tipo_bb_vc ?? Object.values(rw)[1] ?? opt.value; field.appendChild(opt); });
@@ -503,7 +503,7 @@ class CrudTable_vc_bb extends HTMLElement {
         field = document.createElement('select');
         field.name = col;
         field.className = "border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300";
-        fetch('/api/espacios/tipos')
+        fetch('http://localhost:3000/api/espacios/tipos')
           .then(r => r.ok ? r.json() : [])
           .then(rows => {
             rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_TipoEspacio_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.tipo_bb_vc ?? Object.values(rw)[1] ?? opt.value; field.appendChild(opt); });
@@ -531,7 +531,7 @@ class CrudTable_vc_bb extends HTMLElement {
       const selectGrado = document.createElement('select');
       selectGrado.name = 'nro_grado_bb_vc';
       selectGrado.className = 'border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300';
-      fetch('/api/grados')
+      fetch('http://localhost:3000/api/grados')
         .then(r => r.ok ? r.json() : [])
         .then(rows => {
           rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.nro_grado_bb_vc ?? Object.values(rw)[1]; opt.textContent = String(opt.value); selectGrado.appendChild(opt); });
