@@ -17,6 +17,7 @@ import diasRoutes_vc_bb from "./src/routes/dias.routes.js";
 import bloquesRoutes_vc_bb from "./src/routes/bloques.routes.js";
 import indexRoutes_vc_bb from "./src/routes/index.routes.js";
 import loginRoutes_vc_bb from "./src/routes/login.routes.js"; // nueva ruta de login
+import lockRoutes_vc_bb from "./src/routes/lock.routes.js";
 
 // Nueva importación necesaria para CRUD de asignaturas
 import asignaturasRoutes_vc_bb from "./src/routes/asignaturas.routes.js";
@@ -67,6 +68,7 @@ app_vc_bb.use("/api/grados", gradosRoutes_vc_bb);
 app_vc_bb.use("/api/espacios", espaciosRoutes_vc_bb);
 app_vc_bb.use("/api/dias", diasRoutes_vc_bb);
 app_vc_bb.use("/api/bloques", bloquesRoutes_vc_bb);
+app_vc_bb.use("/api/lock", lockRoutes_vc_bb);
 
 // CRUD de asignaturas (PENSUM real)
 app_vc_bb.use("/api/asignaturas", asignaturasRoutes_vc_bb);

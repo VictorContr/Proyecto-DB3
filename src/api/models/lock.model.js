@@ -26,7 +26,7 @@ export class LockModel_vc_bb {
     grados: ['td_Grados_bb_vc'],
     secciones: ['td_Secciones_bb_vc'],
     asignaturas: ['td_Asignaturas_bb_vc', 'td_GradosAsignaturas_bb_vc'],
-    disponibilidades: ['td_DisponibilidadProfesores_bb_vc', 'td_DisponibilidadEspacios_bb_vc']
+    disponibilidades: ['td_DisponibilidadProfesor_bb_vc', 'td_DisponibilidadEspacio_bb_vc']
   };
 
   /**

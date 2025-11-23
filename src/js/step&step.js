@@ -1,3 +1,5 @@
+import { modal_vc_bb } from "./modal.js";
+
 export class StepAndStep_vc_bb {
   constructor() {
     this.sections_vc_bb = Array.from(document.querySelectorAll('section[data-step]'));
@@ -6,6 +8,7 @@ export class StepAndStep_vc_bb {
     this.labelEl_vc_bb = document.getElementById('wizardStepLabel');
     this.prevBtn_vc_bb = document.getElementById('wizardPrev');
     this.nextBtn_vc_bb = document.getElementById('wizardNext');
+    this.apiBaseUrl_vc_bb = "http://localhost:3000";
   }
 
   updateView_vc_bb() {
@@ -27,15 +30,68 @@ export class StepAndStep_vc_bb {
     this.sections_vc_bb.forEach(sec_vc_bb => {
       const btn_vc_bb = sec_vc_bb.querySelector('.lock-btn');
       if (!btn_vc_bb) return;
-      btn_vc_bb.addEventListener('click', () => {
+      btn_vc_bb.addEventListener('click', async () => {
         const icon_vc_bb = btn_vc_bb.querySelector('i');
         if (!icon_vc_bb) return;
-        if (icon_vc_bb.classList.contains('fa-lock')) { icon_vc_bb.classList.replace('fa-lock', 'fa-lock-open'); }
-        else { icon_vc_bb.classList.replace('fa-lock-open', 'fa-lock'); }
-        this.updateView_vc_bb();
+        const isLocked_vc_bb = icon_vc_bb.classList.contains('fa-lock');
+        const stepIndex_vc_bb = Number(sec_vc_bb.getAttribute('data-step'));
+        const tipoCarga_vc_bb = this.mapTipoPorStep_vc_bb(stepIndex_vc_bb);
+        if (!tipoCarga_vc_bb) return;
+        if (isLocked_vc_bb) {
+          try {
+            const res_vc_bb = await fetch(`${this.apiBaseUrl_vc_bb}/api/lock/verificar/${tipoCarga_vc_bb}`);
+            const data_vc_bb = await res_vc_bb.json();
+            if (!res_vc_bb.ok) {
+              await modal_vc_bb.showError_vc_bb('Verificación', data_vc_bb?.mensaje_vc_bb || 'Error al verificar');
+              return;
+            }
+            if (data_vc_bb?.tieneDatos_vc_bb) {
+              const confirmed_vc_bb = await modal_vc_bb.showConfirm_vc_bb('Verificación', data_vc_bb?.mensaje_vc_bb || 'Existen datos. ¿Desea continuar y limpiar?');
+              if (!confirmed_vc_bb) return;
+              const headers_vc_bb = { 'Content-Type': 'application/json' };
+              const userId_vc_bb = this.getCurrentUserId_vc_bb();
+              if (userId_vc_bb) headers_vc_bb['x-user-id'] = String(userId_vc_bb);
+              const rb_vc_bb = await fetch(`${this.apiBaseUrl_vc_bb}/api/lock/rollback/${tipoCarga_vc_bb}`, { method: 'POST', headers: headers_vc_bb, body: JSON.stringify({ confirmar: true }) });
+              const rbData_vc_bb = await rb_vc_bb.json();
+              if (!rb_vc_bb.ok) {
+                await modal_vc_bb.showError_vc_bb('Rollback', rbData_vc_bb?.mensaje_vc_bb || 'Error al ejecutar rollback');
+                return;
+              }
+              await modal_vc_bb.showSuccess_vc_bb('Rollback', rbData_vc_bb?.mensaje_vc_bb || 'Rollback ejecutado');
+            } else {
+              await modal_vc_bb.showSuccess_vc_bb('Verificación', data_vc_bb?.mensaje_vc_bb || 'No hay datos existentes');
+            }
+            icon_vc_bb.classList.replace('fa-lock', 'fa-lock-open');
+            this.updateView_vc_bb();
+          } catch (e_vc_bb) {
+            await modal_vc_bb.showError_vc_bb('Error', 'No se pudo contactar al servidor');
+          }
+        } else {
+          icon_vc_bb.classList.replace('fa-lock-open', 'fa-lock');
+          this.updateView_vc_bb();
+        }
       });
     });
 
     this.updateView_vc_bb();
+  }
+
+  mapTipoPorStep_vc_bb(i_vc_bb) {
+    if (i_vc_bb === 0) return 'secciones';
+    if (i_vc_bb === 1) return 'espacios';
+    if (i_vc_bb === 2) return 'asignaturas';
+    if (i_vc_bb === 3) return 'profesores';
+    if (i_vc_bb === 4) return 'disponibilidades';
+    return null;
+  }
+
+  getCurrentUserId_vc_bb() {
+    try {
+      const v_vc_bb = sessionStorage.getItem('selectedUserId_vc_bb');
+      if (!v_vc_bb) return null;
+      return JSON.parse(v_vc_bb);
+    } catch (_) {
+      return null;
+    }
   }
 }
