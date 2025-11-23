@@ -3,20 +3,20 @@ import { ModalCrud_vc_bb } from "./modalCrud.js";
 class CrudTable_vc_bb extends HTMLElement {
   constructor() {
     super();
-    this.shadow = this.attachShadow({ mode: "open" });
+    this.shadow_vc_bb = this.attachShadow({ mode: "open" });
     this.apiBase_vc_bb = "/api";
-    this.modalCrud = new ModalCrud_vc_bb();
+    this.modalCrud_vc_bb = new ModalCrud_vc_bb();
 
-    this.shadow.innerHTML = `
+    this.shadow_vc_bb.innerHTML = `
     <link rel="stylesheet" href="../public/css/tailwind.css">
-      <div class="p-6 bg-white dark:bg-gray-800 rounded shadow text-gray-800 dark:text-gray-600">
-        <h2 id="title_vc_bb" class="text-2xl font-bold mb-4"></h2>
-        <div id="formWrap_vc_bb" class="mb-6">
+      <div class="p-6  dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200">
+        <h2 id="title_vc_bb" class="text-2xl font-bold mb-4 text-white"></h2>
+        <div id="formWrap_vc_bb" class="mb-6 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded p-4">
           <form id="form_vc_bb" class="mb-6 flex flex-wrap gap-4"></form>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full border-collapse table-fixed">
-            <thead class="bg-gray-200 dark:bg-gray-700" id="thead_vc_bb"></thead>
+          <table class="w-full border-collapse table-fixed text-gray-800 dark:text-gray-200">
+            <thead class="bg-gray-100 dark:bg-gray-700" id="thead_vc_bb"></thead>
             <tbody id="tbody_vc_bb"></tbody>
           </table>
         </div>
@@ -31,7 +31,9 @@ class CrudTable_vc_bb extends HTMLElement {
   observeTheme_vc_bb() {
     const apply = () => {
       const isDark = document.documentElement.classList.contains('dark');
-      this.shadow.host.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      this.shadow_vc_bb.host.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      const rootBox = this.shadow_vc_bb.querySelector('div');
+      if (rootBox) rootBox.classList.toggle('dark', isDark);
 
       const modalMessage = document.getElementById('crudModalMessage');
       if (modalMessage) {
@@ -81,10 +83,10 @@ class CrudTable_vc_bb extends HTMLElement {
       }
     }
     if (!this.table_vc_bb) {
-      this.shadow.getElementById("title_vc_bb").innerText = "Error: tabla no definida.";
+      this.shadow_vc_bb.getElementById("title_vc_bb").innerText = "Error: tabla no definida.";
       return;
     }
-    this.shadow.getElementById("title_vc_bb").innerText = `Administrar ${this.table_vc_bb}`;
+    this.shadow_vc_bb.getElementById("title_vc_bb").innerText = `Administrar ${this.table_vc_bb}`;
     this.observeTheme_vc_bb();
     await this.loadData_vc_bb();
   }
@@ -137,8 +139,8 @@ class CrudTable_vc_bb extends HTMLElement {
   }
 
   async renderTable_vc_bb (data) {
-    const thead = this.shadow.getElementById("thead_vc_bb");
-    const tbody = this.shadow.getElementById("tbody_vc_bb");
+    const thead_vc_bb = this.shadow_vc_bb.getElementById("thead_vc_bb");
+    const tbody_vc_bb = this.shadow_vc_bb.getElementById("tbody_vc_bb");
 
     if (!Array.isArray(data) || data.length === 0) {
       // Si no hay datos, intentar obtener el esquema de la tabla para mostrar el formulario de creación
@@ -149,7 +151,7 @@ class CrudTable_vc_bb extends HTMLElement {
           const colsFromSchema = schema.columns || [];
           // Mostrar encabezados basados en schema (omitiendo id)
           const visibleColsFromSchema = colsFromSchema.filter(c => !/^id/i.test(c));
-          thead.innerHTML = `\n      <tr>\n        ${visibleColsFromSchema.map(col => `<th class=\"border px-3 py-2 text-sm text-left\">${this.prettyLabel_vc_bb(col)}</th>`).join("")}\n        <th class=\"border px-3 py-2 text-sm text-left\">Acciones</th>\n      </tr>\n    `;
+          thead.innerHTML = `\n      <tr>\n        ${visibleColsFromSchema.map(col => `<th class=\"border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm text-left bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200\">${this.prettyLabel_vc_bb(col)}</th>`).join("")}\n        <th class=\"border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm text-left bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200\">Acciones</th>\n      </tr>\n    `;
           // Renderizar formulario de creación usando columnas del schema
           await this.renderForm_vc_bb(colsFromSchema);
           tbody.innerHTML = "";
@@ -159,8 +161,8 @@ class CrudTable_vc_bb extends HTMLElement {
         console.warn('No se pudo obtener schema:', errSchema);
       }
 
-      thead.innerHTML = "<tr><th class='p-2'>No hay datos</th></tr>";
-      tbody.innerHTML = "";
+      thead_vc_bb.innerHTML = "<tr><th class='p-2 border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'>No hay datos</th></tr>";
+      tbody_vc_bb.innerHTML = "";
       return;
     }
 
@@ -168,47 +170,47 @@ class CrudTable_vc_bb extends HTMLElement {
     const visibleCols = cols.filter(c => !/^id/i.test(c));
 
     if (visibleCols.length === 0) {
-      thead.innerHTML = "<tr><th class='p-2'>No hay campos para mostrar</th></tr>";
-      tbody.innerHTML = "";
+      thead_vc_bb.innerHTML = "<tr><th class='p-2 border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'>No hay campos para mostrar</th></tr>";
+      tbody_vc_bb.innerHTML = "";
       return;
     }
 
-    thead.innerHTML = `
+    thead_vc_bb.innerHTML = `
       <tr>
-        ${visibleCols.map(col => `<th class=\"border px-3 py-2 text-sm text-left\">${this.prettyLabel_vc_bb(col)}</th>`).join("")}
-        <th class=\"border px-3 py-2 text-sm text-left\">Acciones</th>
+        ${visibleCols.map(col => `<th class=\"border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm text-left bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200\">${this.prettyLabel_vc_bb(col)}</th>`).join("")}
+        <th class=\"border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm text-left bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200\">Acciones</th>
       </tr>
     `;
 
     await this.renderForm_vc_bb(cols);
-    tbody.innerHTML = "";
+    tbody_vc_bb.innerHTML = "";
 
     data.forEach(row_vc_bb => {
       const tr = document.createElement("tr");
       tr.className = 'group';
       visibleCols.forEach(col => {
         const td = document.createElement("td");
-        td.className = "border px-3 py-2 text-sm align-top truncate transition-all group-hover:py-4";
+        td.className = "border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm align-top truncate transition-all group-hover:py-4 text-gray-700 dark:text-gray-300";
         td.title = row_vc_bb[col] != null ? String(row_vc_bb[col]) : "";
         td.textContent = row_vc_bb[col] != null ? String(row_vc_bb[col]) : "";
         tr.appendChild(td);
       });
 
       const tdActions = document.createElement("td");
-      tdActions.className = "border px-3 py-2 text-sm whitespace-nowrap";
+      tdActions.className = "border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm whitespace-nowrap";
 
       const actionsWrap = document.createElement('div');
       actionsWrap.className = 'flex flex-col gap-2 items-end';
 
       const btnEdit = document.createElement("button");
       btnEdit.textContent = "Editar";
-      btnEdit.className = "bg-blue-500 text-white px-3 py-1 rounded min-w-[64px] whitespace-nowrap flex-shrink-0";
+      btnEdit.className = "bg-colegio-blue hover:bg-colegio-darkblue text-white px-3 py-1 rounded min-w-[64px] whitespace-nowrap flex-shrink-0 transition-colors duration-200";
       const pkId_vc_bb = this.findIdValue_vc_bb(row_vc_bb);
       btnEdit.dataset.id = pkId_vc_bb;
 
       const btnDelete = document.createElement("button");
       btnDelete.textContent = "Eliminar";
-      btnDelete.className = "bg-red-500 text-white px-3 py-1 rounded min-w-[64px] whitespace-nowrap flex-shrink-0";
+      btnDelete.className = "bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded min-w-[64px] whitespace-nowrap flex-shrink-0 transition-colors duration-200";
       btnDelete.dataset.id = pkId_vc_bb;
 
       // Deshabilitar eliminar solo cuando estemos en la tabla `usuarios`
@@ -240,12 +242,12 @@ class CrudTable_vc_bb extends HTMLElement {
       actionsWrap.appendChild(btnDelete);
       tdActions.appendChild(actionsWrap);
       tr.appendChild(tdActions);
-      tbody.appendChild(tr);
+      tbody_vc_bb.appendChild(tr);
     });
   }
 
   async renderForm_vc_bb(cols) {
-    const form = this.shadow.getElementById("form_vc_bb");
+    const form = this.shadow_vc_bb.getElementById("form_vc_bb");
     form.innerHTML = "";
     // Clear any previous submit handler to avoid duplicates
     try { form.onsubmit = null; } catch (e) { /* ignore */ }
@@ -592,7 +594,7 @@ class CrudTable_vc_bb extends HTMLElement {
   }
 
   openEditModal_vc_bb(row_vc_bb) {
-    const modalInstance = this.modalCrud;
+    const modalInstance = this.modalCrud_vc_bb;
     const modalTitleText = `Editar ${this.table_vc_bb}`;
 
     const form_vc_bb = document.createElement("form");
@@ -656,8 +658,8 @@ class CrudTable_vc_bb extends HTMLElement {
         form_vc_bb.appendChild(wrapperFor('Profesor', selectProfesor));
 
         // modal action will send proper ID fields
-        modalInstance.open(modalTitleText, form_vc_bb);
-        modalInstance.onConfirm(async () => {
+        modalInstance.open_vc_bb(modalTitleText, form_vc_bb);
+        modalInstance.onConfirm_vc_bb(async () => {
           const body = {
             ID_dia_DispProfesor_bb_vc: selectDia.value,
             ID_bloque_DispProfesor_bb_vc: selectBloque.value,
@@ -669,7 +671,7 @@ class CrudTable_vc_bb extends HTMLElement {
             headers: Object.assign({ 'Content-Type': 'application/json' }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})),
             body: JSON.stringify(body)
           });
-          modalInstance.close();
+          modalInstance.close_vc_bb();
           this.loadData_vc_bb();
         });
         return;
@@ -710,8 +712,8 @@ class CrudTable_vc_bb extends HTMLElement {
         if (row_vc_bb.ID_espacio_bb_vc) Array.from(selectEspacio.options).forEach(o=>{ if (String(o.value) === String(row_vc_bb.ID_espacio_bb_vc)) o.selected = true; });
         form_vc_bb.appendChild(wrapperFor('Espacio', selectEspacio));
 
-        modalInstance.open(modalTitleText, form_vc_bb);
-        modalInstance.onConfirm(async () => {
+        modalInstance.open_vc_bb(modalTitleText, form_vc_bb);
+        modalInstance.onConfirm_vc_bb(async () => {
           const body = {
             ID_dia_DispEspacio_bb_vc: selectDia.value,
             ID_bloque_DispEspacio_bb_vc: selectBloque.value,
@@ -723,7 +725,7 @@ class CrudTable_vc_bb extends HTMLElement {
             headers: Object.assign({ 'Content-Type': 'application/json' }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})),
             body: JSON.stringify(body)
           });
-          modalInstance.close();
+          modalInstance.close_vc_bb();
           this.loadData_vc_bb();
         });
         return;
@@ -793,8 +795,8 @@ class CrudTable_vc_bb extends HTMLElement {
       })();
     }
 
-    modalInstance.open(modalTitleText, form_vc_bb);
-    modalInstance.onConfirm(async () => {
+    modalInstance.open_vc_bb(modalTitleText, form_vc_bb);
+    modalInstance.onConfirm_vc_bb(async () => {
       const formData_vc_bb = new FormData(form_vc_bb);
       const updated_vc_bb = {};
       for (let [key_vc_bb, value_vc_bb] of formData_vc_bb.entries()) {
@@ -812,7 +814,7 @@ class CrudTable_vc_bb extends HTMLElement {
         headers: Object.assign({ "Content-Type": "application/json" }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})),
         body: JSON.stringify(updated_vc_bb)
       });
-      modalInstance.close();
+      modalInstance.close_vc_bb();
       this.loadData_vc_bb();
     });
   }

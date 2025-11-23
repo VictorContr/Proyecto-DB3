@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import path, { dirname } from 'path';
 import {fileURLToPath} from "url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname_vc_bb = dirname(fileURLToPath(import.meta.url))
 let ventana_vc_bb;
 export const crearVentana_vc_bb = async () => {
   ventana_vc_bb = new BrowserWindow({
@@ -15,34 +15,34 @@ export const crearVentana_vc_bb = async () => {
     }
   });
   // Intentar cargar la API/servidor si está disponible (desarrollo).
-  const port = process.env.PORT || 3000;
-  const serverUrl = `http://localhost:${port}`;
+  const port_vc_bb = process.env.PORT || 3000;
+  const serverUrl_vc_bb = `http://localhost:${port_vc_bb}`;
   // Página que queremos cargar cuando el servidor HTTP esté arriba
-  const pagePath = `${serverUrl}/views/index.html`;
+  const pagePath_vc_bb = `${serverUrl_vc_bb}/views/index.html`;
 
   // Esperar un poco por si el servidor HTTP todavía está arrancando.
-  const waitForServer = async (url, attempts = 20, delay = 200) => {
-    for (let i = 0; i < attempts; i++) {
+  const waitForServer_vc_bb = async (url_vc_bb, attempts_vc_bb = 20, delay_vc_bb = 200) => {
+    for (let i_vc_bb = 0; i_vc_bb < attempts_vc_bb; i_vc_bb++) {
       try {
-        const res = await fetch(url, { method: "HEAD" });
-        if (res && (res.ok || res.status === 200 || res.status === 204)) return true;
-      } catch (e) {
+        const res_vc_bb = await fetch(url_vc_bb, { method: "HEAD" });
+        if (res_vc_bb && (res_vc_bb.ok || res_vc_bb.status === 200 || res_vc_bb.status === 204)) return true;
+      } catch (e_vc_bb) {
         // Ignorar y hacer retry
       }
-      await new Promise(r => setTimeout(r, delay));
+      await new Promise(r_vc_bb => setTimeout(r_vc_bb, delay_vc_bb));
     }
     return false;
   };
 
-  const serverAvailable = await waitForServer(serverUrl, 20, 250);
-  if (serverAvailable) {
-    ventana_vc_bb.loadURL(pagePath);
+  const serverAvailable_vc_bb = await waitForServer_vc_bb(serverUrl_vc_bb, 20, 250);
+  if (serverAvailable_vc_bb) {
+    ventana_vc_bb.loadURL(pagePath_vc_bb);
     return;
   }
   console.warn("Servidor HTTP no respondió tras esperar, cargando archivo local.");
 
   // Fallback: cargar la vista local (file://) si no hay servidor HTTP disponible.
-  ventana_vc_bb.loadFile(path.join(__dirname, '..', '/', 'views', '/', 'index.html'));
+  ventana_vc_bb.loadFile(path.join(__dirname_vc_bb, '..', '/', 'views', '/', 'index.html'));
 };
 
 // Handlers IPC

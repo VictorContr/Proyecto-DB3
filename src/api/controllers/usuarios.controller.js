@@ -1,8 +1,8 @@
 import db_vc_bb from "../db.js";
 
-export const getAllUsuarios_vc_bb = async (req, res) => {
+export const getAllUsuarios_vc_bb = async (req_vc_bb, res_vc_bb) => {
   try {
-    const rows = await db_vc_bb.all_vc_bb(`
+    const rows_vc_bb = await db_vc_bb.all_vc_bb(`
       SELECT u.ID_usuario_bb_vc AS ID_usuario_bb_vc,
              u.userName_bb_vc,
              u.nombre_bb_vc,
@@ -16,14 +16,14 @@ export const getAllUsuarios_vc_bb = async (req, res) => {
       LEFT JOIN td_Rol_bb_vc r ON r.ID_rol_bb_vc = ur.ID_rol_usuarioRol_bb_vc
       ORDER BY u.ID_usuario_bb_vc;
     `);
-    res.json(rows);
+    res_vc_bb.json(rows_vc_bb);
   } catch (err_vc_bb) {
     console.error(err_vc_bb);
-    res.status(500).json({ message: "Error al obtener usuarios" });
+    res_vc_bb.status(500).json({ message: "Error al obtener usuarios" });
   }
 };
 
-export const createUsuario_vc_bb = async (req, res) => {
+export const createUsuario_vc_bb = async (req_vc_bb, res_vc_bb) => {
   try {
     const {
       userName_bb_vc = null,
@@ -33,7 +33,7 @@ export const createUsuario_vc_bb = async (req, res) => {
       telefono_bb_vc = null,
       rol_bb_vc = null,
       password_bb_vc = null
-    } = req.body;
+    } = req_vc_bb.body;
 
     // password_bb_vc es NOT NULL en el esquema; si no viene, usar contraseña por defecto '123456'
     const insertPassword = password_bb_vc || '123456';
@@ -63,16 +63,16 @@ export const createUsuario_vc_bb = async (req, res) => {
       }
     }
 
-    res.status(201).json({ id_usuario: newUserId });
+    res_vc_bb.status(201).json({ id_usuario: newUserId });
   } catch (err_vc_bb) {
     console.error(err_vc_bb);
-    res.status(500).json({ message: "Error al crear usuario" });
+    res_vc_bb.status(500).json({ message: "Error al crear usuario" });
   }
 };
 
-export const updateUsuario_vc_bb = async (req, res) => {
+export const updateUsuario_vc_bb = async (req_vc_bb, res_vc_bb) => {
   try {
-    const { id } = req.params;
+    const { id } = req_vc_bb.params;
     const {
       userName_bb_vc = null,
       nombre_bb_vc = null,
@@ -80,7 +80,7 @@ export const updateUsuario_vc_bb = async (req, res) => {
       correo_bb_vc = null,
       telefono_bb_vc = null,
       rol_bb_vc = null,
-    } = req.body;
+    } = req_vc_bb.body;
 
     // Actualizar campos básicos (solo los que vienen)
     const updates = [];
@@ -117,22 +117,22 @@ export const updateUsuario_vc_bb = async (req, res) => {
       }
     }
 
-    res.json({ message: 'Usuario actualizado' });
+    res_vc_bb.json({ message: 'Usuario actualizado' });
   } catch (err_vc_bb) {
     console.error(err_vc_bb);
-    res.status(500).json({ message: 'Error al actualizar usuario' });
+    res_vc_bb.status(500).json({ message: 'Error al actualizar usuario' });
   }
 };
 
-export const deleteUsuario_vc_bb = async (req, res) => {
+export const deleteUsuario_vc_bb = async (req_vc_bb, res_vc_bb) => {
   try {
-    const { id } = req.params;
+    const { id } = req_vc_bb.params;
     // Borrar el usuario; las relaciones por FK gestionan la integridad
     await db_vc_bb.run_vc_bb(`DELETE FROM td_Usuarios_bb_vc WHERE ID_usuario_bb_vc = ?;`, [id]);
-    res.json({ message: 'Usuario eliminado' });
+    res_vc_bb.json({ message: 'Usuario eliminado' });
   } catch (err_vc_bb) {
     console.error(err_vc_bb);
-    res.status(500).json({ message: 'Error al eliminar usuario' });
+    res_vc_bb.status(500).json({ message: 'Error al eliminar usuario' });
   }
 };
 
