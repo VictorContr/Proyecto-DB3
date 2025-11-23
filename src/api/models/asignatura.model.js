@@ -49,15 +49,15 @@ export class AsignaturaModel_vc_bb {
     return await db_vc_bb.get_vc_bb(sql_vc_bb, [nombre_vc_bb]);
   }
 
-  async crear_vc_bb({ nombre_vc_bb, horas_academicas_vc_bb = null, descripcion_vc_bb = null, duracion_bloque_min_vc_bb = 1, duracion_bloque_max_vc_bb = 1, ID_TipoEspacio_requerido_vc_bb = null }) {
-    if (!nombre_vc_bb || nombre_vc_bb.trim() === '') {
+  async crear_vc_bb({ nombre_bb_vc, horas_academicas_bb_vc = null, descripcion_bb_vc = null, duracion_bloque_min_bb_vc = 1, duracion_bloque_max_bb_vc = 1, ID_TipoEspacio_requerido_bb_vc = null }) {
+    if (!nombre_bb_vc || nombre_bb_vc.trim() === '') {
       throw new Error('El nombre de la asignatura es requerido');
     }
     const sql_vc_bb = `
       INSERT INTO td_Asignaturas_bb_vc (nombre_bb_vc, horas_academicas_bb_vc, descripcion_bb_vc, duracion_bloque_min_bb_vc, duracion_bloque_max_bb_vc, ID_TipoEspacio_requerido_bb_vc)
       VALUES (?, ?, ?, ?, ?, ?)
     `;
-    const result_vc_bb = await db_vc_bb.run_vc_bb(sql_vc_bb, [nombre_vc_bb, horas_academicas_vc_bb, descripcion_vc_bb, duracion_bloque_min_vc_bb, duracion_bloque_max_vc_bb, ID_TipoEspacio_requerido_vc_bb]);
+    const result_vc_bb = await db_vc_bb.run_vc_bb(sql_vc_bb, [nombre_bb_vc, horas_academicas_bb_vc, descripcion_bb_vc, duracion_bloque_min_bb_vc, duracion_bloque_max_bb_vc, ID_TipoEspacio_requerido_bb_vc]);
     return result_vc_bb.lastID;
   }
 

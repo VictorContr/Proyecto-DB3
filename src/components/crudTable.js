@@ -167,7 +167,15 @@ class CrudTable_vc_bb extends HTMLElement {
     }
 
     const cols = Object.keys(data[0]);
-    const visibleCols = cols.filter(c => !/^id/i.test(c));
+    let visibleCols = cols.filter(c => !/^id/i.test(c));
+    if (this.table_vc_bb === 'espacios') {
+      // Evitar columnas duplicadas de tipo de espacio: mostrar solo una
+      visibleCols = visibleCols.filter(c => c.toLowerCase() !== 'tipoespacio_bb_vc');
+    }
+    if (this.table_vc_bb === 'asignaturas') {
+      // Mantener solo "Espacio requerido" y ocultar alias duplicado
+      visibleCols = visibleCols.filter(c => c.toLowerCase() !== 'tipoespacio_bb_vc');
+    }
 
     if (visibleCols.length === 0) {
       thead_vc_bb.innerHTML = "<tr><th class='p-2 border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'>No hay campos para mostrar</th></tr>";
@@ -463,7 +471,24 @@ class CrudTable_vc_bb extends HTMLElement {
       'ID_usuario_bb_vc','ID_espacio_bb_vc','ID_asignatura_bb_vc','ID_grado_bb_vc','ID_seccion_bb_vc','ID_DisponibilidadProfesor_bb_vc','ID_DisponibilidadEspacio_bb_vc','ID_clase_bb_vc'
     ];
     const isPk_vc_bb = (c) => pkNames_vc_bb.includes(c) || /^id$/i.test(c) || (this.table_vc_bb && c.toLowerCase() === (`id_${this.table_vc_bb}_bb_vc`).toLowerCase());
-    const createCols = cols.filter(col => !isPk_vc_bb(col));
+    let createCols = cols.filter(col => !isPk_vc_bb(col));
+    if (this.table_vc_bb === 'espacios') {
+      // Solo permitir el campo FK, ocultar derivados/alias
+      createCols = createCols.filter(c => {
+        const k = String(c).toLowerCase();
+        if (k === 'tipoespacio_bb_vc' || k === 'tipo_espacio_bb_vc') return false;
+        return true;
+      });
+    }
+    if (this.table_vc_bb === 'asignaturas') {
+      // Ocultar alias de tipo espacio y campos de grado duplicados (ID y nro)
+      createCols = createCols.filter(c => {
+        const k = String(c).toLowerCase();
+        if (k === 'tipoespacio_bb_vc' || k === 'tipo_espacio_requerido_bb_vc') return false;
+        if (k === 'id_grado_bb_vc' || k === 'nro_grado_bb_vc') return false;
+        return true;
+      });
+    }
     createCols.forEach(col => {
       const keyLower = col.toLowerCase();
       let field;
@@ -740,7 +765,21 @@ class CrudTable_vc_bb extends HTMLElement {
       'ID_usuario_bb_vc','ID_espacio_bb_vc','ID_asignatura_bb_vc','ID_grado_bb_vc','ID_seccion_bb_vc','ID_DisponibilidadProfesor_bb_vc','ID_DisponibilidadEspacio_bb_vc','ID_clase_bb_vc'
     ];
     const isPk2_vc_bb = (c) => pkNames2_vc_bb.includes(c) || /^id$/i.test(c) || (this.table_vc_bb && c.toLowerCase() === (`id_${this.table_vc_bb}_bb_vc`).toLowerCase());
-    const editableKeys = Object.keys(row_vc_bb).filter(k => !isPk2_vc_bb(k));
+    let editableKeys = Object.keys(row_vc_bb).filter(k => !isPk2_vc_bb(k));
+    if (this.table_vc_bb === 'espacios') {
+      editableKeys = editableKeys.filter(k => {
+        const kk = String(k).toLowerCase();
+        return kk !== 'tipoespacio_bb_vc' && kk !== 'tipo_espacio_bb_vc';
+      });
+    }
+    if (this.table_vc_bb === 'asignaturas') {
+      editableKeys = editableKeys.filter(k => {
+        const kk = String(k).toLowerCase();
+        if (kk === 'tipoespacio_bb_vc' || kk === 'tipo_espacio_requerido_bb_vc') return false;
+        if (kk === 'id_grado_bb_vc' || kk === 'nro_grado_bb_vc') return false;
+        return true;
+      });
+    }
     editableKeys.forEach(async col => {
       const wrapper = document.createElement('div');
       wrapper.className = 'flex flex-col gap-2';
@@ -867,7 +906,9 @@ class CrudTable_vc_bb extends HTMLElement {
       'rol_bb_vc': 'Rol',
       'password_bb_vc': 'Clave',
       'ID_usuario_bb_vc': 'ID',
-      'ID_profesor_bb_vc': 'ID_profesor'
+      'ID_profesor_bb_vc': 'ID_profesor',
+      'tipo_espacio_bb_vc': 'Tipo de espacio',
+      'tipo_espacio_requerido_bb_vc': 'Espacio requerido'
     };
     if (map[col]) return map[col];
 
