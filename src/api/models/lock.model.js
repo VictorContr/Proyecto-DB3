@@ -93,6 +93,26 @@ export class LockModel_vc_bb {
     }
   }
 
+  async eliminarRespaldosAntiguosExcepto_vc_bb(tablas_vc_bb, nombreRespaldo_vc_bb) {
+    try {
+      for (const tabla_vc_bb of tablas_vc_bb) {
+        const keep_vc_bb = `${tabla_vc_bb}_backup_${nombreRespaldo_vc_bb}`;
+        const sqlList_vc_bb = `SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '${tabla_vc_bb}_backup_%'`;
+        const rows_vc_bb = await db_vc_bb.all_vc_bb(sqlList_vc_bb);
+        for (const r_vc_bb of rows_vc_bb) {
+          const n_vc_bb = r_vc_bb.name || Object.values(r_vc_bb)[0];
+          if (n_vc_bb && n_vc_bb !== keep_vc_bb) {
+            await db_vc_bb.run_vc_bb(`DROP TABLE ${n_vc_bb}`);
+          }
+        }
+      }
+      return true;
+    } catch (error_vc_bb) {
+      console.error('Error al eliminar respaldos antiguos:', error_vc_bb);
+      throw error_vc_bb;
+    }
+  }
+
   /**
    * Elimina todos los datos de las tablas especificadas
    */
@@ -167,6 +187,7 @@ export class LockModel_vc_bb {
       // Crear respaldo antes de limpiar
       const nombreRespaldo_vc_bb = await this.crearRespaldo_vc_bb(tablas_vc_bb, tipoCarga_vc_bb);
       
+      await this.eliminarRespaldosAntiguosExcepto_vc_bb(tablas_vc_bb, nombreRespaldo_vc_bb);
       // Limpiar tablas
       await this.limpiarTablas_vc_bb(tablas_vc_bb);
       
