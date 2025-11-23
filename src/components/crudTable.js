@@ -6,11 +6,29 @@ class CrudTable_vc_bb extends HTMLElement {
     this.shadow_vc_bb = this.attachShadow({ mode: "open" });
     this.apiBase_vc_bb = "http://localhost:3000/api";
     this.modalCrud_vc_bb = new ModalCrud_vc_bb();
+    this.data_vc_bb = [];
+    this.filterField_vc_bb = null;
+    this.filterValue_vc_bb = "";
+    this.sortField_vc_bb = null;
+    this.sortDir_vc_bb = "asc";
 
     this.shadow_vc_bb.innerHTML = `
     <link rel="stylesheet" href="../public/css/tailwind.css">
       <div class="p-6  dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200">
         <h2 id="title_vc_bb" class="text-2xl font-bold mb-4 text-white"></h2>
+        <div id="tableTools_vc_bb" class="mb-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded p-4 flex flex-wrap gap-4 items-end">
+          <div class="flex flex-col gap-2 w-full sm:w-56">
+            <label class="text-sm font-medium text-gray-600 dark:text-gray-200">Campo</label>
+            <select id="fieldSelect_vc_bb" class="border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300"></select>
+          </div>
+          <div class="flex flex-col gap-2 w-full sm:w-64">
+            <label class="text-sm font-medium text-gray-600 dark:text-gray-200">Valor</label>
+            <input id="filterInput_vc_bb" type="text" class="border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300" placeholder="Filtrar por campo">
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="clearFilters_vc_bb" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded">Limpiar</button>
+          </div>
+        </div>
         <div id="formWrap_vc_bb" class="mb-6 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded p-4">
           <form id="form_vc_bb" class="mb-6 flex flex-wrap gap-4"></form>
         </div>
@@ -122,7 +140,8 @@ class CrudTable_vc_bb extends HTMLElement {
           });
         } catch (_) { /* ignore */ }
       }
-      await this.renderTable_vc_bb(data);
+      this.data_vc_bb = Array.isArray(data) ? data : [];
+      await this.renderTable_vc_bb(this.data_vc_bb);
     } catch (err) {
       console.error("Error cargando datos:", err);
     }
@@ -141,6 +160,10 @@ class CrudTable_vc_bb extends HTMLElement {
   async renderTable_vc_bb (data) {
     const thead_vc_bb = this.shadow_vc_bb.getElementById("thead_vc_bb");
     const tbody_vc_bb = this.shadow_vc_bb.getElementById("tbody_vc_bb");
+    const tools_vc_bb = this.shadow_vc_bb.getElementById("tableTools_vc_bb");
+    const fieldSelect_vc_bb = this.shadow_vc_bb.getElementById("fieldSelect_vc_bb");
+    const filterInput_vc_bb = this.shadow_vc_bb.getElementById("filterInput_vc_bb");
+    const clearFilters_vc_bb = this.shadow_vc_bb.getElementById("clearFilters_vc_bb");
 
     if (!Array.isArray(data) || data.length === 0) {
       // Si no hay datos, intentar obtener el esquema de la tabla para mostrar el formulario de creación
@@ -177,6 +200,26 @@ class CrudTable_vc_bb extends HTMLElement {
       visibleCols = visibleCols.filter(c => c.toLowerCase() !== 'tipoespacio_bb_vc');
     }
 
+    if (tools_vc_bb && fieldSelect_vc_bb) {
+      const currentField_vc_bb = this.filterField_vc_bb;
+      fieldSelect_vc_bb.innerHTML = "";
+      const emptyOpt_vc_bb = document.createElement('option');
+      emptyOpt_vc_bb.value = "";
+      emptyOpt_vc_bb.textContent = "Todos";
+      fieldSelect_vc_bb.appendChild(emptyOpt_vc_bb);
+      visibleCols.forEach(c => {
+        const opt_vc_bb = document.createElement('option');
+        opt_vc_bb.value = c;
+        opt_vc_bb.textContent = this.prettyLabel_vc_bb(c);
+        fieldSelect_vc_bb.appendChild(opt_vc_bb);
+      });
+      if (currentField_vc_bb) fieldSelect_vc_bb.value = currentField_vc_bb;
+      if (filterInput_vc_bb) filterInput_vc_bb.value = this.filterValue_vc_bb || "";
+      if (fieldSelect_vc_bb) fieldSelect_vc_bb.onchange = () => { this.filterField_vc_bb = fieldSelect_vc_bb.value || null; this.renderTable_vc_bb(this.data_vc_bb); };
+      if (filterInput_vc_bb) filterInput_vc_bb.oninput = () => { this.filterValue_vc_bb = filterInput_vc_bb.value || ""; this.renderTable_vc_bb(this.data_vc_bb); };
+      if (clearFilters_vc_bb) clearFilters_vc_bb.onclick = () => { this.filterField_vc_bb = null; this.filterValue_vc_bb = ""; if (fieldSelect_vc_bb) fieldSelect_vc_bb.value = ""; if (filterInput_vc_bb) filterInput_vc_bb.value = ""; this.renderTable_vc_bb(this.data_vc_bb); };
+    }
+
     if (visibleCols.length === 0) {
       thead_vc_bb.innerHTML = "<tr><th class='p-2 border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200'>No hay campos para mostrar</th></tr>";
       tbody_vc_bb.innerHTML = "";
@@ -185,15 +228,16 @@ class CrudTable_vc_bb extends HTMLElement {
 
     thead_vc_bb.innerHTML = `
       <tr>
-        ${visibleCols.map(col => `<th class=\"border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm text-left bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200\">${this.prettyLabel_vc_bb(col)}</th>`).join("")}
-        <th class=\"border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm text-left bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200\">Acciones</th>
+        ${visibleCols.map(col => `<th class="border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm text-left bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 cursor-pointer select-none">${this.prettyLabel_vc_bb(col)}${this.sortField_vc_bb === col ? (this.sortDir_vc_bb === 'asc' ? ' ▲' : ' ▼') : ''}</th>`).join("")}
+        <th class="border border-gray-200 dark:border-gray-600 px-3 py-2 text-sm text-left bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">Acciones</th>
       </tr>
     `;
 
     await this.renderForm_vc_bb(cols);
     tbody_vc_bb.innerHTML = "";
 
-    data.forEach(row_vc_bb => {
+    const processed_vc_bb = this.applyFiltersAndSort_vc_bb(data, visibleCols);
+    processed_vc_bb.forEach(row_vc_bb => {
       const tr = document.createElement("tr");
       tr.className = 'group';
       visibleCols.forEach(col => {
@@ -252,6 +296,55 @@ class CrudTable_vc_bb extends HTMLElement {
       tr.appendChild(tdActions);
       tbody_vc_bb.appendChild(tr);
     });
+
+    const headerCells_vc_bb = Array.from(thead_vc_bb.querySelectorAll('th'));
+    headerCells_vc_bb.slice(0, visibleCols.length).forEach((th_vc_bb, idx_vc_bb) => {
+      th_vc_bb.onclick = () => {
+        const col_vc_bb = visibleCols[idx_vc_bb];
+        if (this.sortField_vc_bb === col_vc_bb) {
+          this.sortDir_vc_bb = this.sortDir_vc_bb === 'asc' ? 'desc' : 'asc';
+        } else {
+          this.sortField_vc_bb = col_vc_bb;
+          this.sortDir_vc_bb = 'asc';
+        }
+        this.renderTable_vc_bb(this.data_vc_bb);
+      };
+    });
+  }
+
+  applyFiltersAndSort_vc_bb(data, visibleCols) {
+    let arr_vc_bb = Array.isArray(data) ? data.slice() : [];
+    const fField_vc_bb = this.filterField_vc_bb;
+    const fValue_vc_bb = (this.filterValue_vc_bb || '').toLowerCase();
+    if (fValue_vc_bb) {
+      if (fField_vc_bb) {
+        arr_vc_bb = arr_vc_bb.filter(r => {
+          const v = r[fField_vc_bb];
+          return v != null && String(v).toLowerCase().includes(fValue_vc_bb);
+        });
+      } else {
+        arr_vc_bb = arr_vc_bb.filter(r => visibleCols.some(c => {
+          const v = r[c];
+          return v != null && String(v).toLowerCase().includes(fValue_vc_bb);
+        }));
+      }
+    }
+    if (this.sortField_vc_bb) {
+      const sField_vc_bb = this.sortField_vc_bb;
+      const dir_vc_bb = this.sortDir_vc_bb === 'desc' ? -1 : 1;
+      arr_vc_bb.sort((a, b) => {
+        const va = a[sField_vc_bb];
+        const vb = b[sField_vc_bb];
+        const at = va == null ? '' : String(va);
+        const bt = vb == null ? '' : String(vb);
+        const an = Number(at);
+        const bn = Number(bt);
+        const bothNum = !isNaN(an) && !isNaN(bn);
+        if (bothNum) return (an - bn) * dir_vc_bb;
+        return at.localeCompare(bt, undefined, { sensitivity: 'base' }) * dir_vc_bb;
+      });
+    }
+    return arr_vc_bb;
   }
 
   async renderForm_vc_bb(cols) {
