@@ -705,6 +705,7 @@ class CrudTable_vc_bb extends HTMLElement {
         });
         return;
       })();
+      return;
     }
 
     if (this.table_vc_bb === 'disponibilidad' && this.subTable_vc_bb === 'espacio') {
@@ -759,6 +760,7 @@ class CrudTable_vc_bb extends HTMLElement {
         });
         return;
       })();
+      return;
     }
 
     const pkNames2_vc_bb = [
@@ -883,7 +885,16 @@ class CrudTable_vc_bb extends HTMLElement {
     if (obj._pk_vc_bb) return obj._pk_vc_bb;
 
     const candidates = [
-      'ID_usuario_bb_vc', 'ID_profesor_bb_vc', 'ID', 'Id', 'id_usuario', 'id_profesor'
+      'ID_DisponibilidadProfesor_bb_vc',
+      'ID_DisponibilidadEspacio_bb_vc',
+      'ID_clase_bb_vc',
+      'ID_espacio_bb_vc',
+      'ID_asignatura_bb_vc',
+      'ID_grado_bb_vc',
+      'ID_seccion_bb_vc',
+      'ID_usuario_bb_vc',
+      'ID_profesor_bb_vc',
+      'ID', 'Id', 'id_usuario', 'id_profesor'
     ];
     for (const c of candidates) {
       if (Object.prototype.hasOwnProperty.call(obj, c)) return obj[c];
