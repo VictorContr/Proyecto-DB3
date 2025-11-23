@@ -21,11 +21,13 @@ export class LockModel_vc_bb {
    * Define las tablas asociadas a cada tipo de carga masiva
    */
   #tablasPorCarga_vc_bb = {
-    profesores: ['td_Profesores_bb_vc', 'td_UsuarioRol_bb_vc'],
+    // No borrar relaciones de rol para evitar perder el rol del admin
+    profesores: ['td_Profesores_bb_vc'],
     espacios: ['td_Espacios_bb_vc'],
     grados: ['td_Grados_bb_vc'],
-    secciones: ['td_Secciones_bb_vc'],
-    asignaturas: ['td_Asignaturas_bb_vc', 'td_GradosAsignaturas_bb_vc'],
+    // Paso 0 del wizard incluye secciones y grados, y la tabla puente de clases
+    secciones: ['td_Clases_bb_vc', 'td_Secciones_bb_vc', 'td_Grados_bb_vc'],
+    asignaturas: ['td_GradosAsignaturas_bb_vc', 'td_Asignaturas_bb_vc'],
     disponibilidades: ['td_DisponibilidadProfesor_bb_vc', 'td_DisponibilidadEspacio_bb_vc']
   };
 
