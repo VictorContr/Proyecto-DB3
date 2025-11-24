@@ -3,7 +3,9 @@
 import { ApiGuide_vc_bb } from "./guide.js";
 
 export class ExcelManager_vc_bb {
-  constructor() {}
+  constructor(apiGuide_vc_bb = null) {
+    this.apiGuide_vc_bb = apiGuide_vc_bb;
+  }
 
   validateFile_vc_bb(file_vc_bb) {
     const maxSize_vc_bb = 5 * 1024 * 1024; // 5MB
@@ -30,7 +32,7 @@ export class ExcelManager_vc_bb {
     formData_vc_bb.append(fieldName_vc_bb, file_vc_bb);
 
     try {
-      const response_vc_bb = await ApiGuide_vc_bb.request("POST", uploadPath_vc_bb, {
+      const response_vc_bb = await (this.apiGuide_vc_bb || ApiGuide_vc_bb).request("POST", uploadPath_vc_bb, {
         body: formData_vc_bb,
       });
 
@@ -61,7 +63,7 @@ export class ExcelManager_vc_bb {
 
   async descargar_vc_bb({ downloadPath_vc_bb, fileNamePrefix_vc_bb = "reporte" }) {
     try {
-      const response_vc_bb = await ApiGuide_vc_bb.request("GET", downloadPath_vc_bb);
+      const response_vc_bb = await (this.apiGuide_vc_bb || ApiGuide_vc_bb).request("GET", downloadPath_vc_bb);
       if (!response_vc_bb.ok) {
         let jsonError_vc_bb = null;
         try {

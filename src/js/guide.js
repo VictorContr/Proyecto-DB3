@@ -97,8 +97,8 @@ class ApiGuide_vc_bb {
         signal: controller.signal,
       });
       clearTimeout(timer);
-      // Si 404 (endpoint inexistente en primaria), intentar en fallback
-      if (res.status === 404) {
+      // Si 404 o 500 (error interno en primaria), intentar en fallback
+      if (res.status === 404 || res.status === 500) {
         const urlFallback = buildUrl(this.fallbackBaseUrl, path);
         try {
           const res2 = await fetch(urlFallback, { method, headers, body });
