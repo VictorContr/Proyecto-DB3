@@ -1,5 +1,6 @@
 //IMPORTACIONES
 import { modal_vc_bb } from "./modal.js";
+import { ApiGuide_vc_bb, getApiBaseUrl_vc_bb } from "./guide.js";
 
 // VARIABLES
 export const loginForm_vc_bb = document.getElementById("loginForm");
@@ -22,23 +23,19 @@ export class GestorSesion_vc_bb {
     }
 
     try {
-      const response_vc_bb = await fetch("http://localhost:3000/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userName_bb_vc: userName_vc_bb,
-          password_bb_vc: password_vc_bb,
-        }),
-      });
+      const payload_vc_bb = {
+        userName_bb_vc: userName_vc_bb,
+        password_bb_vc: password_vc_bb,
+      };
+      const resp_vc_bb = await ApiGuide_vc_bb.json("POST", "/api/login", payload_vc_bb);
 
-      const data_vc_bb = await response_vc_bb.json();
-
-      if (!response_vc_bb.ok) {
-        modal_vc_bb.showError_vc_bb("Error", data_vc_bb?.message || "Error en el login.");
+      if (!resp_vc_bb.ok) {
+        modal_vc_bb.showError_vc_bb("Error", resp_vc_bb?.data?.message || "Error en el login.");
         return;
       }
 
       // Construimos el objeto con los datos mínimos usando JSON plano del backend
+      const data_vc_bb = resp_vc_bb.data;
       const datosMinimos_vc_bb = {
         id_vc_bb: data_vc_bb.ID_usuario,
         rol_vc_bb: data_vc_bb.rol, // 'Administrador' o 'Profesor'

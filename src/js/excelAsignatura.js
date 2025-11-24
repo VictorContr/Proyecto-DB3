@@ -1,8 +1,9 @@
 import { modal_vc_bb } from "./modal.js";
 import { ExcelManager_vc_bb } from "./excel.js";
+import { getApiBaseUrl_vc_bb } from "./guide.js";
 
 export class ExcelAsignaturaHandler_vc_bb {
-  constructor(apiBaseUrl_vc_bb = "http://localhost:3000") {
+  constructor(apiBaseUrl_vc_bb = getApiBaseUrl_vc_bb()) {
     this.apiBaseUrl_vc_bb = apiBaseUrl_vc_bb;
     this.excelManager_vc_bb = new ExcelManager_vc_bb(this.apiBaseUrl_vc_bb);
 

@@ -1,4 +1,5 @@
 import { modal_vc_bb } from "./modal.js";
+import { getApiBaseUrl_vc_bb, ApiGuide_vc_bb } from "./guide.js";
 
 export class StepAndStep_vc_bb {
   constructor() {
@@ -8,7 +9,7 @@ export class StepAndStep_vc_bb {
     this.labelEl_vc_bb = document.getElementById('wizardStepLabel');
     this.prevBtn_vc_bb = document.getElementById('wizardPrev');
     this.nextBtn_vc_bb = document.getElementById('wizardNext');
-    this.apiBaseUrl_vc_bb = "http://localhost:3000";
+    this.apiBaseUrl_vc_bb = getApiBaseUrl_vc_bb();
   }
 
   updateView_vc_bb() {
@@ -39,9 +40,9 @@ export class StepAndStep_vc_bb {
         if (!tipoCarga_vc_bb) return;
         if (isLocked_vc_bb) {
           try {
-            const res_vc_bb = await fetch(`${this.apiBaseUrl_vc_bb}/api/lock/verificar/${tipoCarga_vc_bb}`);
-            const data_vc_bb = await res_vc_bb.json();
-            if (!res_vc_bb.ok) {
+            const verify_vc_bb = await ApiGuide_vc_bb.json("GET", `/api/lock/verificar/${tipoCarga_vc_bb}`);
+            const data_vc_bb = verify_vc_bb.data;
+            if (!verify_vc_bb.ok) {
               await modal_vc_bb.showError_vc_bb('Verificación', data_vc_bb?.mensaje_vc_bb || 'Error al verificar');
               return;
             }
@@ -51,8 +52,8 @@ export class StepAndStep_vc_bb {
               const headers_vc_bb = { 'Content-Type': 'application/json' };
               const userId_vc_bb = this.getCurrentUserId_vc_bb();
               if (userId_vc_bb) headers_vc_bb['x-user-id'] = String(userId_vc_bb);
-              const rb_vc_bb = await fetch(`${this.apiBaseUrl_vc_bb}/api/lock/rollback/${tipoCarga_vc_bb}`, { method: 'POST', headers: headers_vc_bb, body: JSON.stringify({ confirmar: true }) });
-              const rbData_vc_bb = await rb_vc_bb.json();
+              const rb_vc_bb = await ApiGuide_vc_bb.json("POST", `/api/lock/rollback/${tipoCarga_vc_bb}`, { confirmar: true }, headers_vc_bb);
+              const rbData_vc_bb = rb_vc_bb.data;
               if (!rb_vc_bb.ok) {
                 await modal_vc_bb.showError_vc_bb('Rollback', rbData_vc_bb?.mensaje_vc_bb || 'Error al ejecutar rollback');
                 return;

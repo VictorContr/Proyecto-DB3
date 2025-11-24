@@ -1,8 +1,9 @@
 // Módulo genérico para manejar subida y descarga de Excel
 // Provee métodos reutilizables para evitar redundancias en los manejadores específicos
+import { getApiBaseUrl_vc_bb, ApiGuide_vc_bb } from "./guide.js";
 
 export class ExcelManager_vc_bb {
-  constructor(apiBaseUrl_vc_bb = "http://localhost:3000") {
+  constructor(apiBaseUrl_vc_bb = getApiBaseUrl_vc_bb()) {
     this.apiBaseUrl_vc_bb = apiBaseUrl_vc_bb;
   }
 
@@ -31,8 +32,7 @@ export class ExcelManager_vc_bb {
     formData_vc_bb.append(fieldName_vc_bb, file_vc_bb);
 
     try {
-      const response_vc_bb = await fetch(`${this.apiBaseUrl_vc_bb}${uploadPath_vc_bb}`, {
-        method: "POST",
+      const response_vc_bb = await ApiGuide_vc_bb.request("POST", uploadPath_vc_bb, {
         body: formData_vc_bb,
       });
 
@@ -63,7 +63,7 @@ export class ExcelManager_vc_bb {
 
   async descargar_vc_bb({ downloadPath_vc_bb, fileNamePrefix_vc_bb = "reporte" }) {
     try {
-      const response_vc_bb = await fetch(`${this.apiBaseUrl_vc_bb}${downloadPath_vc_bb}`);
+      const response_vc_bb = await ApiGuide_vc_bb.request("GET", downloadPath_vc_bb);
       if (!response_vc_bb.ok) {
         let jsonError_vc_bb = null;
         try {
@@ -74,7 +74,7 @@ export class ExcelManager_vc_bb {
       }
 
       const blob_vc_bb = await response_vc_bb.blob();
-      const url_vc_bb = window.URL.createObjectURL(blob_vc_bb);
+      const url_vc_bb = URL.createObjectURL(blob_vc_bb);
 
       const a_vc_bb = document.createElement("a");
       a_vc_bb.href = url_vc_bb;
@@ -82,7 +82,7 @@ export class ExcelManager_vc_bb {
       document.body.appendChild(a_vc_bb);
       a_vc_bb.click();
       a_vc_bb.remove();
-      window.URL.revokeObjectURL(url_vc_bb);
+      URL.revokeObjectURL(url_vc_bb);
 
       return { ok_vc_bb: true, message_vc_bb: "Descarga completada" };
     } catch (err_vc_bb) {
