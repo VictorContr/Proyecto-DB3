@@ -1,11 +1,9 @@
 // Módulo genérico para manejar subida y descarga de Excel
 // Provee métodos reutilizables para evitar redundancias en los manejadores específicos
-import { getApiBaseUrl_vc_bb, ApiGuide_vc_bb } from "./guide.js";
+import { ApiGuide_vc_bb } from "./guide.js";
 
 export class ExcelManager_vc_bb {
-  constructor(apiBaseUrl_vc_bb = getApiBaseUrl_vc_bb()) {
-    this.apiBaseUrl_vc_bb = apiBaseUrl_vc_bb;
-  }
+  constructor() {}
 
   validateFile_vc_bb(file_vc_bb) {
     const maxSize_vc_bb = 5 * 1024 * 1024; // 5MB

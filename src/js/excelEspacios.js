@@ -1,11 +1,9 @@
 import { modal_vc_bb } from "./modal.js";
 import { ExcelManager_vc_bb } from "./excel.js";
-import { getApiBaseUrl_vc_bb } from "./guide.js";
 
 export class ExcelEspaciosHandler_vc_bb {
-  constructor(apiBaseUrl_vc_bb = getApiBaseUrl_vc_bb()) {
-    this.apiBaseUrl_vc_bb = apiBaseUrl_vc_bb;
-    this.excelManager_vc_bb = new ExcelManager_vc_bb(this.apiBaseUrl_vc_bb);
+  constructor() {
+    this.excelManager_vc_bb = new ExcelManager_vc_bb();
 
     // Referencias a DOM de la sección Espacios
     this.inputExcel_vc_bb = document.getElementById("archivoExcelEspacios");
