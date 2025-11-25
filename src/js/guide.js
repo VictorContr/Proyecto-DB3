@@ -47,6 +47,8 @@ class ApiGuide_vc_bb {
   static primary = null; // 'mysql' | 'sqlite'
   static fallbackBaseUrl = `http://localhost:${SQLITE_PORT_DEFAULT}`;
   static readyPromise = null;
+  static connectionState = 'unknown'; // 'unknown' | 'online' | 'offline' | 'error'
+  static notifying = false;
 
   static async initialize(options = {}) {
     if (this.initialized) return;
@@ -86,38 +88,72 @@ class ApiGuide_vc_bb {
   }
 
   static async request(method, path, { headers = {}, body = undefined, timeoutMs = DEFAULT_TIMEOUT_MS } = {}) {
-    const urlPrimary = buildUrl(this.baseUrl, path);
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const mysqlBase = `http://localhost:${MYSQL_PORT_DEFAULT}`;
+    const sqliteBase = `http://localhost:${SQLITE_PORT_DEFAULT}`;
+    const urlMySQL = buildUrl(mysqlBase, path);
+    const urlSQLite = buildUrl(sqliteBase, path);
+    // Intentar ONLINE (MySQL) primero
+    const ctrl1 = new AbortController();
+    const t1 = setTimeout(() => ctrl1.abort(), timeoutMs);
     try {
-      const res = await fetch(urlPrimary, {
-        method,
-        headers,
-        body,
-        signal: controller.signal,
-      });
-      clearTimeout(timer);
-      // Si 404 o 500 (error interno en primaria), intentar en fallback
-      if (res.status === 404 || res.status === 500) {
-        const urlFallback = buildUrl(this.fallbackBaseUrl, path);
-        try {
-          const res2 = await fetch(urlFallback, { method, headers, body });
-          return res2;
-        } catch (err2) {
-          throw err2;
-        }
+      const res1 = await fetch(urlMySQL, { method, headers, body, signal: ctrl1.signal });
+      clearTimeout(t1);
+      if (res1.ok) {
+        await this.notifyOnline_vc_bb();
+        return res1;
       }
-      return res;
-    } catch (err) {
-      clearTimeout(timer);
-      // Error de red → intentar fallback
-      const urlFallback = buildUrl(this.fallbackBaseUrl, path);
+      // MySQL respondió pero con error 4xx/5xx: avisar y probar OFFLINE
+      const res2 = await fetch(urlSQLite, { method, headers, body });
+      if (res2.ok) {
+        await this.notifyOffline_vc_bb();
+        return res2;
+      }
+      await this.notifyError_vc_bb();
+      return res2;
+    } catch (err1) {
+      clearTimeout(t1);
+      // No se pudo conectar a ONLINE (MySQL): avisar y probar OFFLINE
+      const ctrl2 = new AbortController();
+      const t2 = setTimeout(() => ctrl2.abort(), timeoutMs);
       try {
-        const res2 = await fetch(urlFallback, { method, headers, body });
+        const res2 = await fetch(urlSQLite, { method, headers, body, signal: ctrl2.signal });
+        clearTimeout(t2);
+        if (res2.ok) {
+          await this.notifyOffline_vc_bb();
+          return res2;
+        }
+        await this.notifyError_vc_bb();
         return res2;
       } catch (err2) {
+        clearTimeout(t2);
+        await this.notifyError_vc_bb();
         throw err2;
       }
+    }
+  }
+
+  static async notifyOnline_vc_bb() {
+    if (this.connectionState === 'online') return;
+    this.connectionState = 'online';
+    if (typeof globalThis !== 'undefined' && typeof globalThis.modal_vc_bb !== 'undefined') {
+      await globalThis.modal_vc_bb.showSuccess_vc_bb('Conexión', 'Estas Online.');
+    }
+  }
+
+  static async notifyOffline_vc_bb() {
+    if (this.connectionState === 'offline') return;
+    this.connectionState = 'offline';
+    if (typeof globalThis !== 'undefined' && typeof globalThis.modal_vc_bb !== 'undefined') {
+      await globalThis.modal_vc_bb.showError_vc_bb('Conexión', 'Error de conexión online... probando offline');
+      await globalThis.modal_vc_bb.showSuccess_vc_bb('Conexión', 'Estas Offline.');
+    }
+  }
+
+  static async notifyError_vc_bb() {
+    if (this.connectionState === 'error') return;
+    this.connectionState = 'error';
+    if (typeof globalThis !== 'undefined' && typeof globalThis.modal_vc_bb !== 'undefined') {
+      await globalThis.modal_vc_bb.showError_vc_bb('Conexión', 'Error de conexión en ONLINE Y OFFLINE');
     }
   }
 

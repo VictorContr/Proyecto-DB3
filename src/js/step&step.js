@@ -20,7 +20,7 @@ export class StepAndStep_vc_bb {
     if (this.labelEl_vc_bb) this.labelEl_vc_bb.textContent = (this.current_vc_bb + 1) + ' / ' + this.sections_vc_bb.length;
     const lockIcon_vc_bb = this.sections_vc_bb[this.current_vc_bb].querySelector('.lock-btn i');
     const locked_vc_bb = lockIcon_vc_bb ? lockIcon_vc_bb.classList.contains('fa-lock') : false;
-    this.sections_vc_bb[this.current_vc_bb].querySelectorAll('input,button[type=submit]').forEach(el_vc_bb => { el_vc_bb.disabled = locked_vc_bb; });
+    this.sections_vc_bb[this.current_vc_bb].querySelectorAll('input,select,textarea,button:not(.lock-btn):not([id^="btnDownloadReporte"])').forEach(el_vc_bb => { el_vc_bb.disabled = locked_vc_bb; });
   }
 
   init_vc_bb() {

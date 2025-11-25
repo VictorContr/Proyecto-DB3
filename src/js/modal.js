@@ -12,6 +12,10 @@ class ModalDialog_vc_bb {
 
         this.resolvePromise = null;
         this.rejectPromise = null;
+        this.queue_vc_bb = [];
+        this.isShowing_vc_bb = false;
+        this.minDurationMs_vc_bb = 1000;
+        this.interDelayMs_vc_bb = 1000;
 
         this.modalClose_vc_bb.addEventListener('click', () => this.cancel_vc_bb());
         this.modalAction_vc_bb.addEventListener('click', () => this.confirm_vc_bb());
@@ -86,9 +90,17 @@ ${r.info}
         this.modalContainer_vc_bb.classList.add('active');
         document.body.style.overflow = 'hidden';
 
-        return new Promise((resolve, reject) => {
-            this.resolvePromise = resolve;
-            this.rejectPromise = reject;
+        if (isConfirm) {
+            return new Promise((resolve, reject) => {
+                this.resolvePromise = resolve;
+                this.rejectPromise = reject;
+            });
+        }
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                this.hide_vc_bb();
+                resolve(true);
+            }, this.minDurationMs_vc_bb);
         });
     }
 
@@ -97,15 +109,15 @@ ${r.info}
     }
 
     showSuccess_vc_bb(title_vc_bb, message_vc_bb) {
-        return this.show_vc_bb(title_vc_bb, message_vc_bb, 'success');
+        return this.enqueue_vc_bb(title_vc_bb, message_vc_bb, 'success');
     }
 
     showError_vc_bb(title_vc_bb, message_vc_bb) {
-        return this.show_vc_bb(title_vc_bb, message_vc_bb, 'error');
+        return this.enqueue_vc_bb(title_vc_bb, message_vc_bb, 'error');
     }
 
     showWarning_vc_bb(title_vc_bb, message_vc_bb) {
-        return this.show_vc_bb(title_vc_bb, message_vc_bb, 'warning');
+        return this.enqueue_vc_bb(title_vc_bb, message_vc_bb, 'warning');
     }
 
     /**
@@ -115,7 +127,35 @@ ${r.info}
      * @returns {Promise<boolean>}
      */
     showReportes_vc_bb(titulo, arrayReportes) {
-        return this.show_vc_bb(titulo, arrayReportes, 'reportes');
+        return this.enqueue_vc_bb(titulo, arrayReportes, 'reportes');
+    }
+
+    enqueue_vc_bb(title_vc_bb, message_vc_bb, type_vc_bb) {
+        return new Promise((resolve) => {
+            this.queue_vc_bb.push({ title_vc_bb, message_vc_bb, type_vc_bb, resolve });
+            this.processQueue_vc_bb();
+        });
+    }
+
+    processQueue_vc_bb() {
+        if (this.isShowing_vc_bb) return;
+        const item_vc_bb = this.queue_vc_bb.shift();
+        if (!item_vc_bb) return;
+        this.isShowing_vc_bb = true;
+        const p_vc_bb = this.show_vc_bb(item_vc_bb.title_vc_bb, item_vc_bb.message_vc_bb, item_vc_bb.type_vc_bb, false);
+        p_vc_bb.then(() => {
+            item_vc_bb.resolve(true);
+            setTimeout(() => {
+                this.isShowing_vc_bb = false;
+                this.processQueue_vc_bb();
+            }, this.interDelayMs_vc_bb);
+        }).catch(() => {
+            item_vc_bb.resolve(false);
+            setTimeout(() => {
+                this.isShowing_vc_bb = false;
+                this.processQueue_vc_bb();
+            }, this.interDelayMs_vc_bb);
+        });
     }
 
     confirm_vc_bb() {
@@ -139,4 +179,7 @@ ${r.info}
 }
 
 export const modal_vc_bb = new ModalDialog_vc_bb();
+if (typeof globalThis !== 'undefined') {
+  globalThis.modal_vc_bb = modal_vc_bb;
+}
 
