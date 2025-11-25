@@ -629,6 +629,11 @@ class CrudTable_vc_bb extends HTMLElement {
             rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_TipoEspacio_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.tipo_bb_vc ?? Object.values(rw)[1] ?? opt.value; field.appendChild(opt); });
           })
           .catch(() => {});
+      } else if (this.table_vc_bb === 'grados' && keyLower === 'nro_grado_bb_vc') {
+        field = document.createElement('select');
+        field.name = col;
+        field.className = "border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300";
+        [1,2,3,4,5].forEach(n => { const opt = document.createElement('option'); opt.value = String(n); opt.textContent = String(n); field.appendChild(opt); });
       } else {
         field = document.createElement("input");
         field.name = col;
@@ -676,7 +681,12 @@ class CrudTable_vc_bb extends HTMLElement {
       e.preventDefault();
       const body = {};
       createCols.forEach(col => {
-        body[col] = form[col].value;
+        let v = form[col].value;
+        if (this.table_vc_bb === 'grados' && String(col).toLowerCase() === 'nro_grado_bb_vc') {
+          const n = parseInt(String(v), 10);
+          v = Number.isNaN(n) ? v : n;
+        }
+        body[col] = v;
       });
       if (this.table_vc_bb === 'asignaturas' && form['nro_grado_bb_vc']) {
         body['nro_grado_bb_vc'] = form['nro_grado_bb_vc'].value;
@@ -911,6 +921,18 @@ class CrudTable_vc_bb extends HTMLElement {
           input.placeholder = 'Nueva clave';
           input.value = '';
         }
+        if (this.table_vc_bb === 'grados' && keyLower === 'nro_grado_bb_vc') {
+          const select = document.createElement('select');
+          select.name = col;
+          select.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
+          [1,2,3,4,5].forEach(n => { const opt = document.createElement('option'); opt.value = String(n); opt.textContent = String(n); select.appendChild(opt); });
+          const currentVal = row_vc_bb[col] != null ? String(row_vc_bb[col]) : '';
+          Array.from(select.options).forEach(o => { if (o.value === currentVal) o.selected = true; });
+          wrapper.appendChild(label);
+          wrapper.appendChild(select);
+          form_vc_bb.appendChild(wrapper);
+          return;
+        }
         input.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
         wrapper.appendChild(label);
         wrapper.appendChild(input);
@@ -944,6 +966,10 @@ class CrudTable_vc_bb extends HTMLElement {
       const updated_vc_bb = {};
       for (let [key_vc_bb, value_vc_bb] of formData_vc_bb.entries()) {
         updated_vc_bb[key_vc_bb] = value_vc_bb;
+        if (this.table_vc_bb === 'grados' && key_vc_bb === 'nro_grado_bb_vc') {
+          const n = parseInt(String(value_vc_bb), 10);
+          updated_vc_bb[key_vc_bb] = Number.isNaN(n) ? value_vc_bb : n;
+        }
       }
       if (this.table_vc_bb === 'asignaturas' && form_vc_bb['nro_grado_bb_vc']) {
         updated_vc_bb['nro_grado_bb_vc'] = form_vc_bb['nro_grado_bb_vc'].value;
