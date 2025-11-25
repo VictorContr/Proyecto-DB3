@@ -1,10 +1,11 @@
 import { ModalCrud_vc_bb } from "./modalCrud.js";
+import { ApiGuide_vc_bb } from "../js/guide.js";
 
 class CrudTable_vc_bb extends HTMLElement {
   constructor() {
     super();
     this.shadow_vc_bb = this.attachShadow({ mode: "open" });
-    this.apiBase_vc_bb = "http://localhost:3000/api";
+    this.apiBase_vc_bb = null;
     this.modalCrud_vc_bb = new ModalCrud_vc_bb();
     this.data_vc_bb = [];
     this.filterField_vc_bb = null;
@@ -81,6 +82,7 @@ class CrudTable_vc_bb extends HTMLElement {
   }
 
   async init_vc_bb() {
+    await ApiGuide_vc_bb.initialize();
     const params = new URLSearchParams(location.search);
     const qTable = params.get('table');
     const qSub = params.get('subTable');
@@ -111,16 +113,16 @@ class CrudTable_vc_bb extends HTMLElement {
 
   async loadData_vc_bb() {
     try {
-      let url = `${this.apiBase_vc_bb}/${this.table_vc_bb}`;
-      if (this.subTable_vc_bb) url = `${url}/${this.subTable_vc_bb}`;
-      const res = await fetch(url);
-      let data = await res.json();
+      let path_vc_bb = `/api/${this.table_vc_bb}`;
+      if (this.subTable_vc_bb) path_vc_bb = `${path_vc_bb}/${this.subTable_vc_bb}`;
+      const res = await ApiGuide_vc_bb.json("GET", path_vc_bb);
+      let data = res.ok ? (res.data || []) : [];
 
       // Enriquecer filas con nombre de tipo de espacio para mostrar en tabla
       if (Array.isArray(data) && (this.table_vc_bb === 'espacios' || this.table_vc_bb === 'asignaturas')) {
         try {
-          const tiposRes = await fetch('http://localhost:3000/api/espacios/tipos');
-          const tipos = tiposRes.ok ? await tiposRes.json() : [];
+          const tiposRes = await ApiGuide_vc_bb.json('GET', '/api/espacios/tipos');
+          const tipos = tiposRes.ok ? (tiposRes.data || []) : [];
           const mapTipos = {};
           tipos.forEach(t => { mapTipos[String(t.ID_TipoEspacio_bb_vc)] = t.tipo_bb_vc; });
           data = data.map(row => {
@@ -168,9 +170,9 @@ class CrudTable_vc_bb extends HTMLElement {
     if (!Array.isArray(data) || data.length === 0) {
       // Si no hay datos, intentar obtener el esquema de la tabla para mostrar el formulario de creación
       try {
-        const schemaRes = await fetch(`${this.apiBase_vc_bb}/schema/${this.table_vc_bb}`);
+        const schemaRes = await ApiGuide_vc_bb.json('GET', `/api/schema/${this.table_vc_bb}`);
         if (schemaRes.ok) {
-          const schema = await schemaRes.json();
+          const schema = schemaRes.data || {};
           const colsFromSchema = schema.columns || [];
           // Mostrar encabezados basados en schema (omitiendo id)
           const visibleColsFromSchema = colsFromSchema.filter(c => !/^id/i.test(c));
@@ -277,10 +279,10 @@ class CrudTable_vc_bb extends HTMLElement {
           const headers = {};
           if (userId) headers['x-user-id'] = String(userId);
           // support subTable (e.g. /api/disponibilidad/profesor/:id)
-          let deleteUrl = `${this.apiBase_vc_bb}/${this.table_vc_bb}`;
-          if (this.subTable_vc_bb) deleteUrl += `/${this.subTable_vc_bb}`;
-          deleteUrl += `/${pkId_vc_bb}`;
-          await fetch(deleteUrl, { method: "DELETE", headers });
+          let deletePath_vc_bb = `/api/${this.table_vc_bb}`;
+          if (this.subTable_vc_bb) deletePath_vc_bb += `/${this.subTable_vc_bb}`;
+          deletePath_vc_bb += `/${pkId_vc_bb}`;
+          await ApiGuide_vc_bb.request('DELETE', deletePath_vc_bb, { headers });
           this.loadData_vc_bb();
         });
       }
@@ -371,9 +373,9 @@ class CrudTable_vc_bb extends HTMLElement {
         selectDia.name = 'ID_dia_DispProfesor_bb_vc';
         selectDia.className = 'border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300';
         try {
-          const r = await fetch('/api/dias');
+          const r = await ApiGuide_vc_bb.json('GET', '/api/dias');
           if (r.ok) {
-            const rows = await r.json();
+            const rows = r.data || [];
             rows.forEach(rw => {
               const opt = document.createElement('option');
               opt.value = rw.ID_dia_bb_vc ?? rw.id ?? Object.values(rw)[0];
@@ -389,9 +391,9 @@ class CrudTable_vc_bb extends HTMLElement {
         selectBloque.name = 'ID_bloque_DispProfesor_bb_vc';
         selectBloque.className = 'border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300';
         try {
-          const r2 = await fetch('/api/bloques');
+          const r2 = await ApiGuide_vc_bb.json('GET', '/api/bloques');
           if (r2.ok) {
-            const rows = await r2.json();
+            const rows = r2.data || [];
             rows.forEach(rw => {
               const opt = document.createElement('option');
               opt.value = rw.ID_bloque_bb_vc ?? rw.id ?? Object.values(rw)[0];
@@ -407,9 +409,9 @@ class CrudTable_vc_bb extends HTMLElement {
         selectProfesor.name = 'ID_profesor_DispProfesor_bb_vc';
         selectProfesor.className = 'border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300';
         try {
-          const rp = await fetch('/api/profesores');
+          const rp = await ApiGuide_vc_bb.json('GET', '/api/profesores');
           if (rp.ok) {
-            const rows = await rp.json();
+            const rows = rp.data || [];
             rows.forEach(rw => {
               const opt = document.createElement('option');
               // intentar usar nombre+apellido o userName
@@ -452,7 +454,7 @@ class CrudTable_vc_bb extends HTMLElement {
           const userId = this.getCurrentUserId_vc_bb();
           if (userId) headers['x-user-id'] = String(userId);
           try {
-            await fetch(`${this.apiBase_vc_bb}/disponibilidad/profesor`, { method: 'POST', headers, body: JSON.stringify(body) });
+            await ApiGuide_vc_bb.json('POST', `/api/disponibilidad/profesor`, body, headers);
             form.reset();
             this.loadData_vc_bb();
           } catch (e) {
@@ -485,8 +487,8 @@ class CrudTable_vc_bb extends HTMLElement {
       selectDia.name = 'ID_dia_DispEspacio_bb_vc';
       selectDia.className = 'border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300';
       try {
-        const r = await fetch('/api/dias');
-        if (r.ok) (await r.json()).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_dia_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.dia_bb_vc || Object.values(rw)[1] || opt.value; selectDia.appendChild(opt); });
+        const r = await ApiGuide_vc_bb.json('GET', '/api/dias');
+        if (r.ok) (r.data || []).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_dia_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.dia_bb_vc || Object.values(rw)[1] || opt.value; selectDia.appendChild(opt); });
       } catch (e) { console.warn(e); }
       form.appendChild(wrapperFor('Día', selectDia));
 
@@ -494,8 +496,8 @@ class CrudTable_vc_bb extends HTMLElement {
       selectBloque.name = 'ID_bloque_DispEspacio_bb_vc';
       selectBloque.className = 'border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300';
       try {
-        const r2 = await fetch('/api/bloques');
-        if (r2.ok) (await r2.json()).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_bloque_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.hora_bloque_bb_vc || Object.values(rw)[1] || opt.value; selectBloque.appendChild(opt); });
+        const r2 = await ApiGuide_vc_bb.json('GET', '/api/bloques');
+        if (r2.ok) (r2.data || []).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_bloque_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.hora_bloque_bb_vc || Object.values(rw)[1] || opt.value; selectBloque.appendChild(opt); });
       } catch (e) { console.warn(e); }
       form.appendChild(wrapperFor('Bloque', selectBloque));
 
@@ -503,9 +505,9 @@ class CrudTable_vc_bb extends HTMLElement {
       selectEspacio.name = 'ID_espacio_DispEspacio_bb_vc';
       selectEspacio.className = 'border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300';
       try {
-        const re = await fetch('/api/espacios');
+        const re = await ApiGuide_vc_bb.json('GET', '/api/espacios');
         if (re.ok) {
-          const rows = await re.json();
+          const rows = re.data || [];
           rows.forEach(rw => {
             const opt = document.createElement('option');
             opt.value = rw.ID_espacio_bb_vc ?? rw.id ?? Object.values(rw)[0];
@@ -544,7 +546,7 @@ class CrudTable_vc_bb extends HTMLElement {
         const userId = this.getCurrentUserId_vc_bb();
         if (userId) headers['x-user-id'] = String(userId);
         try {
-          await fetch(`${this.apiBase_vc_bb}/disponibilidad/espacio`, { method: 'POST', headers, body: JSON.stringify(body) });
+          await ApiGuide_vc_bb.json('POST', `/api/disponibilidad/espacio`, body, headers);
           form.reset();
           this.loadData_vc_bb();
         } catch (e) {
@@ -611,8 +613,8 @@ class CrudTable_vc_bb extends HTMLElement {
         field = document.createElement('select');
         field.name = col;
         field.className = "border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300";
-        fetch('http://localhost:3000/api/espacios/tipos')
-          .then(r => r.ok ? r.json() : [])
+        ApiGuide_vc_bb.json('GET', '/api/espacios/tipos')
+          .then(r => r.ok ? (r.data || []) : [])
           .then(rows => {
             rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_TipoEspacio_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.tipo_bb_vc ?? Object.values(rw)[1] ?? opt.value; field.appendChild(opt); });
           })
@@ -621,8 +623,8 @@ class CrudTable_vc_bb extends HTMLElement {
         field = document.createElement('select');
         field.name = col;
         field.className = "border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300";
-        fetch('http://localhost:3000/api/espacios/tipos')
-          .then(r => r.ok ? r.json() : [])
+        ApiGuide_vc_bb.json('GET', '/api/espacios/tipos')
+          .then(r => r.ok ? (r.data || []) : [])
           .then(rows => {
             rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_TipoEspacio_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.tipo_bb_vc ?? Object.values(rw)[1] ?? opt.value; field.appendChild(opt); });
           })
@@ -653,8 +655,8 @@ class CrudTable_vc_bb extends HTMLElement {
       const selectGrado = document.createElement('select');
       selectGrado.name = 'nro_grado_bb_vc';
       selectGrado.className = 'border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300';
-      fetch('http://localhost:3000/api/grados')
-        .then(r => r.ok ? r.json() : [])
+      ApiGuide_vc_bb.json('GET', '/api/grados')
+        .then(r => r.ok ? (r.data || []) : [])
         .then(rows => {
           rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.nro_grado_bb_vc ?? Object.values(rw)[1]; opt.textContent = String(opt.value); selectGrado.appendChild(opt); });
         })
@@ -681,8 +683,8 @@ class CrudTable_vc_bb extends HTMLElement {
       }
 
       // Decide endpoint (soporta subTable para entidades como disponibilidad)
-      let postUrl = `${this.apiBase_vc_bb}/${this.table_vc_bb}`;
-      if (this.subTable_vc_bb) postUrl = `${postUrl}/${this.subTable_vc_bb}`;
+      let postPath_vc_bb = `/api/${this.table_vc_bb}`;
+      if (this.subTable_vc_bb) postPath_vc_bb = `${postPath_vc_bb}/${this.subTable_vc_bb}`;
 
       const submitBtn = form.querySelector('button[type="submit"]');
       if (submitBtn && submitBtn.disabled) return;
@@ -697,11 +699,7 @@ class CrudTable_vc_bb extends HTMLElement {
       if (userId_vc_bb) headers_vc_bb['x-user-id'] = String(userId_vc_bb);
 
       try {
-        await fetch(postUrl, {
-          method: "POST",
-          headers: headers_vc_bb,
-          body: JSON.stringify(body)
-        });
+        await ApiGuide_vc_bb.json("POST", postPath_vc_bb, body, headers_vc_bb);
         form.reset();
         this.loadData_vc_bb();
       } catch (err) {
@@ -788,11 +786,7 @@ class CrudTable_vc_bb extends HTMLElement {
             ID_profesor_DispProfesor_bb_vc: selectProfesor.value
           };
           const id = row_vc_bb.ID_DisponibilidadProfesor_bb_vc || row_vc_bb.ID_DisponibilidadProfesor_bb_vc;
-          await fetch(`${this.apiBase_vc_bb}/disponibilidad/profesor/${id}`, {
-            method: 'PUT',
-            headers: Object.assign({ 'Content-Type': 'application/json' }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})),
-            body: JSON.stringify(body)
-          });
+          await ApiGuide_vc_bb.json('PUT', `/api/disponibilidad/profesor/${id}`, body, Object.assign({ 'Content-Type': 'application/json' }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})));
           modalInstance.close_vc_bb();
           this.loadData_vc_bb();
         });
@@ -824,14 +818,14 @@ class CrudTable_vc_bb extends HTMLElement {
         const selectBloque = document.createElement('select');
         selectBloque.name = 'ID_bloque_DispEspacio_bb_vc';
         selectBloque.className = selectDia.className;
-        try { const r2 = await fetch('/api/bloques'); if (r2.ok) (await r2.json()).forEach(rw=>{ const opt=document.createElement('option'); opt.value=rw.ID_bloque_bb_vc??Object.values(rw)[0]; opt.textContent=rw.hora_bloque_bb_vc||Object.values(rw)[1]||opt.value; selectBloque.appendChild(opt); }); } catch(e){console.warn(e)}
+        try { const r2 = await ApiGuide_vc_bb.json('GET', '/api/bloques'); if (r2.ok) (r2.data || []).forEach(rw=>{ const opt=document.createElement('option'); opt.value=rw.ID_bloque_bb_vc??Object.values(rw)[0]; opt.textContent=rw.hora_bloque_bb_vc||Object.values(rw)[1]||opt.value; selectBloque.appendChild(opt); }); } catch(e){console.warn(e)}
         if (row_vc_bb.hora_bloque_bb_vc) Array.from(selectBloque.options).forEach(o=>{ if (o.textContent === row_vc_bb.hora_bloque_bb_vc) o.selected = true; });
         form_vc_bb.appendChild(wrapperFor('Bloque', selectBloque));
 
         const selectEspacio = document.createElement('select');
         selectEspacio.name = 'ID_espacio_DispEspacio_bb_vc';
         selectEspacio.className = selectDia.className;
-        try { const re = await fetch('/api/espacios'); if (re.ok) (await re.json()).forEach(rw=>{ const opt=document.createElement('option'); opt.value = rw.ID_espacio_bb_vc ?? rw.id ?? Object.values(rw)[0]; opt.textContent = rw.nombre_bb_vc ?? rw.nombre ?? Object.values(rw)[1] ?? opt.value; selectEspacio.appendChild(opt); }); } catch(e){console.warn(e)}
+        try { const re = await ApiGuide_vc_bb.json('GET', '/api/espacios'); if (re.ok) (re.data || []).forEach(rw=>{ const opt=document.createElement('option'); opt.value = rw.ID_espacio_bb_vc ?? rw.id ?? Object.values(rw)[0]; opt.textContent = rw.nombre_bb_vc ?? rw.nombre ?? Object.values(rw)[1] ?? opt.value; selectEspacio.appendChild(opt); }); } catch(e){console.warn(e)}
         if (row_vc_bb.ID_espacio_bb_vc) Array.from(selectEspacio.options).forEach(o=>{ if (String(o.value) === String(row_vc_bb.ID_espacio_bb_vc)) o.selected = true; });
         form_vc_bb.appendChild(wrapperFor('Espacio', selectEspacio));
 
@@ -843,11 +837,7 @@ class CrudTable_vc_bb extends HTMLElement {
             ID_espacio_DispEspacio_bb_vc: selectEspacio.value
           };
           const id = row_vc_bb.ID_DisponibilidadEspacio_bb_vc || row_vc_bb.ID_DisponibilidadEspacio_bb_vc;
-          await fetch(`${this.apiBase_vc_bb}/disponibilidad/espacio/${id}`, {
-            method: 'PUT',
-            headers: Object.assign({ 'Content-Type': 'application/json' }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})),
-            body: JSON.stringify(body)
-          });
+          await ApiGuide_vc_bb.json('PUT', `/api/disponibilidad/espacio/${id}`, body, Object.assign({ 'Content-Type': 'application/json' }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})));
           modalInstance.close_vc_bb();
           this.loadData_vc_bb();
         });
@@ -959,14 +949,10 @@ class CrudTable_vc_bb extends HTMLElement {
         updated_vc_bb['nro_grado_bb_vc'] = form_vc_bb['nro_grado_bb_vc'].value;
       }
       const resolvedId_vc_bb = row_vc_bb._pk_vc_bb || this.findIdValue_vc_bb(row_vc_bb);
-      let putUrl = `${this.apiBase_vc_bb}/${this.table_vc_bb}`;
-      if (this.subTable_vc_bb) putUrl += `/${this.subTable_vc_bb}`;
-      putUrl += `/${resolvedId_vc_bb}`;
-      await fetch(putUrl, {
-        method: "PUT",
-        headers: Object.assign({ "Content-Type": "application/json" }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})),
-        body: JSON.stringify(updated_vc_bb)
-      });
+      let putPath_vc_bb = `/api/${this.table_vc_bb}`;
+      if (this.subTable_vc_bb) putPath_vc_bb += `/${this.subTable_vc_bb}`;
+      putPath_vc_bb += `/${resolvedId_vc_bb}`;
+      await ApiGuide_vc_bb.json("PUT", putPath_vc_bb, updated_vc_bb, Object.assign({ "Content-Type": "application/json" }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})));
       modalInstance.close_vc_bb();
       this.loadData_vc_bb();
     });
