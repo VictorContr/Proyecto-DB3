@@ -739,8 +739,8 @@ class CrudTable_vc_bb extends HTMLElement {
         selectDia.name = 'ID_dia_DispProfesor_bb_vc';
         selectDia.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
         try {
-          const r = await fetch('/api/dias');
-          if (r.ok) (await r.json()).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_dia_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.dia_bb_vc ?? Object.values(rw)[1] ?? opt.value; selectDia.appendChild(opt); });
+          const r = await ApiGuide_vc_bb.json('GET', '/api/dias');
+          if (r.ok) (r.data || []).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_dia_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.dia_bb_vc ?? Object.values(rw)[1] ?? opt.value; selectDia.appendChild(opt); });
         } catch (e) { console.warn('No se pudo cargar /api/dias', e); }
         // preselect by matching text if ID not present
         if (row_vc_bb.dia_bb_vc) Array.from(selectDia.options).forEach(o => { if (o.textContent === row_vc_bb.dia_bb_vc) o.selected = true; });
@@ -750,8 +750,8 @@ class CrudTable_vc_bb extends HTMLElement {
         selectBloque.name = 'ID_bloque_DispProfesor_bb_vc';
         selectBloque.className = selectDia.className;
         try {
-          const r2 = await fetch('/api/bloques');
-          if (r2.ok) (await r2.json()).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_bloque_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.hora_bloque_bb_vc ?? Object.values(rw)[1] ?? opt.value; selectBloque.appendChild(opt); });
+          const r2 = await ApiGuide_vc_bb.json('GET', '/api/bloques');
+          if (r2.ok) (r2.data || []).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_bloque_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.hora_bloque_bb_vc ?? Object.values(rw)[1] ?? opt.value; selectBloque.appendChild(opt); });
         } catch (e) { console.warn('No se pudo cargar /api/bloques', e); }
         if (row_vc_bb.hora_bloque_bb_vc || row_vc_bb.hora_bloque) Array.from(selectBloque.options).forEach(o => { if (o.textContent === (row_vc_bb.hora_bloque_bb_vc || row_vc_bb.hora_bloque)) o.selected = true; });
         form_vc_bb.appendChild(wrapperFor('Bloque', selectBloque));
@@ -760,9 +760,9 @@ class CrudTable_vc_bb extends HTMLElement {
         selectProfesor.name = 'ID_profesor_DispProfesor_bb_vc';
         selectProfesor.className = selectDia.className;
         try {
-          const rp = await fetch('/api/profesores');
+          const rp = await ApiGuide_vc_bb.json('GET', '/api/profesores');
           if (rp.ok) {
-            const rows = await rp.json();
+            const rows = rp.data || [];
             rows.forEach(rw => {
               const opt = document.createElement('option');
               opt.value = rw.ID_profesor_bb_vc ?? rw.id ?? rw.ID_usuario_bb_vc ?? Object.values(rw)[0];
@@ -811,7 +811,7 @@ class CrudTable_vc_bb extends HTMLElement {
         const selectDia = document.createElement('select');
         selectDia.name = 'ID_dia_DispEspacio_bb_vc';
         selectDia.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
-        try { const r = await fetch('/api/dias'); if (r.ok) (await r.json()).forEach(rw=>{ const opt=document.createElement('option'); opt.value=rw.ID_dia_bb_vc??Object.values(rw)[0]; opt.textContent=rw.dia_bb_vc||Object.values(rw)[1]||opt.value; selectDia.appendChild(opt); }); } catch(e){console.warn(e)}
+        try { const r = await ApiGuide_vc_bb.json('GET', '/api/dias'); if (r.ok) (r.data || []).forEach(rw=>{ const opt=document.createElement('option'); opt.value=rw.ID_dia_bb_vc??Object.values(rw)[0]; opt.textContent=rw.dia_bb_vc||Object.values(rw)[1]||opt.value; selectDia.appendChild(opt); }); } catch(e){console.warn(e)}
         if (row_vc_bb.dia_bb_vc) Array.from(selectDia.options).forEach(o=>{ if (o.textContent === row_vc_bb.dia_bb_vc) o.selected = true; });
         form_vc_bb.appendChild(wrapperFor('Día', selectDia));
 
@@ -877,9 +877,9 @@ class CrudTable_vc_bb extends HTMLElement {
         select.name = col;
         select.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
         try {
-          const r = await fetch('/api/espacios/tipos');
+          const r = await ApiGuide_vc_bb.json('GET', '/api/espacios/tipos');
           if (r.ok) {
-            const rows = await r.json();
+            const rows = r.data || [];
             rows.forEach(rw => {
               const opt = document.createElement('option');
               opt.value = rw.ID_TipoEspacio_bb_vc ?? Object.values(rw)[0];
@@ -929,8 +929,8 @@ class CrudTable_vc_bb extends HTMLElement {
         selectGrado.name = 'nro_grado_bb_vc';
         selectGrado.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
         try {
-          const r = await fetch('/api/grados');
-          if (r.ok) (await r.json()).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.nro_grado_bb_vc ?? Object.values(rw)[1]; opt.textContent = String(opt.value); selectGrado.appendChild(opt); });
+          const r = await ApiGuide_vc_bb.json('GET', '/api/grados');
+          if (r.ok) (r.data || []).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.nro_grado_bb_vc ?? Object.values(rw)[1]; opt.textContent = String(opt.value); selectGrado.appendChild(opt); });
         } catch (_) {}
         wrapGrado.appendChild(labelGrado);
         wrapGrado.appendChild(selectGrado);
