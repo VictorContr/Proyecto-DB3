@@ -6,8 +6,8 @@ import path from 'path';
 // require('../database/conexion');
 
 if (process.env.NODE_ENV === 'development') {
-  const reloader = require('electron-reload');
-  reloader(__dirname, {
+  const reloader_vc_bb = require('electron-reload');
+  reloader_vc_bb(__dirname, {
     electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron')
   });
 }

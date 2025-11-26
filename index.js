@@ -17,6 +17,7 @@ import diasRoutes_vc_bb from "./src/routes/dias.routes.js";
 import bloquesRoutes_vc_bb from "./src/routes/bloques.routes.js";
 import indexRoutes_vc_bb from "./src/routes/index.routes.js";
 import loginRoutes_vc_bb from "./src/routes/login.routes.js"; // nueva ruta de login
+import lockRoutes_vc_bb from "./src/routes/lock.routes.js";
 
 // Nueva importación necesaria para CRUD de asignaturas
 import asignaturasRoutes_vc_bb from "./src/routes/asignaturas.routes.js";
@@ -67,6 +68,7 @@ app_vc_bb.use("/api/grados", gradosRoutes_vc_bb);
 app_vc_bb.use("/api/espacios", espaciosRoutes_vc_bb);
 app_vc_bb.use("/api/dias", diasRoutes_vc_bb);
 app_vc_bb.use("/api/bloques", bloquesRoutes_vc_bb);
+app_vc_bb.use("/api/lock", lockRoutes_vc_bb);
 
 // CRUD de asignaturas (PENSUM real)
 app_vc_bb.use("/api/asignaturas", asignaturasRoutes_vc_bb);
@@ -74,7 +76,6 @@ app_vc_bb.use("/api/disponibilidad", disponibilidadRoutes_vc_bb);
 
 app_vc_bb.use("/api/profesores/excel", excelRoutes_vc_bb);
 app_vc_bb.use("/api/espacios/excel", routerEspaciosExcel_vc_bb);
-// (Eliminados endpoints de Bloques, Días y Calendario)
 app_vc_bb.use("/api/grados/excel", routerGradosExcel_vc_bb);
 app_vc_bb.use("/api/secciones/excel", routerSeccionesExcel_vc_bb);
 app_vc_bb.use("/api/pensum/excel", routerPensumExcel_vc_bb);
@@ -86,7 +87,7 @@ app_vc_bb.use("/api/disponibilidades/excel", routerDisponibilidadesExcel_vc_bb);
 // Servir la misma vista para cualquier ruta bajo /admin (incluyendo subrutas).
 // Usamos una RegExp para evitar problemas con la versión de path-to-regexp.
 app_vc_bb.get(/^\/admin(\/.*)?$/, (req, res) => {
-  res.sendFile(path.join(__dirname, "src", "views", "admin", "crudTable.html"));
+  res.sendFile(path.join(__dirname, "src", "views", "crudTable.html"));
 });
 
 // Manejo de errores 404

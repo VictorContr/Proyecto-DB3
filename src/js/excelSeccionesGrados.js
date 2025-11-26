@@ -3,8 +3,8 @@ import { modal_vc_bb } from "./modal.js";
 
 // Handler para subir/descargar Pensum (Grados + Secciones) en un solo Excel
 export class ExcelSeccionesGradosHandler_vc_bb {
-  constructor(apiBaseUrl_vc_bb = "http://localhost:3000") {
-    this.manager_vc_bb = new ExcelManager_vc_bb(apiBaseUrl_vc_bb);
+  constructor() {
+    this.manager_vc_bb = new ExcelManager_vc_bb();
     this.uploadPath_vc_bb = "/api/pensum/excel/upload";
     this.downloadPath_vc_bb = "/api/pensum/excel/download";
     this.ids_vc_bb = {
@@ -98,7 +98,7 @@ export class ExcelSeccionesGradosHandler_vc_bb {
     try {
       const result_vc_bb = await this.manager_vc_bb.descargar_vc_bb({
         downloadPath_vc_bb: this.downloadPath_vc_bb,
-        fileNamePrefix_vc_bb: "pensum",
+        fileNamePrefix_vc_bb: "grados_secciones",
       });
 
       if (result_vc_bb.ok_vc_bb) {

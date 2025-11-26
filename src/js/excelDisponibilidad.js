@@ -1,10 +1,10 @@
 import { modal_vc_bb } from "./modal.js";
 import { ExcelManager_vc_bb } from "./excel.js";
+import { ApiGuide_vc_bb } from "./guide.js";
 
 export class ExcelDisponibilidadHandler_vc_bb {
-  constructor(apiBaseUrl_vc_bb = "http://localhost:3000") {
-    this.apiBaseUrl_vc_bb = apiBaseUrl_vc_bb;
-    this.excelManager_vc_bb = new ExcelManager_vc_bb(this.apiBaseUrl_vc_bb);
+  constructor() {
+    this.excelManager_vc_bb = new ExcelManager_vc_bb(ApiGuide_vc_bb);
 
     // Referencias al DOM de la sección Disponibilidad
     this.inputExcel_vc_bb = document.getElementById("archivoExcelDisponibilidad");

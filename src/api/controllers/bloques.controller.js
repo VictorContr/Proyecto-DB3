@@ -1,11 +1,11 @@
 import db_vc_bb from "../db.js";
 
-export const getAllBloques_vc_bb = async (req, res) => {
+export const getAllBloques_vc_bb = async (req_vc_bb, res_vc_bb) => {
   try {
-    const rows = await db_vc_bb.all_vc_bb(`SELECT * FROM td_Bloque_bb_vc ORDER BY ID_bloque_bb_vc;`);
-    res.json(rows);
+    const rows_vc_bb = await db_vc_bb.all_vc_bb(`SELECT * FROM td_Bloque_bb_vc ORDER BY ID_bloque_bb_vc;`);
+    res_vc_bb.json(rows_vc_bb);
   } catch (err_vc_bb) {
     console.error(err_vc_bb);
-    res.status(500).json({ message: "Error al obtener bloques" });
+    res_vc_bb.status(500).json({ message: "Error al obtener bloques" });
   }
 };

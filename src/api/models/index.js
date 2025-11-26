@@ -1,0 +1,14 @@
+export { UsuarioModel_vc_bb } from './usuario.model.js';
+export { RolModel_vc_bb } from './rol.model.js';
+export { ProfesorModel_vc_bb } from './profesor.model.js';
+export { GradoModel_vc_bb } from './grado.model.js';
+export { SeccionModel_vc_bb } from './seccion.model.js';
+export { AsignaturaModel_vc_bb } from './asignatura.model.js';
+export { EspacioModel_vc_bb } from './espacio.model.js';
+export { ClaseModel_vc_bb } from './clase.model.js';
+export { DisponibilidadModel_vc_bb } from './disponibilidad.model.js';
+export { DiaModel_vc_bb } from './dia.model.js';
+export { BloqueModel_vc_bb } from './bloque.model.js';
+export { UsuarioRolModel_vc_bb } from './usuarioRol.model.js';
+export { LoginModel_vc_bb } from './login.model.js';
+export { LockModel_vc_bb } from './lock.model.js';

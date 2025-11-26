@@ -28,6 +28,25 @@ class ThemeToggle_vc_bb {
         this.icon_vc_bb.classList.replace('fa-sun', 'fa-moon');
         }
     }
+
+    const adminTitle_vc_bb = document.querySelector('main#admin h1');
+    if (adminTitle_vc_bb) {
+      adminTitle_vc_bb.classList.remove('text-white','text-gray-800','text-gray-700','text-gray-300');
+      adminTitle_vc_bb.classList.add(theme_vc_bb === 'dark' ? 'text-white' : 'text-gray-800');
+    }
+
+    const crudComp_vc_bb = document.querySelector('crud-table-vc-bb');
+    if (crudComp_vc_bb && crudComp_vc_bb.shadowRoot) {
+      const titleEl_vc_bb = crudComp_vc_bb.shadowRoot.getElementById('title_vc_bb');
+      if (titleEl_vc_bb) {
+        titleEl_vc_bb.classList.remove('text-white','text-gray-800','text-gray-700','text-gray-200','text-gray-300');
+        titleEl_vc_bb.classList.add(theme_vc_bb === 'dark' ? 'text-white' : 'text-gray-800');
+      }
+      const rootBox_vc_bb = crudComp_vc_bb.shadowRoot.querySelector('div');
+      if (rootBox_vc_bb) {
+        rootBox_vc_bb.classList.toggle('dark', theme_vc_bb === 'dark');
+      }
+    }
   }
 
   saveThemePreference_vc_bb(theme_vc_bb) {

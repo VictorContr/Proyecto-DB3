@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carga Masiva | U.E Colegio Dr. Jacinto Convit</title>
+  <link rel="shortcut icon" href="../public/img/icon-colegio.png">
+  <link rel="stylesheet" href="../public/css/tailwind.css">
+  <link rel="stylesheet" href="../public/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="../public/css/login-register.css">
+  <link rel="stylesheet" href="../public/css/modal.css">
+</head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center px-4 transition-colors duration-300 font-poppins">
+  <button id="cambio-color" class="fixed top-6 right-6 z-50 p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
+    <i class="fas fa-moon text-gray-700 dark:text-yellow-400 text-lg"></i>
+  </button>
+
+  <main id="cargaMasiva" class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl p-8 grid gap-6 transition-colors duration-300 animate-fade-in">
+    <div class="flex flex-col items-center text-center mb-2">
+      <img src="../public/img/logoColegio-blanco.png" alt="Logo Colegio" class="w-40 h-40 object-contain">
+      <h1 class="text-xl text-gray-700 dark:text-gray-300 mt-2">Carga Masiva de Datos</h1>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Realiza la carga en pasos, un formulario a la vez.</p>
+    </div>
+
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors duration-300">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Administrador</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Último acceso: Hoy</p>
+      </div>
+      <div class="flex gap-3">
+        <a id="backToAdmin" href="./admin.html" class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center">Regresar</a>
+        <button id="logoutButton_vc_bb" class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">Cerrar Sesión</button>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <div class="flex-1 h-2 rounded bg-gray-200 dark:bg-gray-700">
+        <div id="wizardProgress" class="h-2 rounded bg-colegio-blue" style="width: 0%"></div>
+      </div>
+      <span id="wizardStepLabel" class="text-sm text-gray-700 dark:text-gray-300"></span>
+    </div>
+
+    <div class="space-y-6">
+      <section class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md" data-step="0">
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Secciones/Clases</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta la lista de Secciones usando un archivo Excel.</p>
+          </div>
+          <button class="lock-btn text-gray-600 dark:text-gray-300"><i class="fas fa-lock"></i></button>
+        </div>
+        <form id="formUploadSecciones" class="space-y-3 mt-4">
+          <label for="archivoExcelSecciones" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
+          <input type="file" id="archivoExcelSecciones" name="archivoExcelSecciones" accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:cursor-pointer">
+          <button type="submit" id="btnUploadSecciones" class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+            <span id="uploadTextSecciones">Subir Archivo</span>
+            <i id="uploadSpinnerSecciones" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+          </button>
+          <div class="mt-4 border-t border-gray-200 dark:border-gray-600 pt-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descargar reporte</label>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Descarga la lista actualizada de Secciones.</p>
+            <button type="button" id="btnDownloadReporteSecciones" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+              <span id="downloadTextSecciones">Descargar Reporte</span>
+              <i id="downloadSpinnerSecciones" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hidden" data-step="1">
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Espacios</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta la lista de Espacios usando un archivo Excel.</p>
+          </div>
+          <button class="lock-btn text-gray-600 dark:text-gray-300"><i class="fas fa-lock"></i></button>
+        </div>
+        <form id="formUploadEspacios" class="space-y-3 mt-4">
+          <label for="archivoExcelEspacios" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
+          <input type="file" id="archivoExcelEspacios" name="archivoExcelEspacios" accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:cursor-pointer">
+          <button type="submit" id="btnUploadEspacios" class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+            <span id="uploadTextEspacios">Subir Archivo</span>
+            <i id="uploadSpinnerEspacios" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+          </button>
+          <div class="mt-4 border-t border-gray-200 dark:border-gray-600 pt-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descargar reporte</label>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Descarga la lista actualizada de Espacios.</p>
+            <button type="button" id="btnDownloadReporteEspacios" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+              <span id="downloadTextEspacios">Descargar Reporte</span>
+              <i id="downloadSpinnerEspacios" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hidden" data-step="2">
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Asignaturas</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta la lista de Asignaturas usando un archivo Excel.</p>
+          </div>
+          <button class="lock-btn text-gray-600 dark:text-gray-300"><i class="fas fa-lock"></i></button>
+        </div>
+        <form id="formUploadAsignaturas" class="space-y-3 mt-4">
+          <label for="archivoExcelAsignaturas" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
+          <input type="file" id="archivoExcelAsignaturas" name="archivoExcelAsignaturas" accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:cursor-pointer">
+          <button type="submit" id="btnUploadAsignaturas" class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+            <span id="uploadTextAsignaturas">Subir Archivo</span>
+            <i id="uploadSpinnerAsignaturas" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+          </button>
+          <div class="mt-4 border-t border-gray-200 dark:border-gray-600 pt-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descargar reporte</label>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Descarga la lista actualizada de Asignaturas. Columnas: Asignatura, Horas Semanales, Descripción, Duración Bloque Min, Duración Bloque Max, Tipo de Espacio Requerido, Grado.</p>
+            <button type="button" id="btnDownloadReporteAsignaturas" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+              <span id="downloadTextAsignaturas">Descargar Reporte</span>
+              <i id="downloadSpinnerAsignaturas" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hidden" data-step="3">
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Profesores</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta la lista de profesores usando un archivo Excel.</p>
+          </div>
+          <button class="lock-btn text-gray-600 dark:text-gray-300"><i class="fas fa-lock"></i></button>
+        </div>
+        <form id="formUploadProfesores" class="space-y-3 mt-4">
+          <label for="archivoExcelProfesores" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
+          <input type="file" id="archivoExcelProfesores" name="archivoExcelProfesores" accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:cursor-pointer">
+          <button type="submit" id="btnUploadProfesores" class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+            <span id="uploadTextProfesores">Subir Archivo</span>
+            <i id="uploadSpinnerProfesores" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+          </button>
+          <div class="mt-4 border-t border-gray-200 dark:border-gray-600 pt-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descargar reporte</label>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Descarga la lista actualizada de profesores.</p>
+            <button type="button" id="btnDownloadReporteProfesores" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+              <span id="downloadTextProfesores">Descargar Reporte</span>
+              <i id="downloadSpinnerProfesores" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hidden" data-step="4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Disponibilidades</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta disponibilidades de profesores y espacios usando un archivo Excel con dos hojas.</p>
+          </div>
+          <button class="lock-btn text-gray-600 dark:text-gray-300"><i class="fas fa-lock"></i></button>
+        </div>
+        <form id="formUploadDisponibilidad" class="space-y-3 mt-4">
+          <label for="archivoExcelDisponibilidad" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
+          <input type="file" id="archivoExcelDisponibilidad" name="archivoExcelDisponibilidad" accept=".xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:cursor-pointer">
+          <button type="submit" id="btnUploadDisponibilidad" class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+            <span id="uploadTextDisponibilidad">Subir Archivo</span>
+            <i id="uploadSpinnerDisponibilidad" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+          </button>
+          <div class="mt-4 border-t border-gray-200 dark:border-gray-600 pt-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descargar reporte</label>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Descarga un Excel con dos hojas: DisponibilidadProfesor y DisponibilidadEspacio.</p>
+            <button type="button" id="btnDownloadReporteDisponibilidad" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
+              <span id="downloadTextDisponibilidad">Descargar Reporte</span>
+              <i id="downloadSpinnerDisponibilidad" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div class="flex justify-between items-center">
+      <button id="wizardPrev" class="px-4 py-2 rounded-lg font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500">Anterior</button>
+      <button id="wizardNext" class="px-4 py-2 rounded-lg font-medium text-white bg-colegio-blue hover:bg-colegio-darkblue">Siguiente</button>
+    </div>
+  </main>
+
+      <!-- Modal -->
+    <div id="modalContainer" class="modal-container" aria-hidden="true" role="dialog" aria-labelledby="modalTitle" aria-describedby="modalMessage">
+        <div id="modalContent" class="modal-content bg-white dark:bg-gray-800 transition-colors duration-300">
+            <div id="modalHeader" class="modal-header bg-colegio-blue dark:bg-colegio-darkblue">
+                <div class="flex items-center">
+                    <i id="modalIcon" class="modal-icon"></i>
+                    <h2 id="modalTitle" class="text-xl font-bold text-white"></h2>
+                </div>
+                <button id="modalClose" class="text-white hover:text-gray-200 text-xl transition-colors duration-200" aria-label="Cerrar modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modalBody" class="modal-body">
+                <p id="modalMessage" class="text-gray-700 dark:text-gray-300"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="modalAction" class="px-4 py-2 rounded-lg font-medium text-white bg-colegio-blue hover:bg-colegio-darkblue transition-colors duration-200">
+                    Aceptar
+                </button>
+                <button id="modalCancel"
+                    class="px-4 py-2 rounded-lg font-medium text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200"
+                    style="display: none;">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+  <script type="module" src="../js/app.js"></script>
+</body>
+</html>
