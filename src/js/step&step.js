@@ -43,7 +43,7 @@ export class StepAndStep_vc_bb {
             const verify_vc_bb = await ApiGuide_vc_bb.json("GET", `/api/lock/verificar/${tipoCarga_vc_bb}`);
             const data_vc_bb = verify_vc_bb.data;
             if (!verify_vc_bb.ok) {
-              await modal_vc_bb.showError_vc_bb('Verificación', data_vc_bb?.mensaje_vc_bb || 'Error al verificar');
+              await modal_vc_bb.showError_vc_bb('Verificación', data_vc_bb?.mensaje_vc_bb || 'Error al verificar', { durationMs: 0 });
               return;
             }
             if (data_vc_bb?.tieneDatos_vc_bb) {
@@ -55,17 +55,17 @@ export class StepAndStep_vc_bb {
               const rb_vc_bb = await ApiGuide_vc_bb.json("POST", `/api/lock/rollback/${tipoCarga_vc_bb}`, { confirmar: true }, headers_vc_bb);
               const rbData_vc_bb = rb_vc_bb.data;
               if (!rb_vc_bb.ok) {
-                await modal_vc_bb.showError_vc_bb('Rollback', rbData_vc_bb?.mensaje_vc_bb || 'Error al ejecutar rollback');
+                await modal_vc_bb.showError_vc_bb('Rollback', rbData_vc_bb?.mensaje_vc_bb || 'Error al ejecutar rollback', { durationMs: 0 });
                 return;
               }
-              await modal_vc_bb.showSuccess_vc_bb('Rollback', rbData_vc_bb?.mensaje_vc_bb || 'Rollback ejecutado');
+              await modal_vc_bb.showSuccess_vc_bb('Rollback', rbData_vc_bb?.mensaje_vc_bb || 'Rollback ejecutado', { durationMs: 0 });
             } else {
-              await modal_vc_bb.showSuccess_vc_bb('Verificación', data_vc_bb?.mensaje_vc_bb || 'No hay datos existentes');
+              await modal_vc_bb.showSuccess_vc_bb('Verificación', data_vc_bb?.mensaje_vc_bb || 'No hay datos existentes', { durationMs: 0 });
             }
             icon_vc_bb.classList.replace('fa-lock', 'fa-lock-open');
             this.updateView_vc_bb();
           } catch (e_vc_bb) {
-            await modal_vc_bb.showError_vc_bb('Error', 'No se pudo contactar al servidor');
+            await modal_vc_bb.showError_vc_bb('Error', 'No se pudo contactar al servidor', { durationMs: 0 });
           }
         } else {
           icon_vc_bb.classList.replace('fa-lock-open', 'fa-lock');

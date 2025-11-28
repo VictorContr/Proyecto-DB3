@@ -58,7 +58,8 @@ export class ExcelSeccionesGradosHandler_vc_bb {
         await modal_vc_bb.showSuccess_vc_bb(
           "Importación completada",
           `${result_vc_bb.message_vc_bb || "Se procesó el archivo correctamente."}\n\n` +
-          (errorsCount_vc_bb ? `Se registraron ${errorsCount_vc_bb} avisos.\n\n${previewErrors_vc_bb}` : "")
+          (errorsCount_vc_bb ? `Se registraron ${errorsCount_vc_bb} avisos.\n\n${previewErrors_vc_bb}` : ""),
+          { durationMs: 0 }
         );
         return true;
       }
@@ -68,9 +69,9 @@ export class ExcelSeccionesGradosHandler_vc_bb {
 
       if (Array.isArray(result_vc_bb.errors_vc_bb) && result_vc_bb.errors_vc_bb.length) {
         const previewErrors_vc_bb = result_vc_bb.errors_vc_bb.slice(0, 10).join("\n");
-        await modal_vc_bb.showError_vc_bb("Error en la importación", `${baseError_vc_bb}\n\nDetalles:\n${previewErrors_vc_bb}`);
+        await modal_vc_bb.showError_vc_bb("Error en la importación", `${baseError_vc_bb}\n\nDetalles:\n${previewErrors_vc_bb}`, { durationMs: 0 });
       } else {
-        await modal_vc_bb.showError_vc_bb("Error en la importación", baseError_vc_bb);
+        await modal_vc_bb.showError_vc_bb("Error en la importación", baseError_vc_bb, { durationMs: 0 });
       }
       return false;
     } catch (err_vc_bb) {
@@ -78,7 +79,7 @@ export class ExcelSeccionesGradosHandler_vc_bb {
       const message_vc_bb = err_vc_bb.name === "TypeError"
         ? "Error de conexión con el servidor"
         : "Error inesperado al procesar el archivo";
-      await modal_vc_bb.showError_vc_bb("Error de subida", message_vc_bb);
+      await modal_vc_bb.showError_vc_bb("Error de subida", message_vc_bb, { durationMs: 0 });
       return false;
     } finally {
       this.setLoading_vc_bb("upload", false);
@@ -102,20 +103,22 @@ export class ExcelSeccionesGradosHandler_vc_bb {
       });
 
       if (result_vc_bb.ok_vc_bb) {
-        await modal_vc_bb.showSuccess_vc_bb("Descarga completada", "El archivo Excel se descargó correctamente.");
+        await modal_vc_bb.showSuccess_vc_bb("Descarga completada", "El archivo Excel se descargó correctamente.", { durationMs: 0 });
         return true;
       }
 
       await modal_vc_bb.showError_vc_bb(
         "Error de descarga",
-        result_vc_bb.message_vc_bb || "No se pudo descargar el reporte de pensum."
+        result_vc_bb.message_vc_bb || "No se pudo descargar el reporte de pensum.",
+        { durationMs: 0 }
       );
       return false;
     } catch (err_vc_bb) {
       console.error("❌ Error al descargar Excel (Pensum):", err_vc_bb);
       await modal_vc_bb.showError_vc_bb(
         "Error de descarga",
-        err_vc_bb?.message || "No se pudo descargar el reporte de pensum."
+        err_vc_bb?.message || "No se pudo descargar el reporte de pensum.",
+        { durationMs: 0 }
       );
       return false;
     } finally {

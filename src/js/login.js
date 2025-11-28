@@ -18,7 +18,7 @@ export class GestorSesion_vc_bb {
 
 
     if (!userName_vc_bb || !password_vc_bb) {
-          modal_vc_bb.showError_vc_bb("Error","Por favor ingresa usuario y contraseña.");
+          modal_vc_bb.showError_vc_bb("Error","Por favor ingresa usuario y contraseña.", { durationMs: 0 });
       return;
     }
 
@@ -30,7 +30,7 @@ export class GestorSesion_vc_bb {
       const resp_vc_bb = await ApiGuide_vc_bb.json("POST", "/api/login", payload_vc_bb);
 
       if (!resp_vc_bb.ok) {
-        modal_vc_bb.showError_vc_bb("Error", resp_vc_bb?.data?.message || "Error en el login.");
+        modal_vc_bb.showError_vc_bb("Error", resp_vc_bb?.data?.message || "Error en el login.", { durationMs: 0 });
         return;
       }
 
@@ -52,7 +52,8 @@ export class GestorSesion_vc_bb {
       if (rol_vc_bb === "Administrador") {
         modal_vc_bb.showSuccess_vc_bb(
           "Sesión exitosa",
-          "Has iniciado sesión correctamente."
+          "Has iniciado sesión correctamente.",
+          { durationMs: 0 }
         );
         setTimeout(() => {
           location.replace("../views/admin.html");
@@ -60,17 +61,18 @@ export class GestorSesion_vc_bb {
       } else if (rol_vc_bb === "Profesor") {
         modal_vc_bb.showSuccess_vc_bb(
           "Sesión exitosa",
-          "Has iniciado sesión correctamente."
+          "Has iniciado sesión correctamente.",
+          { durationMs: 0 }
         );
         setTimeout(() => {
           location.replace("../views/teacher.html");
         }, 1000);
       } else {
-        modal_vc_bb.showError_vc_bb("Error","Usuario sin rol asignado");  
+        modal_vc_bb.showError_vc_bb("Error","Usuario sin rol asignado", { durationMs: 0 });  
         }
     } catch (error_vc_bb) {
       console.error("❌ Error en login:", error_vc_bb);
-      modal_vc_bb.showError_vc_bb("Error","Error de conexión con el servidor.");  
+      modal_vc_bb.showError_vc_bb("Error","Error de conexión con el servidor.", { durationMs: 0 });  
     }
   }
 
@@ -102,7 +104,8 @@ export class GestorSesion_vc_bb {
     if(typeof modal_vc_bb !== 'undefined') {
         modal_vc_bb.showSuccess_vc_bb(
           "Sesión finalizada",
-          "Has cerrado sesión correctamente."
+          "Has cerrado sesión correctamente.",
+          { durationMs: 0 }
         );
     }
     
@@ -138,7 +141,7 @@ export class GestorSesion_vc_bb {
       console.warn("Intento de acceso sin sesión.");
 
       if (typeof modal_vc_bb !== "undefined") {
-        modal_vc_bb.showError_vc_bb("Error", "Debe iniciar sesión");
+        modal_vc_bb.showError_vc_bb("Error", "Debe iniciar sesión", { durationMs: 0 });
       } else {
          // Fallback si no hay modal
          console.log("Debe iniciar sesión");
@@ -158,7 +161,8 @@ export class GestorSesion_vc_bb {
         if (usuarioActual_vc_bb.rol_vc_bb === "Profesor") {
           modal_vc_bb.showError_vc_bb(
             "Acceso denegado",
-            "Usuario no es Admin."
+            "Usuario no es Admin.",
+            { durationMs: 0 }
           );
           setTimeout(() => {
             location.href = "./teacher.html";
@@ -166,7 +170,8 @@ export class GestorSesion_vc_bb {
         } else {
           modal_vc_bb.showError_vc_bb(
             "Acceso denegado",
-            "Usuario no es Admin."
+            "Usuario no es Admin.",
+            { durationMs: 0 }
           );
           setTimeout(() => {
             location.href = "index.html";
@@ -186,7 +191,8 @@ export class GestorSesion_vc_bb {
         if (usuarioActual_vc_bb.rol_vc_bb === "Administrador") {
           modal_vc_bb.showError_vc_bb(
             "Acceso denegado",
-            "Usuario no es Profesor."
+            "Usuario no es Profesor.",
+            { durationMs: 0 }
           );
           setTimeout(() => {
             location.href = "./admin.html";
@@ -194,7 +200,8 @@ export class GestorSesion_vc_bb {
         } else {
           modal_vc_bb.showError_vc_bb(
             "Acceso denegado",
-            "Usuario no es Profesor."
+            "Usuario no es Profesor.",
+            { durationMs: 0 }
           );
           setTimeout(() => {
             location.href = "index.html";

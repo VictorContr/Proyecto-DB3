@@ -19,13 +19,14 @@ export class ExcelEspaciosHandler_vc_bb {
     if (!file_vc_bb) {
       await modal_vc_bb.showWarning_vc_bb(
         "Archivo no seleccionado",
-        "Por favor, selecciona un archivo Excel antes de subirlo."
+        "Por favor, selecciona un archivo Excel antes de subirlo.",
+        { durationMs: 0 }
       );
       return false;
     }
 
     if (!this.excelManager_vc_bb.validateFile_vc_bb(file_vc_bb)) {
-      await modal_vc_bb.showError_vc_bb("Validación de archivo", "Archivo inválido o muy grande");
+      await modal_vc_bb.showError_vc_bb("Validación de archivo", "Archivo inválido o muy grande", { durationMs: 0 });
       return false;
     }
 
@@ -46,13 +47,14 @@ export class ExcelEspaciosHandler_vc_bb {
 
       if (result_vc_bb.ok_vc_bb && result_vc_bb.exito_vc_bb) {
         const successMsg_vc_bb = result_vc_bb.message_vc_bb || "Los datos se importaron correctamente.";
-        await modal_vc_bb.showSuccess_vc_bb("Importación exitosa", successMsg_vc_bb);
+        await modal_vc_bb.showSuccess_vc_bb("Importación exitosa", successMsg_vc_bb, { durationMs: 0 });
 
         if (Array.isArray(result_vc_bb.errors_vc_bb) && result_vc_bb.errors_vc_bb.length) {
           const previewErrors_vc_bb = result_vc_bb.errors_vc_bb.slice(0, 10).join("\n");
           await modal_vc_bb.showWarning_vc_bb(
             "Observaciones",
-            `Se registraron ${result_vc_bb.errors_vc_bb.length} avisos.\n\n${previewErrors_vc_bb}`
+            `Se registraron ${result_vc_bb.errors_vc_bb.length} avisos.\n\n${previewErrors_vc_bb}`,
+            { durationMs: 0 }
           );
         }
         return true;
@@ -65,10 +67,11 @@ export class ExcelEspaciosHandler_vc_bb {
         const previewErrors_vc_bb = result_vc_bb.errors_vc_bb.slice(0, 10).join("\n");
         await modal_vc_bb.showError_vc_bb(
           "Error en la importación",
-          `${baseError_vc_bb}\n\nDetalles:\n${previewErrors_vc_bb}`
+          `${baseError_vc_bb}\n\nDetalles:\n${previewErrors_vc_bb}`,
+          { durationMs: 0 }
         );
       } else {
-        await modal_vc_bb.showError_vc_bb("Error en la importación", baseError_vc_bb);
+        await modal_vc_bb.showError_vc_bb("Error en la importación", baseError_vc_bb, { durationMs: 0 });
       }
       return false;
     } catch (err_vc_bb) {
@@ -76,7 +79,7 @@ export class ExcelEspaciosHandler_vc_bb {
       const message_vc_bb = err_vc_bb.name === "TypeError"
         ? "Error de conexión con el servidor"
         : "Error inesperado al procesar el archivo";
-      await modal_vc_bb.showError_vc_bb("Error de subida", message_vc_bb);
+      await modal_vc_bb.showError_vc_bb("Error de subida", message_vc_bb, { durationMs: 0 });
       return false;
     } finally {
       this.toggleUploadState_vc_bb(false);
@@ -100,20 +103,22 @@ export class ExcelEspaciosHandler_vc_bb {
       });
 
       if (result_vc_bb.ok_vc_bb) {
-        await modal_vc_bb.showSuccess_vc_bb("Descarga completada", "El archivo Excel se descargó correctamente.");
+        await modal_vc_bb.showSuccess_vc_bb("Descarga completada", "El archivo Excel se descargó correctamente.", { durationMs: 0 });
         return true;
       }
 
       await modal_vc_bb.showError_vc_bb(
         "Error de descarga",
-        result_vc_bb.message_vc_bb || "No se pudo descargar el reporte de espacios."
+        result_vc_bb.message_vc_bb || "No se pudo descargar el reporte de espacios.",
+        { durationMs: 0 }
       );
       return false;
     } catch (err_vc_bb) {
       console.error("❌ Error al descargar Excel (Espacios):", err_vc_bb);
       await modal_vc_bb.showError_vc_bb(
         "Error de descarga",
-        err_vc_bb?.message || "No se pudo descargar el reporte de espacios."
+        err_vc_bb?.message || "No se pudo descargar el reporte de espacios.",
+        { durationMs: 0 }
       );
       return false;
     } finally {

@@ -24,13 +24,14 @@ export class ExcelDisponibilidadHandler_vc_bb {
     if (!file_vc_bb) {
       await modal_vc_bb.showWarning_vc_bb(
         "Archivo no seleccionado",
-        "Por favor, selecciona un archivo Excel antes de subirlo."
+        "Por favor, selecciona un archivo Excel antes de subirlo.",
+        { durationMs: 0 }
       );
       return false;
     }
 
     if (!this.excelManager_vc_bb.validateFile_vc_bb(file_vc_bb)) {
-      await modal_vc_bb.showError_vc_bb("Validación de archivo", "Archivo inválido o muy grande");
+      await modal_vc_bb.showError_vc_bb("Validación de archivo", "Archivo inválido o muy grande", { durationMs: 0 });
       return false;
     }
 
@@ -55,7 +56,8 @@ export class ExcelDisponibilidadHandler_vc_bb {
         await modal_vc_bb.showSuccess_vc_bb(
           "Importación completada",
           `${result_vc_bb.message_vc_bb || "Se procesó el archivo correctamente."}` +
-            (errorsCount_vc_bb ? `\n\nSe registraron ${errorsCount_vc_bb} avisos.\n\n${previewErrors_vc_bb}` : "")
+            (errorsCount_vc_bb ? `\n\nSe registraron ${errorsCount_vc_bb} avisos.\n\n${previewErrors_vc_bb}` : ""),
+          { durationMs: 0 }
         );
         return true;
       }
@@ -63,15 +65,15 @@ export class ExcelDisponibilidadHandler_vc_bb {
       const baseError_vc_bb = result_vc_bb.message_vc_bb || "Ocurrió un error al procesar el archivo.";
       if (Array.isArray(result_vc_bb.errors_vc_bb) && result_vc_bb.errors_vc_bb.length) {
         const previewErrors_vc_bb = result_vc_bb.errors_vc_bb.slice(0, 10).join("\n");
-        await modal_vc_bb.showError_vc_bb("Error en la importación", `${baseError_vc_bb}\n\nDetalles:\n${previewErrors_vc_bb}`);
+        await modal_vc_bb.showError_vc_bb("Error en la importación", `${baseError_vc_bb}\n\nDetalles:\n${previewErrors_vc_bb}`, { durationMs: 0 });
       } else {
-        await modal_vc_bb.showError_vc_bb("Error en la importación", baseError_vc_bb);
+        await modal_vc_bb.showError_vc_bb("Error en la importación", baseError_vc_bb, { durationMs: 0 });
       }
       return false;
     } catch (err_vc_bb) {
       console.error("❌ Error al subir Excel (Disponibilidades):", err_vc_bb);
       const message_vc_bb = err_vc_bb?.name === "TypeError" ? "Error de conexión con el servidor" : "Error inesperado al procesar el archivo";
-      await modal_vc_bb.showError_vc_bb("Error de subida", message_vc_bb);
+      await modal_vc_bb.showError_vc_bb("Error de subida", message_vc_bb, { durationMs: 0 });
       return false;
     } finally {
       this.toggleUploadState_vc_bb(false);
@@ -95,20 +97,22 @@ export class ExcelDisponibilidadHandler_vc_bb {
       });
 
       if (result_vc_bb.ok_vc_bb) {
-        await modal_vc_bb.showSuccess_vc_bb("Descarga completada", "El archivo Excel se descargó correctamente.");
+        await modal_vc_bb.showSuccess_vc_bb("Descarga completada", "El archivo Excel se descargó correctamente.", { durationMs: 0 });
         return true;
       }
 
       await modal_vc_bb.showError_vc_bb(
         "Error de descarga",
-        result_vc_bb.message_vc_bb || "No se pudo descargar el reporte de disponibilidades."
+        result_vc_bb.message_vc_bb || "No se pudo descargar el reporte de disponibilidades.",
+        { durationMs: 0 }
       );
       return false;
     } catch (err_vc_bb) {
       console.error("❌ Error al descargar Excel (Disponibilidades):", err_vc_bb);
       await modal_vc_bb.showError_vc_bb(
         "Error de descarga",
-        err_vc_bb?.message || "No se pudo descargar el reporte de disponibilidades."
+        err_vc_bb?.message || "No se pudo descargar el reporte de disponibilidades.",
+        { durationMs: 0 }
       );
       return false;
     } finally {

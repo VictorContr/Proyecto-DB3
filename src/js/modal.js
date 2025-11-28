@@ -36,7 +36,7 @@ class ModalDialog_vc_bb {
      * @param {boolean} isConfirm 
      * @returns {Promise<boolean>}
      */
-    show_vc_bb(title_vc_bb, message_vc_bb, type_vc_bb, isConfirm = false) {
+    show_vc_bb(title_vc_bb, message_vc_bb, type_vc_bb, isConfirm = false, durationMs_vc_bb = this.minDurationMs_vc_bb) {
         // Tipo de modal
         switch(type_vc_bb) {
             case 'success':
@@ -96,11 +96,16 @@ ${r.info}
                 this.rejectPromise = reject;
             });
         }
+        if (durationMs_vc_bb === 0) {
+            return new Promise((resolve) => {
+                this.resolvePromise = resolve;
+            });
+        }
         return new Promise((resolve) => {
             setTimeout(() => {
                 this.hide_vc_bb();
                 resolve(true);
-            }, this.minDurationMs_vc_bb);
+            }, durationMs_vc_bb);
         });
     }
 
@@ -108,16 +113,16 @@ ${r.info}
         return this.show_vc_bb(title_vc_bb, message_vc_bb, 'warning', true);
     }
 
-    showSuccess_vc_bb(title_vc_bb, message_vc_bb) {
-        return this.enqueue_vc_bb(title_vc_bb, message_vc_bb, 'success');
+    showSuccess_vc_bb(title_vc_bb, message_vc_bb, options_vc_bb = {}) {
+        return this.enqueue_vc_bb(title_vc_bb, message_vc_bb, 'success', options_vc_bb);
     }
 
-    showError_vc_bb(title_vc_bb, message_vc_bb) {
-        return this.enqueue_vc_bb(title_vc_bb, message_vc_bb, 'error');
+    showError_vc_bb(title_vc_bb, message_vc_bb, options_vc_bb = {}) {
+        return this.enqueue_vc_bb(title_vc_bb, message_vc_bb, 'error', options_vc_bb);
     }
 
-    showWarning_vc_bb(title_vc_bb, message_vc_bb) {
-        return this.enqueue_vc_bb(title_vc_bb, message_vc_bb, 'warning');
+    showWarning_vc_bb(title_vc_bb, message_vc_bb, options_vc_bb = {}) {
+        return this.enqueue_vc_bb(title_vc_bb, message_vc_bb, 'warning', options_vc_bb);
     }
 
     /**
@@ -126,13 +131,13 @@ ${r.info}
      * @param {Array} arrayReportes 
      * @returns {Promise<boolean>}
      */
-    showReportes_vc_bb(titulo, arrayReportes) {
-        return this.enqueue_vc_bb(titulo, arrayReportes, 'reportes');
+    showReportes_vc_bb(titulo, arrayReportes, options_vc_bb = {}) {
+        return this.enqueue_vc_bb(titulo, arrayReportes, 'reportes', options_vc_bb);
     }
 
-    enqueue_vc_bb(title_vc_bb, message_vc_bb, type_vc_bb) {
+    enqueue_vc_bb(title_vc_bb, message_vc_bb, type_vc_bb, options_vc_bb = {}) {
         return new Promise((resolve) => {
-            this.queue_vc_bb.push({ title_vc_bb, message_vc_bb, type_vc_bb, resolve });
+            this.queue_vc_bb.push({ title_vc_bb, message_vc_bb, type_vc_bb, options_vc_bb, resolve });
             this.processQueue_vc_bb();
         });
     }
@@ -142,7 +147,8 @@ ${r.info}
         const item_vc_bb = this.queue_vc_bb.shift();
         if (!item_vc_bb) return;
         this.isShowing_vc_bb = true;
-        const p_vc_bb = this.show_vc_bb(item_vc_bb.title_vc_bb, item_vc_bb.message_vc_bb, item_vc_bb.type_vc_bb, false);
+        const durationMs_vc_bb = (item_vc_bb.options_vc_bb && typeof item_vc_bb.options_vc_bb.durationMs === 'number') ? item_vc_bb.options_vc_bb.durationMs : this.minDurationMs_vc_bb;
+        const p_vc_bb = this.show_vc_bb(item_vc_bb.title_vc_bb, item_vc_bb.message_vc_bb, item_vc_bb.type_vc_bb, false, durationMs_vc_bb);
         p_vc_bb.then(() => {
             item_vc_bb.resolve(true);
             setTimeout(() => {
