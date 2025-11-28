@@ -1,5 +1,9 @@
 node_modules
 package-lock.json
 .env
+<<<<<<< HEAD
 src/db/database.db
 .vscode
+=======
+src/db/database.db
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a

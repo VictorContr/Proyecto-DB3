@@ -113,16 +113,28 @@ class CrudTable_vc_bb extends HTMLElement {
 
   async loadData_vc_bb() {
     try {
+<<<<<<< HEAD
       let path_vc_bb = `/api/${this.table_vc_bb}`;
       if (this.subTable_vc_bb) path_vc_bb = `${path_vc_bb}/${this.subTable_vc_bb}`;
       const res = await ApiGuide_vc_bb.json("GET", path_vc_bb);
       let data = res.ok ? (res.data || []) : [];
+=======
+      let url = `${this.apiBase_vc_bb}/${this.table_vc_bb}`;
+      if (this.subTable_vc_bb) url = `${url}/${this.subTable_vc_bb}`;
+      const res = await fetch(url);
+      let data = await res.json();
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
 
       // Enriquecer filas con nombre de tipo de espacio para mostrar en tabla
       if (Array.isArray(data) && (this.table_vc_bb === 'espacios' || this.table_vc_bb === 'asignaturas')) {
         try {
+<<<<<<< HEAD
           const tiposRes = await ApiGuide_vc_bb.json('GET', '/api/espacios/tipos');
           const tipos = tiposRes.ok ? (tiposRes.data || []) : [];
+=======
+          const tiposRes = await fetch('/api/espacios/tipos');
+          const tipos = tiposRes.ok ? await tiposRes.json() : [];
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
           const mapTipos = {};
           tipos.forEach(t => { mapTipos[String(t.ID_TipoEspacio_bb_vc)] = t.tipo_bb_vc; });
           data = data.map(row => {
@@ -142,8 +154,12 @@ class CrudTable_vc_bb extends HTMLElement {
           });
         } catch (_) { /* ignore */ }
       }
+<<<<<<< HEAD
       this.data_vc_bb = Array.isArray(data) ? data : [];
       await this.renderTable_vc_bb(this.data_vc_bb);
+=======
+      await this.renderTable_vc_bb(data);
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
     } catch (err) {
       console.error("Error cargando datos:", err);
     }
@@ -566,6 +582,7 @@ class CrudTable_vc_bb extends HTMLElement {
       'ID_usuario_bb_vc','ID_espacio_bb_vc','ID_asignatura_bb_vc','ID_grado_bb_vc','ID_seccion_bb_vc','ID_DisponibilidadProfesor_bb_vc','ID_DisponibilidadEspacio_bb_vc','ID_clase_bb_vc'
     ];
     const isPk_vc_bb = (c) => pkNames_vc_bb.includes(c) || /^id$/i.test(c) || (this.table_vc_bb && c.toLowerCase() === (`id_${this.table_vc_bb}_bb_vc`).toLowerCase());
+<<<<<<< HEAD
     let createCols = cols.filter(col => !isPk_vc_bb(col));
     if (this.table_vc_bb === 'espacios') {
       // Solo permitir el campo FK, ocultar derivados/alias
@@ -584,6 +601,9 @@ class CrudTable_vc_bb extends HTMLElement {
         return true;
       });
     }
+=======
+    const createCols = cols.filter(col => !isPk_vc_bb(col));
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
     createCols.forEach(col => {
       const keyLower = col.toLowerCase();
       let field;
@@ -613,8 +633,13 @@ class CrudTable_vc_bb extends HTMLElement {
         field = document.createElement('select');
         field.name = col;
         field.className = "border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300";
+<<<<<<< HEAD
         ApiGuide_vc_bb.json('GET', '/api/espacios/tipos')
           .then(r => r.ok ? (r.data || []) : [])
+=======
+        fetch('/api/espacios/tipos')
+          .then(r => r.ok ? r.json() : [])
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
           .then(rows => {
             rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_TipoEspacio_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.tipo_bb_vc ?? Object.values(rw)[1] ?? opt.value; field.appendChild(opt); });
           })
@@ -623,17 +648,25 @@ class CrudTable_vc_bb extends HTMLElement {
         field = document.createElement('select');
         field.name = col;
         field.className = "border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300";
+<<<<<<< HEAD
         ApiGuide_vc_bb.json('GET', '/api/espacios/tipos')
           .then(r => r.ok ? (r.data || []) : [])
+=======
+        fetch('/api/espacios/tipos')
+          .then(r => r.ok ? r.json() : [])
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
           .then(rows => {
             rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_TipoEspacio_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.tipo_bb_vc ?? Object.values(rw)[1] ?? opt.value; field.appendChild(opt); });
           })
           .catch(() => {});
+<<<<<<< HEAD
       } else if (this.table_vc_bb === 'grados' && keyLower === 'nro_grado_bb_vc') {
         field = document.createElement('select');
         field.name = col;
         field.className = "border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300";
         [1,2,3,4,5].forEach(n => { const opt = document.createElement('option'); opt.value = String(n); opt.textContent = String(n); field.appendChild(opt); });
+=======
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
       } else {
         field = document.createElement("input");
         field.name = col;
@@ -660,8 +693,13 @@ class CrudTable_vc_bb extends HTMLElement {
       const selectGrado = document.createElement('select');
       selectGrado.name = 'nro_grado_bb_vc';
       selectGrado.className = 'border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300';
+<<<<<<< HEAD
       ApiGuide_vc_bb.json('GET', '/api/grados')
         .then(r => r.ok ? (r.data || []) : [])
+=======
+      fetch('/api/grados')
+        .then(r => r.ok ? r.json() : [])
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
         .then(rows => {
           rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.nro_grado_bb_vc ?? Object.values(rw)[1]; opt.textContent = String(opt.value); selectGrado.appendChild(opt); });
         })
@@ -860,6 +898,7 @@ class CrudTable_vc_bb extends HTMLElement {
       'ID_usuario_bb_vc','ID_espacio_bb_vc','ID_asignatura_bb_vc','ID_grado_bb_vc','ID_seccion_bb_vc','ID_DisponibilidadProfesor_bb_vc','ID_DisponibilidadEspacio_bb_vc','ID_clase_bb_vc'
     ];
     const isPk2_vc_bb = (c) => pkNames2_vc_bb.includes(c) || /^id$/i.test(c) || (this.table_vc_bb && c.toLowerCase() === (`id_${this.table_vc_bb}_bb_vc`).toLowerCase());
+<<<<<<< HEAD
     let editableKeys = Object.keys(row_vc_bb).filter(k => !isPk2_vc_bb(k));
     if (this.table_vc_bb === 'espacios') {
       editableKeys = editableKeys.filter(k => {
@@ -875,6 +914,9 @@ class CrudTable_vc_bb extends HTMLElement {
         return true;
       });
     }
+=======
+    const editableKeys = Object.keys(row_vc_bb).filter(k => !isPk2_vc_bb(k));
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
     editableKeys.forEach(async col => {
       const wrapper = document.createElement('div');
       wrapper.className = 'flex flex-col gap-2';
@@ -887,9 +929,15 @@ class CrudTable_vc_bb extends HTMLElement {
         select.name = col;
         select.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
         try {
+<<<<<<< HEAD
           const r = await ApiGuide_vc_bb.json('GET', '/api/espacios/tipos');
           if (r.ok) {
             const rows = r.data || [];
+=======
+          const r = await fetch('/api/espacios/tipos');
+          if (r.ok) {
+            const rows = await r.json();
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
             rows.forEach(rw => {
               const opt = document.createElement('option');
               opt.value = rw.ID_TipoEspacio_bb_vc ?? Object.values(rw)[0];
@@ -902,6 +950,7 @@ class CrudTable_vc_bb extends HTMLElement {
         } catch (_) {}
         wrapper.appendChild(label);
         wrapper.appendChild(select);
+<<<<<<< HEAD
       } else if (this.table_vc_bb === 'usuarios' && (keyLower.includes('rol') || keyLower.includes('role'))) {
         const select = document.createElement('select');
         select.name = col;
@@ -912,10 +961,13 @@ class CrudTable_vc_bb extends HTMLElement {
         Array.from(select.options).forEach(o => { if (String(o.value).toLowerCase() === String(currentVal || '').toLowerCase()) o.selected = true; });
         wrapper.appendChild(label);
         wrapper.appendChild(select);
+=======
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
       } else {
         const input = document.createElement('input');
         input.name = col;
         input.value = row_vc_bb[col] != null ? String(row_vc_bb[col]) : '';
+<<<<<<< HEAD
         if (this.table_vc_bb === 'usuarios' && keyLower.includes('password')) {
           input.type = 'password';
           input.placeholder = 'Nueva clave';
@@ -933,6 +985,8 @@ class CrudTable_vc_bb extends HTMLElement {
           form_vc_bb.appendChild(wrapper);
           return;
         }
+=======
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
         input.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
         wrapper.appendChild(label);
         wrapper.appendChild(input);
@@ -951,8 +1005,13 @@ class CrudTable_vc_bb extends HTMLElement {
         selectGrado.name = 'nro_grado_bb_vc';
         selectGrado.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
         try {
+<<<<<<< HEAD
           const r = await ApiGuide_vc_bb.json('GET', '/api/grados');
           if (r.ok) (r.data || []).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.nro_grado_bb_vc ?? Object.values(rw)[1]; opt.textContent = String(opt.value); selectGrado.appendChild(opt); });
+=======
+          const r = await fetch('/api/grados');
+          if (r.ok) (await r.json()).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.nro_grado_bb_vc ?? Object.values(rw)[1]; opt.textContent = String(opt.value); selectGrado.appendChild(opt); });
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
         } catch (_) {}
         wrapGrado.appendChild(labelGrado);
         wrapGrado.appendChild(selectGrado);
@@ -960,8 +1019,13 @@ class CrudTable_vc_bb extends HTMLElement {
       })();
     }
 
+<<<<<<< HEAD
     modalInstance.open_vc_bb(modalTitleText, form_vc_bb);
     modalInstance.onConfirm_vc_bb(async () => {
+=======
+    modalInstance.open(modalTitleText, form_vc_bb);
+    modalInstance.onConfirm(async () => {
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
       const formData_vc_bb = new FormData(form_vc_bb);
       const updated_vc_bb = {};
       for (let [key_vc_bb, value_vc_bb] of formData_vc_bb.entries()) {
@@ -970,6 +1034,9 @@ class CrudTable_vc_bb extends HTMLElement {
           const n = parseInt(String(value_vc_bb), 10);
           updated_vc_bb[key_vc_bb] = Number.isNaN(n) ? value_vc_bb : n;
         }
+      }
+      if (this.table_vc_bb === 'asignaturas' && form_vc_bb['nro_grado_bb_vc']) {
+        updated_vc_bb['nro_grado_bb_vc'] = form_vc_bb['nro_grado_bb_vc'].value;
       }
       if (this.table_vc_bb === 'asignaturas' && form_vc_bb['nro_grado_bb_vc']) {
         updated_vc_bb['nro_grado_bb_vc'] = form_vc_bb['nro_grado_bb_vc'].value;

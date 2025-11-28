@@ -3,19 +3,69 @@ import { GradoModel_vc_bb } from "../models/index.js";
 class GradoController_vc_bb {
   static #instancia_vc_bb = null;
 
+<<<<<<< HEAD
   constructor() {
     if (GradoController_vc_bb.#instancia_vc_bb) {
       return GradoController_vc_bb.#instancia_vc_bb;
     }
     this.gradoModel_vc_bb = GradoModel_vc_bb.obtenerInstancia_vc_bb();
     GradoController_vc_bb.#instancia_vc_bb = this;
+=======
+export const getGradoById_vc_bb = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const row = await db_vc_bb.get_vc_bb(`SELECT * FROM td_Grados_bb_vc WHERE ID_grado_bb_vc = ?;`, [id]);
+    if (!row) return res.status(404).json({ message: "Grado no encontrado" });
+    res.json(row);
+  } catch (err_vc_bb) {
+    console.error(err_vc_bb);
+    res.status(500).json({ message: "Error al obtener grado" });
+  }
+};
+
+export const createGrado_vc_bb = async (req, res) => {
+  try {
+    let { nro_grado_bb_vc } = req.body;
+    const parsed_vc_bb = parseInt(String(nro_grado_bb_vc).trim(), 10);
+    if (!Number.isInteger(parsed_vc_bb) || parsed_vc_bb < 1 || parsed_vc_bb > 5) {
+      return res.status(400).json({ message: "nro_grado_bb_vc inválido" });
+    }
+    const result = await db_vc_bb.run_vc_bb(
+      `INSERT INTO td_Grados_bb_vc (nro_grado_bb_vc) VALUES (?);`,
+      [parsed_vc_bb]
+    );
+    res.status(201).json({ id: result.lastID });
+  } catch (err_vc_bb) {
+    console.error(err_vc_bb);
+    res.status(500).json({ message: err_vc_bb.message || "Error al crear grado" });
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
   }
 
+<<<<<<< HEAD
   static obtenerInstancia_vc_bb() {
     if (!GradoController_vc_bb.#instancia_vc_bb) {
       GradoController_vc_bb.#instancia_vc_bb = new GradoController_vc_bb();
     }
     return GradoController_vc_bb.#instancia_vc_bb;
+=======
+export const updateGrado_vc_bb = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let { nro_grado_bb_vc } = req.body;
+    const parsed_vc_bb = parseInt(String(nro_grado_bb_vc).trim(), 10);
+    if (!Number.isInteger(parsed_vc_bb) || parsed_vc_bb < 1 || parsed_vc_bb > 5) {
+      return res.status(400).json({ message: "nro_grado_bb_vc inválido" });
+    }
+    const result = await db_vc_bb.run_vc_bb(
+      `UPDATE td_Grados_bb_vc SET nro_grado_bb_vc = ? WHERE ID_grado_bb_vc = ?;`,
+      [parsed_vc_bb, id]
+    );
+    if (result.changes === 0) return res.status(404).json({ message: "Grado no encontrado" });
+    res.json({ message: "Grado actualizado" });
+  } catch (err_vc_bb) {
+    console.error(err_vc_bb);
+    res.status(500).json({ message: "Error al actualizar grado" });
+>>>>>>> 54018063647aa95c573d06690f4211958d621f0a
   }
 
   async obtenerTodos_vc_bb(req_vc_bb, res_vc_bb) {
