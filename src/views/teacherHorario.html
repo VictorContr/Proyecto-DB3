@@ -27,52 +27,37 @@
         <div class="flex flex-col items-center text-center mb-6">
             <img src="../public/img/logoColegio-blanco.png" alt="Logo Colegio" class="w-80 h-80 object-contain">
             <h1 class="text-xl text-gray-700 dark:text-gray-300 mt-4">Bienvenido al Panel de Profesor</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Desde aquí puedes gestionar tus actividades académicas y estudiantes.</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Desde aquí puedes consultar tu horario de clases.</p>
         </div>
 
         <!-- Contenido del Panel de Profesor -->
         <div class="grid gap-6">
-            <!-- Tarjeta de acciones disponibles -->
-            <div class="bg-colegio-blue dark:bg-colegio-darkblue text-white p-6 rounded-lg shadow-md transition-colors duration-300">
-                <h2 class="text-2xl font-semibold mb-4">Acciones disponibles</h2>
-                <ul class="list-disc pl-5 space-y-2">
-                    <li class="text-lg">Ver mi horario de clases</li>
-                    <li class="text-lg">Gestionar calificaciones de estudiantes</li>
-                    <li class="text-lg">Registrar asistencia de estudiantes</li>
-                    <li class="text-lg">Subir material de estudio</li>
-                    <li class="text-lg">Comunicarme con estudiantes y padres</li>
-                </ul>
-            </div>
 
-            <!-- Sección de bienvenida y botón de cerrar sesión -->
+        <!-- Sección interna del panel -->
+        <div class="min-h-screen bg-colegio-light dark:bg-colegio-dark font-poppins p-6">
+
+            <!-- Título -->
+            <h1 class="text-2xl font-semibold text-colegio-blue dark:text-white mb-6">
+                Consulta de Horarios
+            </h1>
+
+            <!-- Sección: cerrar sesión + volver -->
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors duration-300">
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Bienvenido, Profesor</h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Próxima clase: <span id="nextClass">Matemáticas - 10:00 AM</span></p>
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Administrador</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Último acceso: Hoy</p>
                 </div>
-                <button id="logoutButton_vc_bb"
-                    class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg w-full sm:w-auto">
-                    Cerrar Sesión
-                </button>
+                <div class="flex gap-3">
+                    <a href="./teacher.html" class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center">Regresar</a>
+                    <button id="logoutButton_vc_bb" class="bg-colegio-blue hover:bg-colegio-darkblue text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">Cerrar Sesión</button>
+                </div>
             </div>
 
-            <!-- Tarjetas de funcionalidades -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                <!-- Tarjeta 1: Horario -->
-                <div class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
-                    <div class="flex items-center mb-3">
-                        <i class="fas fa-calendar-alt text-colegio-blue text-xl mr-3"></i>
-                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Mi Horario</h3>
-                    </div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                        Consulta tu horario de clases semanal.
-                    </p>
-                    <a href="teacherHorario.html" id="btnConsultarHorarioProfesor" class="w-full bg-colegio-blue hover:bg-colegio-darkblue text-white py-2 px-4 rounded transition-colors duration-200">
-                        Ver Horario
-                    </a>
+            <!-- Contenedor para mostrar resultados -->
+                <div id="horarioProfesor" class="mt-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-auto max-h-96">
+                    <p class="text-gray-600 dark:text-gray-300">Aquí aparecerá tu horario de clases cuando el administrador lo genere...</p>
                 </div>
-
-            </div>
+        </div>
 
         </div>
     </main>

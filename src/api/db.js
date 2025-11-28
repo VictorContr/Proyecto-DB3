@@ -202,6 +202,18 @@ class Database_vc_bb {
             UNIQUE (ID_dia_DispEspacio_bb_vc, ID_bloque_DispEspacio_bb_vc, ID_espacio_DispEspacio_bb_vc)
           );
 
+          -- Tabla de ocupación (derivada de horarios)
+          CREATE TABLE IF NOT EXISTS td_OcupacionEspacio_bb_vc (
+            ID_OcupacionEspacio_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
+            ID_dia_OcupEspacio_bb_vc INTEGER NOT NULL,
+            ID_bloque_OcupEspacio_bb_vc INTEGER NOT NULL,
+            ID_espacio_OcupEspacio_bb_vc INTEGER NOT NULL,
+            FOREIGN KEY (ID_dia_OcupEspacio_bb_vc) REFERENCES td_Dia_bb_vc(ID_dia_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_bloque_OcupEspacio_bb_vc) REFERENCES td_Bloque_bb_vc(ID_bloque_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            FOREIGN KEY (ID_espacio_OcupEspacio_bb_vc) REFERENCES td_Espacios_bb_vc(ID_espacio_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+            UNIQUE (ID_dia_OcupEspacio_bb_vc, ID_bloque_OcupEspacio_bb_vc, ID_espacio_OcupEspacio_bb_vc)
+          );
+
           -- -----------------------------------------------------
           -- Tabla Central: El Horario (Resultado del Algoritmo)
           -- -----------------------------------------------------
@@ -224,6 +236,7 @@ class Database_vc_bb {
             UNIQUE (ID_dia_horario_bb_vc, ID_bloque_horario_bb_vc, ID_espacio_horario_bb_vc, ID_profesor_horario_bb_vc)
           );
 
+
           -- -----------------------------------------------------
           -- Índices recomendados
           -- -----------------------------------------------------
@@ -240,6 +253,18 @@ class Database_vc_bb {
           CREATE INDEX IF NOT EXISTS idx_td_Clases_seccion ON td_Clases_bb_vc(ID_seccion_clase_bb_vc);
           CREATE INDEX IF NOT EXISTS idx_td_Asignaturas_nombre ON td_Asignaturas_bb_vc(nombre_bb_vc);
 
+
+          -- Evitar doble reserva del espacio
+          CREATE UNIQUE INDEX IF NOT EXISTS ux_horario_espacio_dia_bloque_bb_vc
+          ON td_Horario_bb_vc (ID_dia_horario_bb_vc, ID_bloque_horario_bb_vc, ID_espacio_horario_bb_vc);
+
+          -- Evitar doble reserva del profesor
+          CREATE UNIQUE INDEX IF NOT EXISTS ux_horario_profesor_dia_bloque_bb_vc
+          ON td_Horario_bb_vc (ID_dia_horario_bb_vc, ID_bloque_horario_bb_vc, ID_profesor_horario_bb_vc);
+
+          -- Evitar doble reserva de la sección (grupo)
+          CREATE UNIQUE INDEX IF NOT EXISTS ux_horario_grupo_dia_bloque_bb_vc
+          ON td_Horario_bb_vc (ID_dia_horario_bb_vc, ID_bloque_horario_bb_vc, ID_grado_horario_bb_vc, ID_seccion_horario_bb_vc);
           -- -----------------------------------------------------
           -- TRIGGERS: Sincronizar td_Clases_bb_vc al insertar grados o secciones
           -- -----------------------------------------------------
@@ -269,6 +294,171 @@ class Database_vc_bb {
           AFTER DELETE ON td_Secciones_bb_vc
           BEGIN
             DELETE FROM td_Clases_bb_vc WHERE ID_seccion_clase_bb_vc = OLD.ID_seccion_bb_vc;
+          END;
+
+
+          ------TRIGGERS PARA HORARIOS-------
+                    --  Profesores
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_profesor_insert
+          AFTER INSERT ON td_Profesores_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_profesor_update
+          AFTER UPDATE ON td_Profesores_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_profesor_delete
+          AFTER DELETE ON td_Profesores_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          -- Asignaturas
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_asignatura_insert
+          AFTER INSERT ON td_Asignaturas_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_asignatura_update
+          AFTER UPDATE ON td_Asignaturas_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_asignatura_delete
+          AFTER DELETE ON td_Asignaturas_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          -- Espacios (salones)
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_espacio_insert
+          AFTER INSERT ON td_Espacios_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_espacio_update
+          AFTER UPDATE ON td_Espacios_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_espacio_delete
+          AFTER DELETE ON td_Espacios_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          -- Bloques
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_bloque_insert
+          AFTER INSERT ON td_Bloque_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_bloque_update
+          AFTER UPDATE ON td_Bloque_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_bloque_delete
+          AFTER DELETE ON td_Bloque_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          -- Grados
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_grado_insert
+          AFTER INSERT ON td_Grados_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_grado_update
+          AFTER UPDATE ON td_Grados_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_grado_delete
+          AFTER DELETE ON td_Grados_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          -- Secciones
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_seccion_insert
+          AFTER INSERT ON td_Secciones_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_seccion_update
+          AFTER UPDATE ON td_Secciones_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_seccion_delete
+          AFTER DELETE ON td_Secciones_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          -- =====================================================
+          -- Disponibilidad de Profesores
+          -- =====================================================
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_disp_profesor_insert
+          AFTER INSERT ON td_DisponibilidadProfesor_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_disp_profesor_update
+          AFTER UPDATE ON td_DisponibilidadProfesor_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_disp_profesor_delete
+          AFTER DELETE ON td_DisponibilidadProfesor_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          -- =====================================================
+          -- Disponibilidad de Espacios
+          -- =====================================================
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_disp_espacio_insert
+          AFTER INSERT ON td_DisponibilidadEspacio_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_disp_espacio_update
+          AFTER UPDATE ON td_DisponibilidadEspacio_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_disp_espacio_delete
+          AFTER DELETE ON td_DisponibilidadEspacio_bb_vc
+          BEGIN
+            DELETE FROM td_Horario_bb_vc;
+          END;
+
+      --  Al borrar horarios, vaciar ocupación de espacios
+          CREATE TRIGGER IF NOT EXISTS trg_reset_ocup_espacio_horarios_delete
+          AFTER DELETE ON td_Horario_bb_vc
+          BEGIN
+            DELETE FROM td_OcupacionEspacio_bb_vc;
           END;
 
           -- -----------------------------------------------------
@@ -312,9 +502,80 @@ class Database_vc_bb {
 
           INSERT OR IGNORE INTO td_Bloque_bb_vc (hora_bloque_bb_vc) VALUES
           ('7:00 am'), ('8:00 am'), ('9:00 am'), ('10:00 am'), ('11:00 am'),
-          ('12:00 pm'), ('1:00 pm'), ('2:00 pm'), ('3:00 pm'), ('4:00 pm');
+          ('12:00 pm'), ('1:00 pm'), ('2:00 pm'), ('3:00 pm');
 
-        `;
+
+        --- VISTAS SQL ---
+
+DROP VIEW IF EXISTS vista_horarios_admin_bb_vc;
+CREATE VIEW vista_horarios_admin_bb_vc AS
+SELECT 
+  h.ID_Horario_bb_vc,
+  d.dia_bb_vc AS dia,
+  b.hora_bloque_bb_vc AS bloque,
+  a.nombre_bb_vc AS asignatura,
+  u.nombre_bb_vc || ' ' || u.apellido_bb_vc AS profesor,
+  g.nro_grado_bb_vc AS grado,
+  s.letra_seccion_bb_vc AS seccion,
+  e.nombre_bb_vc AS espacio
+FROM td_Horario_bb_vc h
+JOIN td_Asignaturas_bb_vc a ON h.ID_asignatura_horario_bb_vc = a.ID_asignatura_bb_vc
+JOIN td_Profesores_bb_vc p ON h.ID_profesor_horario_bb_vc = p.ID_profesor_bb_vc
+JOIN td_UsuarioRol_bb_vc ur ON p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc
+JOIN td_Usuarios_bb_vc u ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc
+JOIN td_Grados_bb_vc g ON h.ID_grado_horario_bb_vc = g.ID_grado_bb_vc
+JOIN td_Secciones_bb_vc s ON h.ID_seccion_horario_bb_vc = s.ID_seccion_bb_vc
+JOIN td_Espacios_bb_vc e ON h.ID_espacio_horario_bb_vc = e.ID_espacio_bb_vc
+JOIN td_Dia_bb_vc d ON h.ID_dia_horario_bb_vc = d.ID_dia_bb_vc
+JOIN td_Bloque_bb_vc b ON h.ID_bloque_horario_bb_vc = b.ID_bloque_bb_vc;
+
+DROP VIEW IF EXISTS vista_horarios_profesor_bb_vc;
+CREATE VIEW vista_horarios_profesor_bb_vc AS
+SELECT 
+  h.ID_Horario_bb_vc,
+  d.dia_bb_vc AS dia,
+  b.hora_bloque_bb_vc AS bloque,
+  a.nombre_bb_vc AS asignatura,
+  u.nombre_bb_vc || ' ' || u.apellido_bb_vc AS profesor,
+  g.nro_grado_bb_vc AS grado,
+  s.letra_seccion_bb_vc AS seccion,
+  e.nombre_bb_vc AS espacio,
+  h.ID_profesor_horario_bb_vc AS ID_profesor
+FROM td_Horario_bb_vc h
+JOIN td_Asignaturas_bb_vc a ON h.ID_asignatura_horario_bb_vc = a.ID_asignatura_bb_vc
+JOIN td_Profesores_bb_vc p ON h.ID_profesor_horario_bb_vc = p.ID_profesor_bb_vc
+JOIN td_UsuarioRol_bb_vc ur ON p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc
+JOIN td_Usuarios_bb_vc u ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc
+JOIN td_Grados_bb_vc g ON h.ID_grado_horario_bb_vc = g.ID_grado_bb_vc
+JOIN td_Secciones_bb_vc s ON h.ID_seccion_horario_bb_vc = s.ID_seccion_bb_vc
+JOIN td_Espacios_bb_vc e ON h.ID_espacio_horario_bb_vc = e.ID_espacio_bb_vc
+JOIN td_Dia_bb_vc d ON h.ID_dia_horario_bb_vc = d.ID_dia_bb_vc
+JOIN td_Bloque_bb_vc b ON h.ID_bloque_horario_bb_vc = b.ID_bloque_bb_vc;
+
+
+-- Todos los slots posibles (día , bloque , espacio)
+CREATE VIEW IF NOT EXISTS vista_SlotsEspacio_bb_vc AS
+SELECT d.ID_dia_bb_vc AS ID_dia,
+       b.ID_bloque_bb_vc AS ID_bloque,
+       e.ID_espacio_bb_vc AS ID_espacio
+FROM td_Dia_bb_vc d
+CROSS JOIN td_Bloque_bb_vc b
+CROSS JOIN td_Espacios_bb_vc e;
+
+-- Disponibilidad real: slots posibles menos ocupación actual
+CREATE VIEW IF NOT EXISTS vista_DisponibilidadRealEspacio_bb_vc AS
+SELECT s.ID_dia, s.ID_bloque, s.ID_espacio
+FROM vista_SlotsEspacio_bb_vc s
+LEFT JOIN td_OcupacionEspacio_bb_vc o
+  ON o.ID_dia_OcupEspacio_bb_vc = s.ID_dia
+ AND o.ID_bloque_OcupEspacio_bb_vc = s.ID_bloque
+ AND o.ID_espacio_OcupEspacio_bb_vc = s.ID_espacio
+WHERE o.ID_OcupacionEspacio_bb_vc IS NULL;
+
+
+
+
+`;
         
         // Usar .exec() para correr múltiples sentencias SQL a la vez
         this.db_vc_bb.exec(sql_vc_bb, (error_vc_bb) => {

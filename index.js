@@ -4,6 +4,8 @@ import cors from "cors";
 import { config } from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import horariosRoutes_vc_bb from "./src/routes/horarios.routes.js"; // Asegúrate de importar la ruta de horarios
+
 
 // Routes
 import adminRoutes_vc_bb from "./src/routes/admin.routes.js";
@@ -81,6 +83,9 @@ app_vc_bb.use("/api/secciones/excel", routerSeccionesExcel_vc_bb);
 app_vc_bb.use("/api/pensum/excel", routerPensumExcel_vc_bb);
 app_vc_bb.use("/api/asignaturas/excel", routerAsignaturasExcel_vc_bb);
 app_vc_bb.use("/api/disponibilidades/excel", routerDisponibilidadesExcel_vc_bb);
+
+// Horarios
+app_vc_bb.use("/api/horarios", horariosRoutes_vc_bb);
 
 // Para que cualquier ruta de tabla CRUD de admin (incluyendo subrutas)
 // cargue en la misma vista (el componente web lee la URL para saber qué tabla/subtabla cargar).

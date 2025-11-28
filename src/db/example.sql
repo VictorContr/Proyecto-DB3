@@ -1,3 +1,22 @@
+USE DBHorarios_bb_vc;
+
+SELECT
+  g.ID_grado_gradoAsig_bb_vc,
+  g.nombre_gradoAsig_bb_vc,
+  s.ID_seccion_bb_vc,
+  s.nombre_seccion_bb_vc
+FROM
+  td_GradosAsignaturas_bb_vc g
+LEFT JOIN
+  td_Secciones_bb_vc s ON g.ID_grado_gradoAsig_bb_vc = s.ID_grado_gradoAsig_bb_vc
+WHERE
+  g.ID_grado_gradoAsig_bb_vc IS NOT NULL
+ORDER BY
+  g.ID_grado_gradoAsig_bb_vc;
+
+
+
+
 -- Habilita el soporte para claves foráneas (requerido en cada conexión)
 PRAGMA foreign_keys = ON;
 

@@ -41,6 +41,7 @@ export class GestorSesion_vc_bb {
         rol_vc_bb: data_vc_bb.rol, // 'Administrador' o 'Profesor'
         nombre_vc_bb: data_vc_bb.nombre,
         apellido_vc_bb: data_vc_bb.apellido,
+        idProfesor_vc_bb: data_vc_bb.ID_profesor 
       };
 
       // Usamos 'this' para llamar al método estático de la misma clase
@@ -85,6 +86,12 @@ export class GestorSesion_vc_bb {
       "selectedUserId_vc_bb",
       JSON.stringify(datosMinimos_vc_bb.id_vc_bb)
     );
+
+    // guardar idProfesor explícito si existe
+    if (datosMinimos_vc_bb.rol_vc_bb === "Profesor" && datosMinimos_vc_bb.idProfesor_vc_bb) {
+      sessionStorage.setItem("idProfesor", datosMinimos_vc_bb.idProfesor_vc_bb);
+    }
+
   }
 
   // 2. OBTENER DATOS

@@ -7,6 +7,7 @@ import { ExcelDisponibilidadHandler_vc_bb } from "./excelDisponibilidad.js";
 import { GestorSesion_vc_bb, loginForm_vc_bb, logoutButton_vc_bb } from "./login.js";
 import "../components/crudTable.js";
 import { StepAndStep_vc_bb } from "./step&step.js";
+import { generarHorarios_vc_bb, mostrarHorarioProfesor_vc_bb } from "./horarios.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("cargado el app_vc_bb");
@@ -181,5 +182,18 @@ document.addEventListener("DOMContentLoaded", () => {
         await excelDisponibilidadHandler_vc_bb.downloadExcel_vc_bb();
       });
     }
+  }
+
+  ///--- Evento para disparar la generación de horarios académicos automática ---///
+  const btnGenerarHorarios_vc_bb = document.getElementById("btnGenerarHorarios");
+  if (btnGenerarHorarios_vc_bb) {
+    btnGenerarHorarios_vc_bb.addEventListener("click", async () => {
+      await generarHorarios_vc_bb();
+    });
+  }
+  // Mostrar horario automáticamente si estamos en la vista del profesor
+  const contenedorHorario = document.getElementById("horarioProfesor");
+  if (contenedorHorario) {
+    mostrarHorarioProfesor_vc_bb(); // se ejecuta al cargar la página
   }
 });

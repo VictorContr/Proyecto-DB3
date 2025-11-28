@@ -12,3 +12,4 @@ export { BloqueModel_vc_bb } from './bloque.model.js';
 export { UsuarioRolModel_vc_bb } from './usuarioRol.model.js';
 export { LoginModel_vc_bb } from './login.model.js';
 export { LockModel_vc_bb } from './lock.model.js';
+export { GeneradorHorarios_vc_bb } from './generadorHorarios.model.js';
