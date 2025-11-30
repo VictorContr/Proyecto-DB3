@@ -179,6 +179,13 @@
     </div>
   </main>
 
+  <div id="pageSpinner" class="hidden fixed inset-0 z-[999] bg-black/40 flex items-center justify-center text-white" aria-hidden="true" role="status">
+    <div class="flex flex-col items-center gap-3">
+      <div class="spinner-pulse"></div>
+      <span class="text-sm">Cargando...</span>
+    </div>
+  </div>
+
       <!-- Modal -->
     <div id="modalContainer" class="modal-container" aria-hidden="true" role="dialog" aria-labelledby="modalTitle" aria-describedby="modalMessage">
         <div id="modalContent" class="modal-content bg-white dark:bg-gray-800 transition-colors duration-300">

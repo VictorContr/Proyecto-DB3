@@ -1,5 +1,5 @@
 import { modal_vc_bb } from "./modal.js";
-import { ExcelManager_vc_bb } from "./excel.js";
+import { ExcelManager_vc_bb, togglePageSpinner_vc_bb } from "./excel.js";
 import { ApiGuide_vc_bb } from "./guide.js";
 
 export class ExcelDisponibilidadHandler_vc_bb {
@@ -41,6 +41,7 @@ export class ExcelDisponibilidadHandler_vc_bb {
     if (!confirm_vc_bb) return false;
 
     this.toggleUploadState_vc_bb(true);
+    togglePageSpinner_vc_bb(true);
 
     try {
       const result_vc_bb = await this.excelManager_vc_bb.subir_vc_bb({
@@ -76,6 +77,7 @@ export class ExcelDisponibilidadHandler_vc_bb {
     } finally {
       this.toggleUploadState_vc_bb(false);
       if (this.inputExcel_vc_bb) this.inputExcel_vc_bb.value = "";
+      togglePageSpinner_vc_bb(false);
     }
   }
 
@@ -87,6 +89,7 @@ export class ExcelDisponibilidadHandler_vc_bb {
     if (!confirm_vc_bb) return false;
 
     this.toggleDownloadState_vc_bb(true);
+    togglePageSpinner_vc_bb(true);
 
     try {
       const result_vc_bb = await this.excelManager_vc_bb.descargar_vc_bb({
@@ -113,6 +116,7 @@ export class ExcelDisponibilidadHandler_vc_bb {
       return false;
     } finally {
       this.toggleDownloadState_vc_bb(false);
+      togglePageSpinner_vc_bb(false);
     }
   }
 

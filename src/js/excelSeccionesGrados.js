@@ -1,4 +1,4 @@
-import { ExcelManager_vc_bb } from "./excel.js";
+import { ExcelManager_vc_bb, togglePageSpinner_vc_bb } from "./excel.js";
 import { modal_vc_bb } from "./modal.js";
 
 // Handler para subir/descargar Pensum (Grados + Secciones) en un solo Excel
@@ -45,6 +45,7 @@ export class ExcelSeccionesGradosHandler_vc_bb {
     if (!confirm_vc_bb) return false;
 
     this.setLoading_vc_bb("upload", true);
+    togglePageSpinner_vc_bb(true);
     try {
       const result_vc_bb = await this.manager_vc_bb.subir_vc_bb({
         file_vc_bb,
@@ -84,6 +85,7 @@ export class ExcelSeccionesGradosHandler_vc_bb {
       this.setLoading_vc_bb("upload", false);
       const input_vc_bb = document.getElementById(this.ids_vc_bb.input);
       if (input_vc_bb) input_vc_bb.value = "";
+      togglePageSpinner_vc_bb(false);
     }
   }
 
@@ -95,6 +97,7 @@ export class ExcelSeccionesGradosHandler_vc_bb {
     if (!confirm_vc_bb) return false;
 
     this.setLoading_vc_bb("download", true);
+    togglePageSpinner_vc_bb(true);
     try {
       const result_vc_bb = await this.manager_vc_bb.descargar_vc_bb({
         downloadPath_vc_bb: this.downloadPath_vc_bb,
@@ -120,6 +123,7 @@ export class ExcelSeccionesGradosHandler_vc_bb {
       return false;
     } finally {
       this.setLoading_vc_bb("download", false);
+      togglePageSpinner_vc_bb(false);
     }
   }
 }

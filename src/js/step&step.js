@@ -1,4 +1,5 @@
 import { modal_vc_bb } from "./modal.js";
+import { togglePageSpinner_vc_bb } from "./excel.js";
 import { getApiBaseUrl_vc_bb, ApiGuide_vc_bb } from "./guide.js";
 
 export class StepAndStep_vc_bb {
@@ -40,6 +41,7 @@ export class StepAndStep_vc_bb {
         if (!tipoCarga_vc_bb) return;
         if (isLocked_vc_bb) {
           try {
+            togglePageSpinner_vc_bb(true);
             const verify_vc_bb = await ApiGuide_vc_bb.json("GET", `/api/lock/verificar/${tipoCarga_vc_bb}`);
             const data_vc_bb = verify_vc_bb.data;
             if (!verify_vc_bb.ok) {
@@ -66,6 +68,8 @@ export class StepAndStep_vc_bb {
             this.updateView_vc_bb();
           } catch (e_vc_bb) {
             await modal_vc_bb.showError_vc_bb('Error', 'No se pudo contactar al servidor');
+          } finally {
+            togglePageSpinner_vc_bb(false);
           }
         } else {
           icon_vc_bb.classList.replace('fa-lock-open', 'fa-lock');

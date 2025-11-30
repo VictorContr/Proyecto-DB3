@@ -1,5 +1,5 @@
 import { modal_vc_bb } from "./modal.js";
-import { ExcelManager_vc_bb } from "./excel.js";
+import { ExcelManager_vc_bb, togglePageSpinner_vc_bb } from "./excel.js";
 
 export class ExcelAsignaturaHandler_vc_bb {
   constructor() {
@@ -27,6 +27,7 @@ export class ExcelAsignaturaHandler_vc_bb {
     if (!confirm_vc_bb) return false;
 
     this.toggleUploadState_vc_bb(true);
+    togglePageSpinner_vc_bb(true);
 
     try {
       console.log("[ExcelAsignaturas] Subida: llamando a /api/asignaturas/excel/upload");
@@ -67,6 +68,7 @@ export class ExcelAsignaturaHandler_vc_bb {
     } finally {
       this.toggleUploadState_vc_bb(false);
       if (this.inputExcel_vc_bb) this.inputExcel_vc_bb.value = "";
+      togglePageSpinner_vc_bb(false);
     }
   }
 
@@ -78,6 +80,7 @@ export class ExcelAsignaturaHandler_vc_bb {
     if (!confirm_vc_bb) return false;
 
     this.toggleDownloadState_vc_bb(true);
+    togglePageSpinner_vc_bb(true);
 
     try {
       console.log("[ExcelAsignaturas] Descarga: llamando a /api/asignaturas/excel/download");
@@ -105,6 +108,7 @@ export class ExcelAsignaturaHandler_vc_bb {
       return false;
     } finally {
       this.toggleDownloadState_vc_bb(false);
+      togglePageSpinner_vc_bb(false);
     }
   }
 

@@ -2,6 +2,18 @@
 // Provee métodos reutilizables para evitar redundancias en los manejadores específicos
 import { ApiGuide_vc_bb } from "./guide.js";
 
+export function togglePageSpinner_vc_bb(show_vc_bb) {
+  const el_vc_bb = typeof document !== 'undefined' ? document.getElementById('pageSpinner') : null;
+  if (!el_vc_bb) return;
+  if (show_vc_bb) {
+    el_vc_bb.classList.remove('hidden');
+    el_vc_bb.classList.add('active');
+  } else {
+    el_vc_bb.classList.remove('active');
+    el_vc_bb.classList.add('hidden');
+  }
+}
+
 export class ExcelManager_vc_bb {
   constructor(apiGuide_vc_bb = null) {
     this.apiGuide_vc_bb = apiGuide_vc_bb;
