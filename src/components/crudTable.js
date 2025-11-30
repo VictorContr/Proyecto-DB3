@@ -1,4 +1,5 @@
 import { ModalCrud_vc_bb } from "./modalCrud.js";
+import { modal_vc_bb } from "../js/modal.js";
 import { ApiGuide_vc_bb } from "../js/guide.js";
 
 class CrudTable_vc_bb extends HTMLElement {
@@ -15,7 +16,14 @@ class CrudTable_vc_bb extends HTMLElement {
 
     this.shadow_vc_bb.innerHTML = `
     <link rel="stylesheet" href="../public/css/tailwind.css">
-      <div class="p-6  dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200">
+    <style>
+      #tableSpinner{opacity:0;transition:opacity .2s ease}
+      #tableSpinner.flex{opacity:1}
+      .spinner-pulse{width:36px;height:36px;border-radius:50%;border:3px solid rgba(255,255,255,.5);border-top-color:#fff;animation:spin 1s linear infinite,pulse 1.2s ease-in-out infinite}
+      @keyframes spin{to{transform:rotate(360deg)}}
+      @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.35)}50%{box-shadow:0 0 0 10px rgba(255,255,255,0)}}
+    </style>
+      <div class="p-6 relative dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200">
         <h2 id="title_vc_bb" class="text-2xl font-bold mb-4 text-white"></h2>
         <div id="tableTools_vc_bb" class="mb-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded p-4 flex flex-wrap gap-4 items-end">
           <div class="flex flex-col gap-2 w-full sm:w-56">
@@ -38,6 +46,9 @@ class CrudTable_vc_bb extends HTMLElement {
             <thead class="bg-gray-100 dark:bg-gray-700" id="thead_vc_bb"></thead>
             <tbody id="tbody_vc_bb"></tbody>
           </table>
+        </div>
+        <div id="tableSpinner" class="hidden absolute inset-0 bg-black/20 backdrop-blur-sm items-center justify-center">
+          <div class="spinner-pulse"></div>
         </div>
       </div>
     `;
@@ -112,7 +123,11 @@ class CrudTable_vc_bb extends HTMLElement {
   }
 
   async loadData_vc_bb() {
+    const pageSpinner = document.getElementById('pageSpinner');
+    const tableSpinner = this.shadow_vc_bb.getElementById('tableSpinner');
     try {
+      if (pageSpinner) { pageSpinner.classList.remove('hidden'); pageSpinner.classList.add('active'); }
+      if (tableSpinner) { tableSpinner.classList.remove('hidden'); tableSpinner.classList.add('flex'); }
       let path_vc_bb = `/api/${this.table_vc_bb}`;
       if (this.subTable_vc_bb) path_vc_bb = `${path_vc_bb}/${this.subTable_vc_bb}`;
       const res = await ApiGuide_vc_bb.json("GET", path_vc_bb);
@@ -146,6 +161,9 @@ class CrudTable_vc_bb extends HTMLElement {
       await this.renderTable_vc_bb(this.data_vc_bb);
     } catch (err) {
       console.error("Error cargando datos:", err);
+    } finally {
+      if (tableSpinner) { tableSpinner.classList.add('hidden'); tableSpinner.classList.remove('flex'); }
+      if (pageSpinner) { pageSpinner.classList.remove('active'); pageSpinner.classList.add('hidden'); }
     }
   }
 
@@ -278,12 +296,20 @@ class CrudTable_vc_bb extends HTMLElement {
           const userId = this.getCurrentUserId_vc_bb();
           const headers = {};
           if (userId) headers['x-user-id'] = String(userId);
-          // support subTable (e.g. /api/disponibilidad/profesor/:id)
           let deletePath_vc_bb = `/api/${this.table_vc_bb}`;
           if (this.subTable_vc_bb) deletePath_vc_bb += `/${this.subTable_vc_bb}`;
           deletePath_vc_bb += `/${pkId_vc_bb}`;
-          await ApiGuide_vc_bb.request('DELETE', deletePath_vc_bb, { headers });
-          this.loadData_vc_bb();
+          try {
+            const res = await ApiGuide_vc_bb.request('DELETE', deletePath_vc_bb, { headers });
+            if (res.ok) {
+              await modal_vc_bb.showSuccess_vc_bb('Éxito','Registro eliminado');
+              this.loadData_vc_bb();
+            } else {
+              await modal_vc_bb.showError_vc_bb('Error','No se pudo eliminar');
+            }
+          } catch (_) {
+            await modal_vc_bb.showError_vc_bb('Error','Falló la eliminación');
+          }
         });
       }
 
@@ -453,12 +479,17 @@ class CrudTable_vc_bb extends HTMLElement {
           const headers = { 'Content-Type': 'application/json' };
           const userId = this.getCurrentUserId_vc_bb();
           if (userId) headers['x-user-id'] = String(userId);
-          try {
-            await ApiGuide_vc_bb.json('POST', `/api/disponibilidad/profesor`, body, headers);
-            form.reset();
-            this.loadData_vc_bb();
+        try {
+            const r = await ApiGuide_vc_bb.json('POST', `/api/disponibilidad/profesor`, body, headers);
+            if (r.ok) {
+              await modal_vc_bb.showSuccess_vc_bb('Éxito','Registro creado');
+              form.reset();
+              this.loadData_vc_bb();
+            } else {
+              await modal_vc_bb.showError_vc_bb('Error','No se pudo crear');
+            }
           } catch (e) {
-            console.error('Error creando disponibilidad profesor', e);
+            await modal_vc_bb.showError_vc_bb('Error','Falló la creación');
           } finally {
             btnSubmit.textContent = prevText;
             // re-enable solo si siguen existiendo opciones
@@ -619,11 +650,16 @@ class CrudTable_vc_bb extends HTMLElement {
       if (userId_vc_bb) headers_vc_bb['x-user-id'] = String(userId_vc_bb);
 
       try {
-        await ApiGuide_vc_bb.json("POST", postPath_vc_bb, body, headers_vc_bb);
-        form.reset();
-        this.loadData_vc_bb();
+        const r = await ApiGuide_vc_bb.json("POST", postPath_vc_bb, body, headers_vc_bb);
+        if (r.ok) {
+          await modal_vc_bb.showSuccess_vc_bb('Éxito','Registro creado');
+          form.reset();
+          this.loadData_vc_bb();
+        } else {
+          await modal_vc_bb.showError_vc_bb('Error','No se pudo crear');
+        }
       } catch (err) {
-        console.error('Error creando registro', err);
+        await modal_vc_bb.showError_vc_bb('Error','Falló la creación');
       } finally {
         if (submitBtn) {
           submitBtn.textContent = prev || 'Crear';
@@ -705,10 +741,19 @@ class CrudTable_vc_bb extends HTMLElement {
             ID_bloque_DispProfesor_bb_vc: selectBloque.value,
             ID_profesor_DispProfesor_bb_vc: selectProfesor.value
           };
-          const id = row_vc_bb.ID_DisponibilidadProfesor_bb_vc || row_vc_bb.ID_DisponibilidadProfesor_bb_vc;
-          await ApiGuide_vc_bb.json('PUT', `/api/disponibilidad/profesor/${id}`, body, Object.assign({ 'Content-Type': 'application/json' }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})));
-          modalInstance.close_vc_bb();
-          this.loadData_vc_bb();
+        const id = row_vc_bb.ID_DisponibilidadProfesor_bb_vc || row_vc_bb.ID_DisponibilidadProfesor_bb_vc;
+          try {
+            const r = await ApiGuide_vc_bb.json('PUT', `/api/disponibilidad/profesor/${id}`, body, Object.assign({ 'Content-Type': 'application/json' }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})));
+            if (r.ok) {
+              await modal_vc_bb.showSuccess_vc_bb('Éxito','Registro actualizado');
+              modalInstance.close_vc_bb();
+              this.loadData_vc_bb();
+            } else {
+              await modal_vc_bb.showError_vc_bb('Error','No se pudo actualizar');
+            }
+          } catch (_) {
+            await modal_vc_bb.showError_vc_bb('Error','Falló la actualización');
+          }
         });
         return;
       })();
@@ -838,9 +883,18 @@ class CrudTable_vc_bb extends HTMLElement {
       let putPath_vc_bb = `/api/${this.table_vc_bb}`;
       if (this.subTable_vc_bb) putPath_vc_bb += `/${this.subTable_vc_bb}`;
       putPath_vc_bb += `/${resolvedId_vc_bb}`;
-      await ApiGuide_vc_bb.json("PUT", putPath_vc_bb, updated_vc_bb, Object.assign({ "Content-Type": "application/json" }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})));
-      modalInstance.close_vc_bb();
-      this.loadData_vc_bb();
+      try {
+        const r = await ApiGuide_vc_bb.json("PUT", putPath_vc_bb, updated_vc_bb, Object.assign({ "Content-Type": "application/json" }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})));
+        if (r.ok) {
+          await modal_vc_bb.showSuccess_vc_bb('Éxito','Registro actualizado');
+          modalInstance.close_vc_bb();
+          this.loadData_vc_bb();
+        } else {
+          await modal_vc_bb.showError_vc_bb('Error','No se pudo actualizar');
+        }
+      } catch (_) {
+        await modal_vc_bb.showError_vc_bb('Error','Falló la actualización');
+      }
     });
   }
 

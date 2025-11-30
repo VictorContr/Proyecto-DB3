@@ -1,4 +1,5 @@
 import { setupThemeToggle_vc_bb } from "./dark-mode.js";
+import "./modal.js";
 import { ExcelHandler_vc_bb } from "./excelProfesor.js";
 import { ExcelEspaciosHandler_vc_bb } from "./excelEspacios.js";
 import { ExcelAsignaturaHandler_vc_bb } from "./excelAsignatura.js";

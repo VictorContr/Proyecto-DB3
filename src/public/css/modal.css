@@ -201,3 +201,8 @@ background-color: #F59E0B;
         .modal-header.warning-bg ~ .modal-footer .modal-btn-accept {
             background-color: #F59E0B; /* Amarillo para advertencia */
         }
+#pageSpinner{opacity:0;transform:scale(0.98);transition:opacity .2s ease,transform .2s ease}
+#pageSpinner.active{opacity:1;transform:scale(1)}
+.spinner-pulse{width:48px;height:48px;border-radius:50%;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;animation:spin 1s linear infinite,pulse 1.2s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.35)}50%{box-shadow:0 0 0 12px rgba(255,255,255,0)}}
