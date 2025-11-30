@@ -518,12 +518,13 @@ class CrudTable_vc_bb extends HTMLElement {
     }
     if (this.table_vc_bb === 'asignaturas') {
       // Ocultar alias de tipo espacio y campos de grado duplicados (ID y nro)
-      createCols = createCols.filter(c => {
-        const k = String(c).toLowerCase();
-        if (k === 'tipoespacio_bb_vc' || k === 'tipo_espacio_requerido_bb_vc') return false;
-        if (k === 'id_grado_bb_vc' || k === 'nro_grado_bb_vc') return false;
-        return true;
-      });
+    createCols = createCols.filter(c => {
+      const k = String(c).toLowerCase();
+      if (k === 'tipoespacio_bb_vc' || k === 'tipo_espacio_requerido_bb_vc') return false;
+      if (k === 'id_grado_bb_vc' || k === 'nro_grado_bb_vc') return false;
+      if (k === 'grados_vc_bb') return false;
+      return true;
+    });
     }
     createCols.forEach(col => {
       const keyLower = col.toLowerCase();
@@ -777,6 +778,7 @@ class CrudTable_vc_bb extends HTMLElement {
         const kk = String(k).toLowerCase();
         if (kk === 'tipoespacio_bb_vc' || kk === 'tipo_espacio_requerido_bb_vc') return false;
         if (kk === 'id_grado_bb_vc' || kk === 'nro_grado_bb_vc') return false;
+        if (kk === 'grados_vc_bb') return false;
         return true;
       });
     }
@@ -846,6 +848,54 @@ class CrudTable_vc_bb extends HTMLElement {
     });
 
     if (this.table_vc_bb === 'asignaturas') {
+      const wrapInfo = document.createElement('div');
+      wrapInfo.className = 'flex flex-col gap-2';
+      const labelInfo = document.createElement('label');
+      labelInfo.className = 'text-sm font-medium text-gray-600 dark:text-gray-200';
+      labelInfo.textContent = 'Grados actuales';
+      const chips = document.createElement('div');
+      chips.className = 'flex flex-wrap gap-2';
+      const userIdForHeaders = this.getCurrentUserId_vc_bb();
+      const headersForDelete = userIdForHeaders ? { 'x-user-id': String(userIdForHeaders) } : {};
+      const pkAsignatura = row_vc_bb._pk_vc_bb || this.findIdValue_vc_bb(row_vc_bb);
+      const arrGrados = (row_vc_bb.grados_vc_bb ? String(row_vc_bb.grados_vc_bb) : '').split('|').map(s => String(s).trim()).filter(s => s.length > 0);
+      if (arrGrados.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'text-sm text-gray-700 dark:text-gray-300';
+        empty.textContent = '—';
+        chips.appendChild(empty);
+      } else {
+        arrGrados.forEach(gStr => {
+          const badge = document.createElement('span');
+          badge.className = 'inline-flex items-center gap-2 px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs';
+          const txt = document.createElement('span');
+          txt.textContent = gStr;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'bg-red-500 hover:bg-red-600 text-white rounded px-2 py-0.5 text-xs';
+          btn.textContent = 'Quitar';
+          btn.onclick = async () => {
+            try {
+              const r = await ApiGuide_vc_bb.request('DELETE', `/api/asignaturas/${pkAsignatura}/grados/${gStr}`, { headers: headersForDelete });
+              if (r.ok) {
+                await modal_vc_bb.showSuccess_vc_bb('Éxito', `Grado ${gStr} desvinculado`);
+                this.loadData_vc_bb();
+                badge.remove();
+              } else {
+                await modal_vc_bb.showError_vc_bb('Error', 'No se pudo desvincular');
+              }
+            } catch (_) {
+              await modal_vc_bb.showError_vc_bb('Error', 'Falló la desvinculación');
+            }
+          };
+          badge.appendChild(txt);
+          badge.appendChild(btn);
+          chips.appendChild(badge);
+        });
+      }
+      wrapInfo.appendChild(labelInfo);
+      wrapInfo.appendChild(chips);
+      form_vc_bb.appendChild(wrapInfo);
       (async () => {
         const wrapGrado = document.createElement('div');
         wrapGrado.className = 'flex flex-col gap-2';

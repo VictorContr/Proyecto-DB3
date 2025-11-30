@@ -143,7 +143,7 @@ static async request(method, path, { headers = {}, body = undefined, timeoutMs }
     if (this.connectionState === 'online') return;
     this.connectionState = 'online';
     if (typeof globalThis !== 'undefined' && typeof globalThis.modal_vc_bb !== 'undefined') {
-      await globalThis.modal_vc_bb.showSuccess_vc_bb('Conexión', 'Estas Online.');
+      await globalThis.modal_vc_bb.showSuccess_vc_bb('Conexión', 'Estas Online.', { durationMs: 1500 });
     }
   }
 
@@ -151,8 +151,8 @@ static async request(method, path, { headers = {}, body = undefined, timeoutMs }
     if (this.connectionState === 'offline') return;
     this.connectionState = 'offline';
     if (typeof globalThis !== 'undefined' && typeof globalThis.modal_vc_bb !== 'undefined') {
-      await globalThis.modal_vc_bb.showError_vc_bb('Conexión', 'Error de conexión online... probando offline');
-      await globalThis.modal_vc_bb.showSuccess_vc_bb('Conexión', 'Estas Offline.');
+      await globalThis.modal_vc_bb.showError_vc_bb('Conexión', 'Error de conexión online... probando offline', { durationMs: 1500 });
+      await globalThis.modal_vc_bb.showSuccess_vc_bb('Conexión', 'Estas Offline.', { durationMs: 1500 });
     }
   }
 
@@ -160,7 +160,7 @@ static async request(method, path, { headers = {}, body = undefined, timeoutMs }
     if (this.connectionState === 'error') return;
     this.connectionState = 'error';
     if (typeof globalThis !== 'undefined' && typeof globalThis.modal_vc_bb !== 'undefined') {
-      await globalThis.modal_vc_bb.showError_vc_bb('Conexión', 'Error de conexión en ONLINE Y OFFLINE');
+      await globalThis.modal_vc_bb.showError_vc_bb('Conexión', 'Error de conexión en ONLINE Y OFFLINE', { durationMs: 1500 });
     }
   }
 

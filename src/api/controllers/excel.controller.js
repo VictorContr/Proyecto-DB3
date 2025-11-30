@@ -532,13 +532,13 @@ export const subirAsignaturasGradosExcel_vc_bb = async (req, res) => {
     const { successfulImports_vc_bb, errors_vc_bb } = await ExcelModel_vc_bb.parseAndProcessExcel_vc_bb({
       filePath_vc_bb,
       columns_vc_bb: [
-        { key_vc_bb: "nombre_bb_vc", required_vc_bb: true },
-        { key_vc_bb: "horas_academicas_bb_vc", required_vc_bb: false },
-        { key_vc_bb: "descripcion_bb_vc", required_vc_bb: false },
-        { key_vc_bb: "duracion_bloque_min_bb_vc", required_vc_bb: false },
-        { key_vc_bb: "duracion_bloque_max_bb_vc", required_vc_bb: false },
-        { key_vc_bb: "tipo_espacio_requerido_bb_vc", required_vc_bb: false },
-        { key_vc_bb: "nro_grado_bb_vc", required_vc_bb: false },
+        { key_vc_bb: "nombre_bb_vc", required_vc_bb: true, title_vc_bb: "Asignatura" },
+        { key_vc_bb: "horas_academicas_bb_vc", required_vc_bb: false, title_vc_bb: "Horas Semanales" },
+        { key_vc_bb: "descripcion_bb_vc", required_vc_bb: false, title_vc_bb: "Descripción" },
+        { key_vc_bb: "duracion_bloque_min_bb_vc", required_vc_bb: false, title_vc_bb: "Duración Bloque Min" },
+        { key_vc_bb: "duracion_bloque_max_bb_vc", required_vc_bb: false, title_vc_bb: "Duración Bloque Max" },
+        { key_vc_bb: "tipo_espacio_requerido_bb_vc", required_vc_bb: false, title_vc_bb: "Tipo Espacio Requerido" },
+        { key_vc_bb: "nro_grado_bb_vc", required_vc_bb: false, title_vc_bb: "Grado" },
       ],
       processRow_vc_bb: async (rowMap_vc_bb) => {
         const nombre_vc_bb = String(rowMap_vc_bb.nombre_bb_vc || "").trim();

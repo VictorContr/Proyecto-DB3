@@ -70,7 +70,7 @@ export class ExcelModel_vc_bb {
   // Subida genérica: parsea el Excel y ejecuta un handler por fila
   static async parseAndProcessExcel_vc_bb({
     filePath_vc_bb,
-    columns_vc_bb = [], // [{ key_vc_bb: "nombre", required_vc_bb: true }, ...] en el orden esperado del archivo
+    columns_vc_bb = [],
     processRow_vc_bb     // async (rowMap_vc_bb) => void
   }) {
     const result_vc_bb = {
@@ -87,11 +87,24 @@ export class ExcelModel_vc_bb {
         throw new Error("El archivo está vacío o no tiene formato válido.");
       }
 
-      // Primera fila se asume headers del archivo, aunque no se validan por nombre
-      // Se usa el orden para mapear columnas a keys
+      const headerRow_vc_bb = rows_vc_bb[0] || [];
+      const norm_vc_bb = (s_vc_bb) => String(s_vc_bb || "").trim().toLowerCase();
+      const headerIndexByTitle_vc_bb = {};
+      for (let hIdx_vc_bb = 0; hIdx_vc_bb < headerRow_vc_bb.length; hIdx_vc_bb++) {
+        headerIndexByTitle_vc_bb[norm_vc_bb(headerRow_vc_bb[hIdx_vc_bb])] = hIdx_vc_bb;
+      }
+
+      const columnIndex_vc_bb = columns_vc_bb.map((col_vc_bb, idx_vc_bb) => {
+        if (col_vc_bb.title_vc_bb) {
+          const tIdx_vc_bb = headerIndexByTitle_vc_bb[norm_vc_bb(col_vc_bb.title_vc_bb)];
+          if (typeof tIdx_vc_bb === "number") return tIdx_vc_bb;
+        }
+        return idx_vc_bb;
+      });
+
       for (let i_vc_bb = 1; i_vc_bb < rows_vc_bb.length; i_vc_bb++) {
         const row_vc_bb = rows_vc_bb[i_vc_bb];
-
+        
         // Saltar filas vacías
         if (!row_vc_bb || row_vc_bb.every((cell_vc_bb) => cell_vc_bb === null || cell_vc_bb === undefined || cell_vc_bb === "")) {
           continue;
@@ -99,7 +112,8 @@ export class ExcelModel_vc_bb {
 
         const rowMap_vc_bb = {};
         columns_vc_bb.forEach((col_vc_bb, idx_vc_bb) => {
-          rowMap_vc_bb[col_vc_bb.key_vc_bb] = row_vc_bb[idx_vc_bb];
+          const colIdx_vc_bb = columnIndex_vc_bb[idx_vc_bb];
+          rowMap_vc_bb[col_vc_bb.key_vc_bb] = row_vc_bb[colIdx_vc_bb];
         });
 
         // Validar requeridos
