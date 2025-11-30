@@ -831,7 +831,6 @@ export const descargarDisponibilidadesExcel_vc_bb = async (req, res) => {
   try {
     const wb_vc_bb = new xl_vc_bb.Workbook();
     const wsProf_vc_bb = wb_vc_bb.addWorksheet("DisponibilidadProfesor");
-    const wsEsp_vc_bb = wb_vc_bb.addWorksheet("DisponibilidadEspacio");
 
     // Encabezados para ambas hojas
     const headersProf_vc_bb = [
@@ -840,16 +839,9 @@ export const descargarDisponibilidadesExcel_vc_bb = async (req, res) => {
       { title_vc_bb: "Bloque", key_vc_bb: "hora_bloque_bb_vc" },
       { title_vc_bb: "Usuario Profesor", key_vc_bb: "userName_bb_vc" },
     ];
-    const headersEsp_vc_bb = [
-      { title_vc_bb: "ID", key_vc_bb: "ID_DisponibilidadEspacio_bb_vc" },
-      { title_vc_bb: "Día", key_vc_bb: "dia_bb_vc" },
-      { title_vc_bb: "Bloque", key_vc_bb: "hora_bloque_bb_vc" },
-      { title_vc_bb: "Nombre Espacio", key_vc_bb: "nombre_bb_vc" },
-    ];
 
     // Escribir encabezados
     headersProf_vc_bb.forEach((h_vc_bb, i_vc_bb) => wsProf_vc_bb.cell(1, i_vc_bb + 1).string(h_vc_bb.title_vc_bb));
-    headersEsp_vc_bb.forEach((h_vc_bb, i_vc_bb) => wsEsp_vc_bb.cell(1, i_vc_bb + 1).string(h_vc_bb.title_vc_bb));
 
     // Consultas
     const dispProfRows_vc_bb = await db_vc_bb.all_vc_bb(
@@ -867,18 +859,6 @@ export const descargarDisponibilidadesExcel_vc_bb = async (req, res) => {
        ORDER BY d.dia_bb_vc, b.hora_bloque_bb_vc, u.userName_bb_vc`
     );
 
-    const dispEspRows_vc_bb = await db_vc_bb.all_vc_bb(
-      `SELECT 
-         de.ID_DisponibilidadEspacio_bb_vc,
-         d.dia_bb_vc,
-         b.hora_bloque_bb_vc,
-         e.nombre_bb_vc
-       FROM td_DisponibilidadEspacio_bb_vc de
-       LEFT JOIN td_Dia_bb_vc d ON de.ID_dia_DispEspacio_bb_vc = d.ID_dia_bb_vc
-       LEFT JOIN td_Bloque_bb_vc b ON de.ID_bloque_DispEspacio_bb_vc = b.ID_bloque_bb_vc
-       LEFT JOIN td_Espacios_bb_vc e ON de.ID_espacio_DispEspacio_bb_vc = e.ID_espacio_bb_vc
-       ORDER BY d.dia_bb_vc, b.hora_bloque_bb_vc, e.nombre_bb_vc`
-    );
 
     // Escribir filas de profesor
     dispProfRows_vc_bb.forEach((row_vc_bb, rowIndex_vc_bb) => {
@@ -894,24 +874,11 @@ export const descargarDisponibilidadesExcel_vc_bb = async (req, res) => {
       });
     });
 
-    // Escribir filas de espacio
-    dispEspRows_vc_bb.forEach((row_vc_bb, rowIndex_vc_bb) => {
-      headersEsp_vc_bb.forEach((h_vc_bb, colIndex_vc_bb) => {
-        const value_vc_bb = row_vc_bb[h_vc_bb.key_vc_bb];
-        if (typeof value_vc_bb === "number") {
-          wsEsp_vc_bb.cell(rowIndex_vc_bb + 2, colIndex_vc_bb + 1).number(value_vc_bb);
-        } else {
-          wsEsp_vc_bb.cell(rowIndex_vc_bb + 2, colIndex_vc_bb + 1).string(
-            value_vc_bb !== undefined && value_vc_bb !== null ? String(value_vc_bb) : ""
-          );
-        }
-      });
-    });
 
     const tempDir_vc_bb = path_vc_bb.resolve("temp");
     if (!fs_vc_bb.existsSync(tempDir_vc_bb)) fs_vc_bb.mkdirSync(tempDir_vc_bb);
 
-    const fileName_vc_bb = `disponibilidades_${Date.now()}.xlsx`;
+    const fileName_vc_bb = `disponibilidad_profesor_${Date.now()}.xlsx`;
     const filePath_vc_bb = path_vc_bb.join(tempDir_vc_bb, fileName_vc_bb);
 
     await new Promise((resolve_vc_bb, reject_vc_bb) => {
@@ -921,7 +888,7 @@ export const descargarDisponibilidadesExcel_vc_bb = async (req, res) => {
       });
     });
 
-    res.download(filePath_vc_bb, `disponibilidades.xlsx`, (err_vc_bb) => {
+    res.download(filePath_vc_bb, `disponibilidad_profesor.xlsx`, (err_vc_bb) => {
       if (err_vc_bb) {
         console.error("Error al enviar archivo:", err_vc_bb);
         if (fs_vc_bb.existsSync(filePath_vc_bb)) fs_vc_bb.unlinkSync(filePath_vc_bb);
@@ -940,7 +907,6 @@ export const subirDisponibilidadesExcel_vc_bb = async (req, res) => {
   const filePath_vc_bb = req.file?.path;
   const result_vc_bb = {
     successfulProfesor_vc_bb: 0,
-    successfulEspacio_vc_bb: 0,
     errors_vc_bb: [],
   };
 
@@ -955,7 +921,7 @@ export const subirDisponibilidadesExcel_vc_bb = async (req, res) => {
 
     const workbook_vc_bb = await XlsxPopulate_vc_bb.fromFileAsync(filePath_vc_bb);
 
-    // --- Hoja: DisponibilidadProfesor ---
+    // Hoja: DisponibilidadProfesor
     const sheetProf_vc_bb = workbook_vc_bb.sheet("DisponibilidadProfesor");
     if (!sheetProf_vc_bb) throw new Error("No se encontró hoja 'DisponibilidadProfesor'");
     const rowsProf_vc_bb = sheetProf_vc_bb.usedRange().value();
@@ -1015,66 +981,11 @@ export const subirDisponibilidadesExcel_vc_bb = async (req, res) => {
       }
     }
 
-    // --- Hoja: DisponibilidadEspacio ---
-    const sheetEsp_vc_bb = workbook_vc_bb.sheet("DisponibilidadEspacio");
-    if (!sheetEsp_vc_bb) throw new Error("No se encontró hoja 'DisponibilidadEspacio'");
-    const rowsEsp_vc_bb = sheetEsp_vc_bb.usedRange().value();
-    if (rowsEsp_vc_bb && rowsEsp_vc_bb.length >= 2) {
-      for (let i_vc_bb = 1; i_vc_bb < rowsEsp_vc_bb.length; i_vc_bb++) {
-        const row_vc_bb = rowsEsp_vc_bb[i_vc_bb];
-        if (!row_vc_bb || row_vc_bb.every((c_vc_bb) => c_vc_bb === null || c_vc_bb === undefined || c_vc_bb === "")) {
-          continue;
-        }
-        try {
-          const diaRaw_vc_bb = String(row_vc_bb[0] ?? "").trim();
-          const bloqueRaw_vc_bb = String(row_vc_bb[1] ?? "").trim();
-          const espacioNombreRaw_vc_bb = String(row_vc_bb[2] ?? "").trim();
-
-          if (!diaRaw_vc_bb || !bloqueRaw_vc_bb || !espacioNombreRaw_vc_bb) {
-            throw new Error("Faltan datos requeridos (Día, Bloque, Nombre Espacio)");
-          }
-
-          const dia_vc_bb = await db_vc_bb.get_vc_bb(
-            `SELECT ID_dia_bb_vc FROM td_Dia_bb_vc WHERE LOWER(dia_bb_vc) = LOWER(?)`,
-            [diaRaw_vc_bb]
-          );
-          if (!dia_vc_bb) throw new Error(`Día inválido: '${diaRaw_vc_bb}'`);
-
-          const bloque_vc_bb = await db_vc_bb.get_vc_bb(
-            `SELECT ID_bloque_bb_vc FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = ?`,
-            [bloqueRaw_vc_bb]
-          );
-          if (!bloque_vc_bb) throw new Error(`Bloque inválido: '${bloqueRaw_vc_bb}'`);
-
-          const espacio_vc_bb = await db_vc_bb.get_vc_bb(
-            `SELECT ID_espacio_bb_vc FROM td_Espacios_bb_vc WHERE nombre_bb_vc = ?`,
-            [espacioNombreRaw_vc_bb]
-          );
-          if (!espacio_vc_bb) throw new Error(`Espacio no encontrado: '${espacioNombreRaw_vc_bb}'`);
-
-          const exists_vc_bb = await db_vc_bb.get_vc_bb(
-            `SELECT ID_DisponibilidadEspacio_bb_vc FROM td_DisponibilidadEspacio_bb_vc 
-             WHERE ID_dia_DispEspacio_bb_vc = ? AND ID_bloque_DispEspacio_bb_vc = ? AND ID_espacio_DispEspacio_bb_vc = ?`,
-            [dia_vc_bb.ID_dia_bb_vc, bloque_vc_bb.ID_bloque_bb_vc, espacio_vc_bb.ID_espacio_bb_vc]
-          );
-          if (exists_vc_bb) throw new Error("La disponibilidad de espacio ya existe (duplicada)");
-
-          await db_vc_bb.run_vc_bb(
-            `INSERT INTO td_DisponibilidadEspacio_bb_vc (ID_dia_DispEspacio_bb_vc, ID_bloque_DispEspacio_bb_vc, ID_espacio_DispEspacio_bb_vc)
-             VALUES (?, ?, ?)`,
-            [dia_vc_bb.ID_dia_bb_vc, bloque_vc_bb.ID_bloque_bb_vc, espacio_vc_bb.ID_espacio_bb_vc]
-          );
-          result_vc_bb.successfulEspacio_vc_bb++;
-        } catch (errRow_vc_bb) {
-          result_vc_bb.errors_vc_bb.push(`Hoja DisponibilidadEspacio - Fila ${i_vc_bb + 1}: ${errRow_vc_bb.message}`);
-        }
-      }
-    }
 
     res.status(200).json({
-      message: `Proceso finalizado. Disponibilidades profesor importadas: ${result_vc_bb.successfulProfesor_vc_bb}. Disponibilidades espacio importadas: ${result_vc_bb.successfulEspacio_vc_bb}.`,
+      message: `Proceso finalizado. Disponibilidades de profesor importadas: ${result_vc_bb.successfulProfesor_vc_bb}.`,
       errors: result_vc_bb.errors_vc_bb,
-      exito: (result_vc_bb.successfulProfesor_vc_bb + result_vc_bb.successfulEspacio_vc_bb) > 0,
+      exito: result_vc_bb.successfulProfesor_vc_bb > 0,
     });
   } catch (error_vc_bb) {
     console.error("❌ Error general al subir disponibilidades:", error_vc_bb);

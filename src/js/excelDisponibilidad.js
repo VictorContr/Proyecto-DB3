@@ -35,8 +35,8 @@ export class ExcelDisponibilidadHandler_vc_bb {
     }
 
     const confirm_vc_bb = await modal_vc_bb.showConfirm_vc_bb(
-      "Subir Disponibilidades",
-      "Se procesará un archivo Excel con DOS hojas: 'DisponibilidadProfesor' (columnas: Día, Bloque, Usuario Profesor) y 'DisponibilidadEspacio' (columnas: Día, Bloque, Nombre Espacio). ¿Deseas continuar?"
+      "Subir Disponibilidad de Profesores",
+      "Se procesará un archivo Excel con la hoja 'DisponibilidadProfesor' (columnas: Día, Bloque, Usuario Profesor). ¿Deseas continuar?"
     );
     if (!confirm_vc_bb) return false;
 
@@ -81,8 +81,8 @@ export class ExcelDisponibilidadHandler_vc_bb {
 
   async downloadExcel_vc_bb() {
     const confirm_vc_bb = await modal_vc_bb.showConfirm_vc_bb(
-      "Descargar Disponibilidades",
-      "Se descargará un Excel con dos hojas: 'DisponibilidadProfesor' y 'DisponibilidadEspacio'."
+      "Descargar Disponibilidad de Profesores",
+      "Se descargará un Excel con la hoja 'DisponibilidadProfesor'."
     );
     if (!confirm_vc_bb) return false;
 

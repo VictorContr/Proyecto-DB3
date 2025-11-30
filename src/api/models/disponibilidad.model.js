@@ -31,18 +31,6 @@ export class DisponibilidadModel_vc_bb {
     return await db_vc_bb.all_vc_bb(sql_vc_bb);
   }
 
-  async obtenerDisponibilidadEspacio_vc_bb() {
-    const sql_vc_bb = `
-      SELECT de.ID_DisponibilidadEspacio_bb_vc, d.dia_bb_vc, b.hora_bloque_bb_vc, e.nombre_bb_vc as espacio_bb_vc
-      FROM td_DisponibilidadEspacio_bb_vc de
-      JOIN td_Dia_bb_vc d ON de.ID_dia_DispEspacio_bb_vc = d.ID_dia_bb_vc
-      JOIN td_Bloque_bb_vc b ON de.ID_bloque_DispEspacio_bb_vc = b.ID_bloque_bb_vc
-      JOIN td_Espacios_bb_vc e ON de.ID_espacio_DispEspacio_bb_vc = e.ID_espacio_bb_vc
-      ORDER BY d.ID_dia_bb_vc, b.ID_bloque_bb_vc, e.nombre_bb_vc
-    `;
-    return await db_vc_bb.all_vc_bb(sql_vc_bb);
-  }
-
   async crearDisponibilidadProfesor_vc_bb({ ID_dia_vc_bb, ID_bloque_vc_bb, ID_profesor_vc_bb }) {
     if (!ID_dia_vc_bb || !ID_bloque_vc_bb || !ID_profesor_vc_bb) {
       throw new Error('Día, bloque y profesor son requeridos');
@@ -52,18 +40,6 @@ export class DisponibilidadModel_vc_bb {
       VALUES (?, ?, ?)
     `;
     const result_vc_bb = await db_vc_bb.run_vc_bb(sql_vc_bb, [ID_dia_vc_bb, ID_bloque_vc_bb, ID_profesor_vc_bb]);
-    return result_vc_bb.lastID;
-  }
-
-  async crearDisponibilidadEspacio_vc_bb({ ID_dia_vc_bb, ID_bloque_vc_bb, ID_espacio_vc_bb }) {
-    if (!ID_dia_vc_bb || !ID_bloque_vc_bb || !ID_espacio_vc_bb) {
-      throw new Error('Día, bloque y espacio son requeridos');
-    }
-    const sql_vc_bb = `
-      INSERT INTO td_DisponibilidadEspacio_bb_vc (ID_dia_DispEspacio_bb_vc, ID_bloque_DispEspacio_bb_vc, ID_espacio_DispEspacio_bb_vc)
-      VALUES (?, ?, ?)
-    `;
-    const result_vc_bb = await db_vc_bb.run_vc_bb(sql_vc_bb, [ID_dia_vc_bb, ID_bloque_vc_bb, ID_espacio_vc_bb]);
     return result_vc_bb.lastID;
   }
 
@@ -80,27 +56,8 @@ export class DisponibilidadModel_vc_bb {
     return result_vc_bb.changes;
   }
 
-  async actualizarDisponibilidadEspacio_vc_bb(id_vc_bb, { ID_dia_vc_bb, ID_bloque_vc_bb, ID_espacio_vc_bb }) {
-    if (!ID_dia_vc_bb || !ID_bloque_vc_bb || !ID_espacio_vc_bb) {
-      throw new Error('Día, bloque y espacio son requeridos');
-    }
-    const sql_vc_bb = `
-      UPDATE td_DisponibilidadEspacio_bb_vc
-      SET ID_dia_DispEspacio_bb_vc = ?, ID_bloque_DispEspacio_bb_vc = ?, ID_espacio_DispEspacio_bb_vc = ?
-      WHERE ID_DisponibilidadEspacio_bb_vc = ?
-    `;
-    const result_vc_bb = await db_vc_bb.run_vc_bb(sql_vc_bb, [ID_dia_vc_bb, ID_bloque_vc_bb, ID_espacio_vc_bb, id_vc_bb]);
-    return result_vc_bb.changes;
-  }
-
   async eliminarDisponibilidadProfesor_vc_bb(id_vc_bb) {
     const sql_vc_bb = `DELETE FROM td_DisponibilidadProfesor_bb_vc WHERE ID_DisponibilidadProfesor_bb_vc = ?`;
-    const result_vc_bb = await db_vc_bb.run_vc_bb(sql_vc_bb, [id_vc_bb]);
-    return result_vc_bb.changes;
-  }
-
-  async eliminarDisponibilidadEspacio_vc_bb(id_vc_bb) {
-    const sql_vc_bb = `DELETE FROM td_DisponibilidadEspacio_bb_vc WHERE ID_DisponibilidadEspacio_bb_vc = ?`;
     const result_vc_bb = await db_vc_bb.run_vc_bb(sql_vc_bb, [id_vc_bb]);
     return result_vc_bb.changes;
   }

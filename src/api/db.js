@@ -190,17 +190,7 @@ class Database_vc_bb {
             FOREIGN KEY (ID_profesor_DispProfesor_bb_vc) REFERENCES td_Profesores_bb_vc(ID_profesor_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
             UNIQUE (ID_dia_DispProfesor_bb_vc, ID_bloque_DispProfesor_bb_vc, ID_profesor_DispProfesor_bb_vc)
           );
-
-          CREATE TABLE IF NOT EXISTS td_DisponibilidadEspacio_bb_vc (
-            ID_DisponibilidadEspacio_bb_vc INTEGER PRIMARY KEY AUTOINCREMENT,
-            ID_dia_DispEspacio_bb_vc INTEGER NOT NULL,
-            ID_bloque_DispEspacio_bb_vc INTEGER NOT NULL,
-            ID_espacio_DispEspacio_bb_vc INTEGER NOT NULL,
-            FOREIGN KEY (ID_dia_DispEspacio_bb_vc) REFERENCES td_Dia_bb_vc(ID_dia_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
-            FOREIGN KEY (ID_bloque_DispEspacio_bb_vc) REFERENCES td_Bloque_bb_vc(ID_bloque_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
-            FOREIGN KEY (ID_espacio_DispEspacio_bb_vc) REFERENCES td_Espacios_bb_vc(ID_espacio_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
-            UNIQUE (ID_dia_DispEspacio_bb_vc, ID_bloque_DispEspacio_bb_vc, ID_espacio_DispEspacio_bb_vc)
-          );
+          DROP TABLE IF EXISTS td_DisponibilidadEspacio_bb_vc;
 
           -- Tabla de ocupación (derivada de horarios)
           CREATE TABLE IF NOT EXISTS td_OcupacionEspacio_bb_vc (
@@ -433,26 +423,7 @@ class Database_vc_bb {
             DELETE FROM td_Horario_bb_vc;
           END;
 
-          -- =====================================================
-          -- Disponibilidad de Espacios
-          -- =====================================================
-          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_disp_espacio_insert
-          AFTER INSERT ON td_DisponibilidadEspacio_bb_vc
-          BEGIN
-            DELETE FROM td_Horario_bb_vc;
-          END;
-
-          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_disp_espacio_update
-          AFTER UPDATE ON td_DisponibilidadEspacio_bb_vc
-          BEGIN
-            DELETE FROM td_Horario_bb_vc;
-          END;
-
-          CREATE TRIGGER IF NOT EXISTS trg_reset_horarios_disp_espacio_delete
-          AFTER DELETE ON td_DisponibilidadEspacio_bb_vc
-          BEGIN
-            DELETE FROM td_Horario_bb_vc;
-          END;
+          -- (Eliminadas triggers de disponibilidad de espacios debido a remoción de la tabla)
 
       --  Al borrar horarios, vaciar ocupación de espacios
           CREATE TRIGGER IF NOT EXISTS trg_reset_ocup_espacio_horarios_delete
