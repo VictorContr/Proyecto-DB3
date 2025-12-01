@@ -76,7 +76,22 @@ export async function generarHorarios_vc_bb() {
 
 export async function mostrarHorarioProfesor_vc_bb() {
   const contenedor = document.getElementById("horarioProfesor");
-  const idProfesor = sessionStorage.getItem("idProfesor");
+  let idProfesor = sessionStorage.getItem("idProfesor");
+  if (!idProfesor) {
+    try {
+      const rawUserId = sessionStorage.getItem("selectedUserId_vc_bb");
+      const idUsuario = rawUserId ? JSON.parse(rawUserId) : null;
+      if (idUsuario) {
+        const respMap = await ApiGuide_vc_bb.json("GET", `/api/horarios/profesor-por-usuario/${idUsuario}`);
+        if (respMap.ok && respMap.data && respMap.data.ID_profesor) {
+          idProfesor = String(respMap.data.ID_profesor);
+          sessionStorage.setItem("idProfesor", idProfesor);
+        }
+      }
+    } catch (_) {
+      // ignorar error y continuar
+    }
+  }
 
   if (!idProfesor || !contenedor) return;
 
