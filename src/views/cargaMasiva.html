@@ -42,13 +42,30 @@
     </div>
 
     <div class="space-y-6">
+      <section class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md">
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Guía de Cargas Masivas</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Antes de subir, descarga el reporte para ver la estructura; luego desbloquea con el candado, selecciona el archivo y finalmente súbelo.</p>
+          </div>
+        </div>
+        <div class="mt-3 text-sm text-gray-700 dark:text-gray-300">
+          <p class="mb-2">Orden recomendado: Secciones/Clases → Espacios → Asignaturas → Profesores → Disponibilidades.</p>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>Descarga el reporte para ver la estructura y columnas esperadas.</li>
+            <li>Desbloquea la tarjeta con el candado (verifica/limpia si aplica).</li>
+            <li>Selecciona el archivo .xlsx con el botón correspondiente.</li>
+            <li>Pulsa "Subir Archivo" para cargar los datos.</li>
+          </ul>
+        </div>
+      </section>
       <section class="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-md" data-step="0">
         <div class="flex justify-between items-start">
           <div>
             <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Secciones/Clases</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta la lista de Secciones usando un archivo Excel.</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta Secciones/Clases. Descarga primero el reporte para ver columnas esperadas y sube un .xlsx sin fórmulas.</p>
           </div>
-          <button class="lock-btn text-gray-600 dark:text-gray-300"><i class="fas fa-lock"></i></button>
+          <button class="lock-btn p-2 rounded-full bg-colegio-blue hover:bg-colegio-darkblue text-white shadow-md"><i class="fas fa-lock text-xl"></i></button>
         </div>
         <form id="formUploadSecciones" class="space-y-3 mt-4">
           <label for="archivoExcelSecciones" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
@@ -72,9 +89,9 @@
         <div class="flex justify-between items-start">
           <div>
             <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Espacios</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta la lista de Espacios usando un archivo Excel.</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta Espacios físicos. Trabaja con la plantilla descargada y usa .xlsx con encabezados simples.</p>
           </div>
-          <button class="lock-btn text-gray-600 dark:text-gray-300"><i class="fas fa-lock"></i></button>
+          <button class="lock-btn p-2 rounded-full bg-colegio-blue hover:bg-colegio-darkblue text-white shadow-md"><i class="fas fa-lock text-xl"></i></button>
         </div>
         <form id="formUploadEspacios" class="space-y-3 mt-4">
           <label for="archivoExcelEspacios" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
@@ -98,9 +115,9 @@
         <div class="flex justify-between items-start">
           <div>
             <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Asignaturas</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta la lista de Asignaturas usando un archivo Excel.</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta Asignaturas según la plantilla. Valida que los nombres de grados y espacios coincidan con los cargados previamente.</p>
           </div>
-          <button class="lock-btn text-gray-600 dark:text-gray-300"><i class="fas fa-lock"></i></button>
+          <button class="lock-btn p-2 rounded-full bg-colegio-blue hover:bg-colegio-darkblue text-white shadow-md"><i class="fas fa-lock text-xl"></i></button>
         </div>
         <form id="formUploadAsignaturas" class="space-y-3 mt-4">
           <label for="archivoExcelAsignaturas" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
@@ -124,9 +141,9 @@
         <div class="flex justify-between items-start">
           <div>
             <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Profesores</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta la lista de profesores usando un archivo Excel.</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta Profesores. Usa la plantilla para evitar errores y mantén identificadores y asignaturas consistentes.</p>
           </div>
-          <button class="lock-btn text-gray-600 dark:text-gray-300"><i class="fas fa-lock"></i></button>
+          <button class="lock-btn p-2 rounded-full bg-colegio-blue hover:bg-colegio-darkblue text-white shadow-md"><i class="fas fa-lock text-xl"></i></button>
         </div>
         <form id="formUploadProfesores" class="space-y-3 mt-4">
           <label for="archivoExcelProfesores" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>
@@ -150,9 +167,9 @@
         <div class="flex justify-between items-start">
           <div>
             <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Disponibilidades</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta disponibilidades de profesores y espacios usando un archivo Excel con dos hojas.</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta disponibilidades de profesores. Sigue la estructura de hojas indicada en la plantilla.</p>
           </div>
-          <button class="lock-btn text-gray-600 dark:text-gray-300"><i class="fas fa-lock"></i></button>
+          <button class="lock-btn p-2 rounded-full bg-colegio-blue hover:bg-colegio-darkblue text-white shadow-md"><i class="fas fa-lock text-xl"></i></button>
         </div>
         <form id="formUploadDisponibilidad" class="space-y-3 mt-4">
           <label for="archivoExcelDisponibilidad" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subir archivo (.xlsx)</label>

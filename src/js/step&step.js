@@ -18,7 +18,10 @@ export class StepAndStep_vc_bb {
     this.sections_vc_bb.forEach((s_vc_bb, i_vc_bb) => { s_vc_bb.classList.toggle('hidden', i_vc_bb !== this.current_vc_bb); });
     const pct_vc_bb = Math.round(((this.current_vc_bb + 1) / this.sections_vc_bb.length) * 100);
     if (this.progressEl_vc_bb) this.progressEl_vc_bb.style.width = pct_vc_bb + '%';
-    if (this.labelEl_vc_bb) this.labelEl_vc_bb.textContent = (this.current_vc_bb + 1) + ' / ' + this.sections_vc_bb.length;
+    if (this.labelEl_vc_bb) {
+      const title_vc_bb = this.getStepTitle_vc_bb(this.current_vc_bb);
+      this.labelEl_vc_bb.textContent = 'Paso ' + (this.current_vc_bb + 1) + ': ' + title_vc_bb + ' (' + (this.current_vc_bb + 1) + ' / ' + this.sections_vc_bb.length + ')';
+    }
     const lockIcon_vc_bb = this.sections_vc_bb[this.current_vc_bb].querySelector('.lock-btn i');
     const locked_vc_bb = lockIcon_vc_bb ? lockIcon_vc_bb.classList.contains('fa-lock') : false;
     this.sections_vc_bb[this.current_vc_bb].querySelectorAll('input,select,textarea,button:not(.lock-btn):not([id^="btnDownloadReporte"])').forEach(el_vc_bb => { el_vc_bb.disabled = locked_vc_bb; });
@@ -88,6 +91,16 @@ export class StepAndStep_vc_bb {
     if (i_vc_bb === 3) return 'profesores';
     if (i_vc_bb === 4) return 'disponibilidades';
     return null;
+  }
+
+  getStepTitle_vc_bb(i_vc_bb) {
+    const t_vc_bb = this.mapTipoPorStep_vc_bb(i_vc_bb);
+    if (t_vc_bb === 'secciones') return 'Secciones/Clases';
+    if (t_vc_bb === 'espacios') return 'Espacios';
+    if (t_vc_bb === 'asignaturas') return 'Asignaturas';
+    if (t_vc_bb === 'profesores') return 'Profesores';
+    if (t_vc_bb === 'disponibilidades') return 'Disponibilidades';
+    return '';
   }
 
   getCurrentUserId_vc_bb() {
