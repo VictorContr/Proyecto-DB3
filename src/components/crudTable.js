@@ -697,7 +697,7 @@ class CrudTable_vc_bb extends HTMLElement {
     };
   }
 
-  openEditModal_vc_bb(row_vc_bb) {
+  async openEditModal_vc_bb(row_vc_bb) {
     const modalInstance = this.modalCrud_vc_bb;
     const modalTitleText = `Editar ${this.table_vc_bb}`;
 
@@ -846,6 +846,18 @@ class CrudTable_vc_bb extends HTMLElement {
       return;
     }
 
+
+    if (this.table_vc_bb === 'usuarios') {
+      try {
+        const resolvedId_vc_bb = row_vc_bb._pk_vc_bb || this.findIdValue_vc_bb(row_vc_bb);
+        if (resolvedId_vc_bb != null) {
+          const r_vc_bb = await ApiGuide_vc_bb.json('GET', `/api/usuarios/${resolvedId_vc_bb}`);
+          if (r_vc_bb.ok && r_vc_bb.data) {
+            Object.assign(row_vc_bb, r_vc_bb.data);
+          }
+        }
+      } catch (_) {}
+    }
 
     const pkNames2_vc_bb = [
       'ID_usuario_bb_vc','ID_espacio_bb_vc','ID_asignatura_bb_vc','ID_grado_bb_vc','ID_seccion_bb_vc','ID_DisponibilidadProfesor_bb_vc','ID_DisponibilidadEspacio_bb_vc','ID_clase_bb_vc','ID_gradoAsignatura_bb_vc'

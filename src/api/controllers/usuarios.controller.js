@@ -258,12 +258,14 @@ class UsuarioController_vc_bb {
 const controlador_vc_bb = UsuarioController_vc_bb.obtenerInstancia_vc_bb();
 
 export const getAllUsuarios_vc_bb = (req_vc_bb, res_vc_bb) => controlador_vc_bb.obtenerTodos_vc_bb(req_vc_bb, res_vc_bb);
+export const getUsuarioById_vc_bb = (req_vc_bb, res_vc_bb) => controlador_vc_bb.obtenerPorId_vc_bb(req_vc_bb, res_vc_bb);
 export const createUsuario_vc_bb = (req_vc_bb, res_vc_bb) => controlador_vc_bb.crear_vc_bb(req_vc_bb, res_vc_bb);
 export const updateUsuario_vc_bb = (req_vc_bb, res_vc_bb) => controlador_vc_bb.actualizar_vc_bb(req_vc_bb, res_vc_bb);
 export const deleteUsuario_vc_bb = (req_vc_bb, res_vc_bb) => controlador_vc_bb.eliminar_vc_bb(req_vc_bb, res_vc_bb);
 
 export default {
   getAllUsuarios_vc_bb,
+  getUsuarioById_vc_bb,
   createUsuario_vc_bb,
   updateUsuario_vc_bb,
   deleteUsuario_vc_bb
