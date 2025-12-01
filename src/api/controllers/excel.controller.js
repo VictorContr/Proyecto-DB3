@@ -12,7 +12,6 @@ export const descargarProfesoresExcel_vc_bb = async (req, res) => {
     sheetName_vc_bb: "Profesores",
     filePrefix_vc_bb: "profesores",
     headers_vc_bb: [
-      { title_vc_bb: "ID", key_vc_bb: "ID_profesor_bb_vc" },
       { title_vc_bb: "Nombre", key_vc_bb: "nombre_bb_vc" },
       { title_vc_bb: "Apellido", key_vc_bb: "apellido_bb_vc" },
       { title_vc_bb: "Correo", key_vc_bb: "correo_bb_vc" },
@@ -266,7 +265,6 @@ export const descargarEspaciosExcel_vc_bb = async (req, res) => {
     sheetName_vc_bb: "Espacios",
     filePrefix_vc_bb: "espacios",
     headers_vc_bb: [
-      { title_vc_bb: "ID", key_vc_bb: "ID_espacio_bb_vc" },
       { title_vc_bb: "Nombre", key_vc_bb: "nombre_bb_vc" },
       { title_vc_bb: "Capacidad", key_vc_bb: "capacidad_bb_vc" },
       { title_vc_bb: "Tipo", key_vc_bb: "tipo_bb_vc" },
@@ -352,7 +350,6 @@ export const descargarGradosExcel_vc_bb = async (req, res) => {
     sheetName_vc_bb: "Grados",
     filePrefix_vc_bb: "grados",
     headers_vc_bb: [
-      { title_vc_bb: "ID Grado", key_vc_bb: "ID_grado_bb_vc" },
       { title_vc_bb: "Grado", key_vc_bb: "nro_grado_bb_vc" },
     ],
     fetchRows_vc_bb: async () => {
@@ -419,7 +416,6 @@ export const descargarSeccionesExcel_vc_bb = async (req, res) => {
     sheetName_vc_bb: "Secciones",
     filePrefix_vc_bb: "secciones",
     headers_vc_bb: [
-      { title_vc_bb: "ID Sección", key_vc_bb: "ID_seccion_bb_vc" },
       { title_vc_bb: "Sección", key_vc_bb: "letra_seccion_bb_vc" },
     ],
     fetchRows_vc_bb: async () => {
@@ -485,7 +481,6 @@ export const descargarAsignaturasGradosExcel_vc_bb = async (req, res) => {
     sheetName_vc_bb: "Asignaturas",
     filePrefix_vc_bb: "asignaturas_grados",
     headers_vc_bb: [
-      { title_vc_bb: "ID Asignatura", key_vc_bb: "ID_asignatura_bb_vc" },
       { title_vc_bb: "Asignatura", key_vc_bb: "nombre_bb_vc" },
       { title_vc_bb: "Horas Semanales", key_vc_bb: "horas_academicas_bb_vc" },
       { title_vc_bb: "Descripción", key_vc_bb: "descripcion_bb_vc" },
@@ -703,25 +698,21 @@ export const descargarGradosSeccionesExcel_vc_bb = async (req, res) => {
     // Hoja: Grados
     const wsGrados_vc_bb = wb_vc_bb.addWorksheet("Grados");
     const grados_vc_bb = await db_vc_bb.all_vc_bb(
-      `SELECT ID_grado_bb_vc, nro_grado_bb_vc FROM td_Grados_bb_vc ORDER BY nro_grado_bb_vc`
+      `SELECT nro_grado_bb_vc FROM td_Grados_bb_vc ORDER BY nro_grado_bb_vc`
     );
-    wsGrados_vc_bb.cell(1, 1).string("ID Grado");
-    wsGrados_vc_bb.cell(1, 2).string("Grado");
+    wsGrados_vc_bb.cell(1, 1).string("Grado");
     grados_vc_bb.forEach((g_vc_bb, i_vc_bb) => {
-      wsGrados_vc_bb.cell(i_vc_bb + 2, 1).number(Number(g_vc_bb.ID_grado_bb_vc));
-      wsGrados_vc_bb.cell(i_vc_bb + 2, 2).number(Number(g_vc_bb.nro_grado_bb_vc));
+      wsGrados_vc_bb.cell(i_vc_bb + 2, 1).number(Number(g_vc_bb.nro_grado_bb_vc));
     });
 
     // Hoja: Secciones
     const wsSecciones_vc_bb = wb_vc_bb.addWorksheet("Secciones");
     const secciones_vc_bb = await db_vc_bb.all_vc_bb(
-      `SELECT ID_seccion_bb_vc, letra_seccion_bb_vc FROM td_Secciones_bb_vc ORDER BY letra_seccion_bb_vc`
+      `SELECT letra_seccion_bb_vc FROM td_Secciones_bb_vc ORDER BY letra_seccion_bb_vc`
     );
-    wsSecciones_vc_bb.cell(1, 1).string("ID Sección");
-    wsSecciones_vc_bb.cell(1, 2).string("Sección");
+    wsSecciones_vc_bb.cell(1, 1).string("Sección");
     secciones_vc_bb.forEach((s_vc_bb, i_vc_bb) => {
-      wsSecciones_vc_bb.cell(i_vc_bb + 2, 1).number(Number(s_vc_bb.ID_seccion_bb_vc));
-      wsSecciones_vc_bb.cell(i_vc_bb + 2, 2).string(String(s_vc_bb.letra_seccion_bb_vc));
+      wsSecciones_vc_bb.cell(i_vc_bb + 2, 1).string(String(s_vc_bb.letra_seccion_bb_vc));
     });
 
     const tempDir_vc_bb = path_vc_bb.resolve("temp");
@@ -834,7 +825,6 @@ export const descargarDisponibilidadesExcel_vc_bb = async (req, res) => {
 
     // Encabezados para ambas hojas
     const headersProf_vc_bb = [
-      { title_vc_bb: "ID", key_vc_bb: "ID_DisponibilidadProfesor_bb_vc" },
       { title_vc_bb: "Día", key_vc_bb: "dia_bb_vc" },
       { title_vc_bb: "Bloque", key_vc_bb: "hora_bloque_bb_vc" },
       { title_vc_bb: "Usuario Profesor", key_vc_bb: "userName_bb_vc" },
