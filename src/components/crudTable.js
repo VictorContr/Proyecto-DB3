@@ -1069,6 +1069,7 @@ class CrudTable_vc_bb extends HTMLElement {
       'apellido_bb_vc': 'Apellido',
       'correo_bb_vc': 'Correo',
       'telefono_bb_vc': 'Teléfono',
+      'cedula_bb_vc': 'Cédula',
       'rol_bb_vc': 'Rol',
       'password_bb_vc': 'Clave',
       'ID_usuario_bb_vc': 'ID',

@@ -16,6 +16,7 @@ export const descargarProfesoresExcel_vc_bb = async (req, res) => {
       { title_vc_bb: "Apellido", key_vc_bb: "apellido_bb_vc" },
       { title_vc_bb: "Correo", key_vc_bb: "correo_bb_vc" },
       { title_vc_bb: "Teléfono", key_vc_bb: "telefono_bb_vc" },
+      { title_vc_bb: "Cédula", key_vc_bb: "cedula_bb_vc" },
       { title_vc_bb: "Asignaturas", key_vc_bb: "asignaturas" },
     ],
     fetchRows_vc_bb: async () => {
@@ -26,13 +27,14 @@ export const descargarProfesoresExcel_vc_bb = async (req, res) => {
           u.apellido_bb_vc,
           u.correo_bb_vc,
           u.telefono_bb_vc,
+          u.cedula_bb_vc,
           COALESCE(GROUP_CONCAT(a.nombre_bb_vc, ' | '), '') AS asignaturas
         FROM td_Profesores_bb_vc p
         JOIN td_UsuarioRol_bb_vc ur ON p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc
         JOIN td_Usuarios_bb_vc u ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc
         LEFT JOIN td_ProfesorAsignaturas_bb_vc pa ON pa.ID_profesor_profAsig_bb_vc = p.ID_profesor_bb_vc
         LEFT JOIN td_Asignaturas_bb_vc a ON pa.ID_asignatura_profAsig_bb_vc = a.ID_asignatura_bb_vc
-        GROUP BY p.ID_profesor_bb_vc, u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc
+        GROUP BY p.ID_profesor_bb_vc, u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc, u.cedula_bb_vc
       `);
       return profesores_vc_bb;
     },
@@ -82,6 +84,7 @@ export const subirProfesoresExcel_vc_bb = async (req, res) => {
         { key_vc_bb: "apellido_bb_vc", required_vc_bb: true, title_vc_bb: "Apellido" },
         { key_vc_bb: "correo_bb_vc", required_vc_bb: true, title_vc_bb: "Correo" },
         { key_vc_bb: "telefono_bb_vc", required_vc_bb: false, title_vc_bb: "Teléfono" },
+        { key_vc_bb: "cedula_bb_vc", required_vc_bb: false, title_vc_bb: "Cédula" },
         // Nueva columna opcional para asignaturas del profesor (separadas por coma, punto y coma o |)
         { key_vc_bb: "asignaturas", required_vc_bb: false, title_vc_bb: "Asignaturas" },
       ],
@@ -90,6 +93,7 @@ export const subirProfesoresExcel_vc_bb = async (req, res) => {
         const apellido_vc_bb = rowMap_vc_bb.apellido_bb_vc;
         const correo_vc_bb = rowMap_vc_bb.correo_bb_vc;
         const telefono_vc_bb = rowMap_vc_bb.telefono_bb_vc;
+        const cedula_vc_bb = rowMap_vc_bb.cedula_bb_vc;
         const asignaturasRaw_vc_bb = rowMap_vc_bb.asignaturas;
 
         // Dedupe por correo
@@ -107,14 +111,15 @@ export const subirProfesoresExcel_vc_bb = async (req, res) => {
         const userInsert_vc_bb = await db_vc_bb.run_vc_bb(
           `
           INSERT INTO td_Usuarios_bb_vc (
-            nombre_bb_vc, apellido_bb_vc, correo_bb_vc, telefono_bb_vc, userName_bb_vc, password_bb_vc
-          ) VALUES (?, ?, ?, ?, ?, ?)
+            nombre_bb_vc, apellido_bb_vc, correo_bb_vc, telefono_bb_vc, cedula_bb_vc, userName_bb_vc, password_bb_vc
+          ) VALUES (?, ?, ?, ?, ?, ?, ?)
         `,
           [
             nombre_vc_bb.toString().trim(),
             apellido_vc_bb.toString().trim(),
             correo_vc_bb.toString().trim(),
             (telefono_vc_bb ?? "").toString().trim(),
+            (cedula_vc_bb ?? "").toString().trim(),
             userNameGenerado_vc_bb,
             passwordDefault_vc_bb,
           ]
@@ -911,6 +916,56 @@ export const subirDisponibilidadesExcel_vc_bb = async (req, res) => {
 
     const workbook_vc_bb = await XlsxPopulate_vc_bb.fromFileAsync(filePath_vc_bb);
 
+    const normalizarHoraBloque_vc_bb = (raw_vc_bb) => {
+      if (raw_vc_bb == null) return null;
+      let s_vc_bb = String(raw_vc_bb).trim().toLowerCase();
+      if (!s_vc_bb) return null;
+      s_vc_bb = s_vc_bb.replace(/\s+/g, '');
+      // Si viene como '7:00am', '7am', '07am', '13:00', '13', etc.
+      const m1 = s_vc_bb.match(/^([0-9]{1,2})(?::([0-9]{2}))?(am|pm)?$/);
+      if (m1) {
+        const hh = parseInt(m1[1], 10);
+        const mm = m1[2] ? m1[2] : '00';
+        const suf = m1[3] || null;
+        if (Number.isNaN(hh)) return null;
+        // Si trae sufijo am/pm, normalizar directamente
+        if (suf === 'am' || suf === 'pm') {
+          let hr = hh;
+          if (hr < 1 || hr > 12) return null;
+          return `${hr}:00 ${suf}`;
+        }
+        // Si es hora 24h, mapear al formato almacenado
+        if (hh >= 0 && hh <= 23) {
+          if (hh >= 7 && hh <= 11) return `${hh}:00 am`;
+          if (hh === 12) return `12:00 pm`;
+          if (hh >= 13 && hh <= 16) return `${hh - 12}:00 pm`;
+          return null;
+        }
+        // Si es un número sin sufijo y fuera de 24h, tratar como índice de bloque (1..N)
+        return String(hh);
+      }
+      return null;
+    };
+
+    const resolverBloqueId_vc_bb = async (raw_vc_bb) => {
+      const norm_vc_bb = normalizarHoraBloque_vc_bb(raw_vc_bb);
+      if (!norm_vc_bb) return null;
+      // Si es un número simple, interpretarlo como índice de bloque (orden por hora)
+      if (/^[0-9]+$/.test(norm_vc_bb)) {
+        const idx = parseInt(norm_vc_bb, 10);
+        if (Number.isNaN(idx) || idx < 1) return null;
+        const rows = await db_vc_bb.all_vc_bb(`SELECT ID_bloque_bb_vc FROM td_Bloque_bb_vc ORDER BY ID_bloque_bb_vc ASC`);
+        if (idx > rows.length) return null;
+        return rows[idx - 1]?.ID_bloque_bb_vc || null;
+      }
+      // Buscar por texto normalizado '7:00 am', '1:00 pm', etc.
+      const row = await db_vc_bb.get_vc_bb(
+        `SELECT ID_bloque_bb_vc FROM td_Bloque_bb_vc WHERE LOWER(hora_bloque_bb_vc) = LOWER(?)`,
+        [norm_vc_bb]
+      );
+      return row ? row.ID_bloque_bb_vc : null;
+    };
+
     // Hoja: DisponibilidadProfesor
     const sheetProf_vc_bb = workbook_vc_bb.sheet("DisponibilidadProfesor");
     if (!sheetProf_vc_bb) throw new Error("No se encontró hoja 'DisponibilidadProfesor'");
@@ -936,11 +991,8 @@ export const subirDisponibilidadesExcel_vc_bb = async (req, res) => {
           );
           if (!dia_vc_bb) throw new Error(`Día inválido: '${diaRaw_vc_bb}'`);
 
-          const bloque_vc_bb = await db_vc_bb.get_vc_bb(
-            `SELECT ID_bloque_bb_vc FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = ?`,
-            [bloqueRaw_vc_bb]
-          );
-          if (!bloque_vc_bb) throw new Error(`Bloque inválido: '${bloqueRaw_vc_bb}'`);
+          const bloqueId_vc_bb = await resolverBloqueId_vc_bb(bloqueRaw_vc_bb);
+          if (!bloqueId_vc_bb) throw new Error(`Bloque inválido: '${bloqueRaw_vc_bb}'`);
 
           const profesor_vc_bb = await db_vc_bb.get_vc_bb(
             `SELECT p.ID_profesor_bb_vc AS id_profesor
@@ -955,14 +1007,14 @@ export const subirDisponibilidadesExcel_vc_bb = async (req, res) => {
           const exists_vc_bb = await db_vc_bb.get_vc_bb(
             `SELECT ID_DisponibilidadProfesor_bb_vc FROM td_DisponibilidadProfesor_bb_vc 
              WHERE ID_dia_DispProfesor_bb_vc = ? AND ID_bloque_DispProfesor_bb_vc = ? AND ID_profesor_DispProfesor_bb_vc = ?`,
-            [dia_vc_bb.ID_dia_bb_vc, bloque_vc_bb.ID_bloque_bb_vc, profesor_vc_bb.id_profesor]
+            [dia_vc_bb.ID_dia_bb_vc, bloqueId_vc_bb, profesor_vc_bb.id_profesor]
           );
           if (exists_vc_bb) throw new Error("La disponibilidad de profesor ya existe (duplicada)");
 
           await db_vc_bb.run_vc_bb(
             `INSERT INTO td_DisponibilidadProfesor_bb_vc (ID_dia_DispProfesor_bb_vc, ID_bloque_DispProfesor_bb_vc, ID_profesor_DispProfesor_bb_vc)
              VALUES (?, ?, ?)`,
-            [dia_vc_bb.ID_dia_bb_vc, bloque_vc_bb.ID_bloque_bb_vc, profesor_vc_bb.id_profesor]
+            [dia_vc_bb.ID_dia_bb_vc, bloqueId_vc_bb, profesor_vc_bb.id_profesor]
           );
           result_vc_bb.successfulProfesor_vc_bb++;
         } catch (errRow_vc_bb) {

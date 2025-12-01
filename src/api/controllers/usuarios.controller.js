@@ -63,6 +63,7 @@ class UsuarioController_vc_bb {
         apellido_bb_vc = null,
         correo_bb_vc = null,
         telefono_bb_vc = null,
+        cedula_bb_vc = null,
         rol_bb_vc = null,
         password_bb_vc = null
       } = req_vc_bb.body;
@@ -89,6 +90,7 @@ class UsuarioController_vc_bb {
         apellido_bb_vc,
         correo_bb_vc,
         telefono_bb_vc,
+        cedula_bb_vc,
         password_bb_vc
       });
 
@@ -116,7 +118,7 @@ class UsuarioController_vc_bb {
       const datosActualizar_vc_bb = {};
       
       // Filtrar solo los campos que se envían
-      const camposPermitidos_vc_bb = ['userName_bb_vc', 'nombre_bb_vc', 'apellido_bb_vc', 'correo_bb_vc', 'telefono_bb_vc', 'password_bb_vc'];
+      const camposPermitidos_vc_bb = ['userName_bb_vc', 'nombre_bb_vc', 'apellido_bb_vc', 'correo_bb_vc', 'telefono_bb_vc', 'cedula_bb_vc', 'password_bb_vc'];
       // No actualizar password si se envía vacío
       if (typeof req_vc_bb.body.password_bb_vc === 'string' && req_vc_bb.body.password_bb_vc.trim() === '') {
         delete req_vc_bb.body.password_bb_vc;

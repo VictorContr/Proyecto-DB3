@@ -22,6 +22,8 @@ export class GeneradorHorarios_vc_bb {
 
     // Índice de disponibilidad real (dia|bloque|espacio) => true
     this._dispRealIndex_vc_bb = new Set();
+    this._globalStartTime_vc_bb = null;
+    this.timeLimitMs_vc_bb = 180000;
   }
 
   // Helper: intenta elegir la primera propiedad existente entre candidatos
@@ -62,6 +64,10 @@ export class GeneradorHorarios_vc_bb {
       this.gradosAsignaturas_vc_bb = gradosAsignaturas;
       this.secciones_vc_bb = secciones;
       this.clases_vc_bb = clases;
+
+      const tiposEspacio = await this.db_vc_bb.all_vc_bb("SELECT * FROM td_TipoEspacio_bb_vc");
+      this.tiposEspacio_vc_bb = tiposEspacio;
+      this._tipoEspacioPorId_vc_bb = new Map(this.tiposEspacio_vc_bb.map(t => [t.ID_TipoEspacio_bb_vc, t.tipo_bb_vc]));
 
       // Construir índice de disponibilidad real a partir de disponibilidadEsp
       this._dispRealIndex_vc_bb = new Set();
@@ -190,6 +196,7 @@ getSlotsDisponibles_vc_bb(profesorId, tipoEspacio, asignaturaId) {
     ? this.espacios_vc_bb.filter(e => e.ID_TipoEspacio_espacio_bb_vc === tipoEspacio)
     : this.espacios_vc_bb;
   if (espaciosCompatibles.length === 0) return candidatos;
+  const asignaturaObj = this.asignaturas_vc_bb.find(a => a.ID_asignatura_bb_vc === asignaturaId);
 
   // Grados asignados
   const gradosAsignatura = this.gradosAsignaturas_vc_bb.filter(
@@ -211,6 +218,7 @@ getSlotsDisponibles_vc_bb(profesorId, tipoEspacio, asignaturaId) {
     const [dia, bloque] = diaBloque.split("|");
 
     for (const espacio of espaciosCompatibles) {
+      if (!this._esEspacioCompatibleConAsignatura_vc_bb(espacio, asignaturaObj)) continue;
       const keyEsp = `${dia}|${bloque}|${espacio.ID_espacio_bb_vc}`;
       if (!this._dispRealIndex_vc_bb.has(keyEsp)) continue;
 
@@ -241,6 +249,24 @@ getSlotsDisponibles_vc_bb(profesorId, tipoEspacio, asignaturaId) {
   return candidatos;
 }
 
+  _esEspacioCompatibleConAsignatura_vc_bb(espacio, asignatura) {
+    if (!espacio || !asignatura) return false;
+    const tipoEspId = espacio.ID_TipoEspacio_espacio_bb_vc;
+    const tipoNombre = (this._tipoEspacioPorId_vc_bb.get(tipoEspId) || "").toLowerCase();
+    const requerido = asignatura.ID_TipoEspacio_requerido_bb_vc;
+    const nombreAsig = (asignatura.nombre_bb_vc || "").toLowerCase();
+    if (requerido) {
+      if (tipoEspId !== requerido) return false;
+    }
+    if (nombreAsig.includes("quim")) {
+      if (tipoNombre.includes("cancha") || tipoNombre.includes("gimnasio")) return false;
+    }
+    if (nombreAsig.includes("preemilitar") || nombreAsig.includes("educación física") || nombreAsig.includes("educacion fisica") || nombreAsig.includes("fisica")) {
+      if (tipoNombre.includes("laboratorio")) return false;
+    }
+    return true;
+  }
+
   buscarHorario_vc_bb() {
     this.ocupacionProf_vc_bb = {};
     this.ocupacionEsp_vc_bb = {};
@@ -261,6 +287,7 @@ getSlotsDisponibles_vc_bb(profesorId, tipoEspacio, asignaturaId) {
     });
 
     this._listaTrabajo_vc_bb = listaTrabajo;
+    this._globalStartTime_vc_bb = Date.now();
     this.buscarSoluciones_vc_bb(0);
 
     this.solucion_vc_bb = this.mejorSolucion_vc_bb;
@@ -269,8 +296,9 @@ getSlotsDisponibles_vc_bb(profesorId, tipoEspacio, asignaturaId) {
 
 // Método de búsqueda con límite de tiempo
 buscarSoluciones_vc_bb(idx) {
-  const timeLimit = 180000; // 3min
-  const startTime = Date.now();
+  if (this._globalStartTime_vc_bb && Date.now() - this._globalStartTime_vc_bb > this.timeLimitMs_vc_bb) {
+    return;
+  }
 
   const listaTrabajo = this._listaTrabajo_vc_bb || this.asignaturas_vc_bb;
 
@@ -286,19 +314,26 @@ buscarSoluciones_vc_bb(idx) {
   const asig = listaTrabajo[idx];
   let candidatos = this.dominios_vc_bb[asig.ID_asignatura_bb_vc] || [];
 
-  if (candidatos.length === 0) return this.buscarSoluciones_vc_bb(idx + 1);
+  if (candidatos.length === 0) {
+    this.buscarSoluciones_vc_bb(idx + 1);
+    return;
+  }
 
   candidatos.sort((a, b) => {
-    const cargaA = (this.ocupacionProf_vc_bb[a.profesor]?.[a.dia]?.length || 0) +
-      (this.ocupacionEsp_vc_bb[a.espacio]?.[a.dia]?.length || 0);
-    const cargaB = (this.ocupacionProf_vc_bb[b.profesor]?.[b.dia]?.length || 0) +
-      (this.ocupacionEsp_vc_bb[b.espacio]?.[b.dia]?.length || 0);
-    return cargaA - cargaB;
+    const cargaA = (this.ocupacionProf_vc_bb[a.profesor]?.[a.dia]?.size || 0) +
+      (this.ocupacionEsp_vc_bb[a.espacio]?.[a.dia]?.size || 0);
+    const cargaB = (this.ocupacionProf_vc_bb[b.profesor]?.[b.dia]?.size || 0) +
+      (this.ocupacionEsp_vc_bb[b.espacio]?.[b.dia]?.size || 0);
+    const diasUsadosA = new Set(this.solucion_vc_bb.filter(s => s.asignatura === a.asignatura && s.grado === a.grado && s.seccion === a.seccion).map(s => s.dia));
+    const diasUsadosB = new Set(this.solucion_vc_bb.filter(s => s.asignatura === b.asignatura && s.grado === b.grado && s.seccion === b.seccion).map(s => s.dia));
+    const prefA = diasUsadosA.has(a.dia) ? 1 : 0;
+    const prefB = diasUsadosB.has(b.dia) ? 1 : 0;
+    if (cargaA !== cargaB) return cargaA - cargaB;
+    return prefA - prefB;
   });
 
   for (const slot of candidatos) {
-    if (Date.now() - startTime > timeLimit) {
-      console.error("[ERROR] Tiempo límite excedido.");
+    if (this._globalStartTime_vc_bb && Date.now() - this._globalStartTime_vc_bb > this.timeLimitMs_vc_bb) {
       return;
     }
 
@@ -306,7 +341,10 @@ buscarSoluciones_vc_bb(idx) {
       this.solucion_vc_bb.push(slot);
       this._marcarOcupacion_vc_bb(slot);
 
-      this.buscarSoluciones_vc_bb(idx + 1);
+      const costoParcial = this.calcularCostoParcial_vc_bb(this.solucion_vc_bb);
+      if (costoParcial < this.mejorCosto_vc_bb) {
+        this.buscarSoluciones_vc_bb(idx + 1);
+      }
 
       this._desmarcarOcupacion_vc_bb(slot);
       this.solucion_vc_bb.pop();
@@ -401,9 +439,83 @@ calcularCosto_vc_bb(solucion) {
 
   for (const asig in diasPorAsignatura) {
     const dias = diasPorAsignatura[asig].size;
-    if (dias > 3) costo += (dias - 3) * 2; // penalización por demasiada dispersión
+    if (dias > 3) costo += (dias - 3) * 2;
   }
 
+  const cargaDiaProfesor = {};
+  const cargaDiaEspacio = {};
+  const cargaDiaGrupo = {};
+  const diasPorAsigGrupo = {};
+
+  for (const s of solucion) {
+    const kp = `${s.profesor}|${s.dia}`;
+    const ke = `${s.espacio}|${s.dia}`;
+    const kg = `${s.grado}|${s.seccion}|${s.dia}`;
+    const kag = `${s.asignatura}|${s.grado}|${s.seccion}`;
+    cargaDiaProfesor[kp] = (cargaDiaProfesor[kp] || 0) + 1;
+    cargaDiaEspacio[ke] = (cargaDiaEspacio[ke] || 0) + 1;
+    cargaDiaGrupo[kg] = (cargaDiaGrupo[kg] || 0) + 1;
+    if (!diasPorAsigGrupo[kag]) diasPorAsigGrupo[kag] = new Set();
+    diasPorAsigGrupo[kag].add(s.dia);
+  }
+
+  for (const k in cargaDiaProfesor) costo += Math.max(0, cargaDiaProfesor[k] - 3);
+  for (const k in cargaDiaEspacio) costo += Math.max(0, cargaDiaEspacio[k] - 3);
+  for (const k in cargaDiaGrupo) costo += Math.max(0, cargaDiaGrupo[k] - 4);
+
+  for (const kag in diasPorAsigGrupo) {
+    const dias = diasPorAsigGrupo[kag].size;
+    if (dias === 1) costo += 50;
+  }
+
+  return costo;
+}
+
+calcularCostoParcial_vc_bb(solucion) {
+  let costo = 0;
+  const horasPorProfesor = {};
+  for (const s of solucion) {
+    if (!horasPorProfesor[s.profesor]) horasPorProfesor[s.profesor] = {};
+    if (!horasPorProfesor[s.profesor][s.dia]) horasPorProfesor[s.profesor][s.dia] = [];
+    horasPorProfesor[s.profesor][s.dia].push(s.bloque);
+  }
+  for (const prof in horasPorProfesor) {
+    for (const dia in horasPorProfesor[prof]) {
+      const horas = horasPorProfesor[prof][dia].sort((a, b) => a - b);
+      let consecutivas = 1;
+      for (let i = 1; i < horas.length; i++) {
+        if (horas[i] === horas[i - 1] + 1) {
+          consecutivas++;
+          if (consecutivas > 3) costo += 2;
+        } else {
+          consecutivas = 1;
+        }
+        if (horas[i] - horas[i - 1] > 2) costo += 1;
+      }
+    }
+  }
+  const cargaDiaProfesor = {};
+  const cargaDiaEspacio = {};
+  const cargaDiaGrupo = {};
+  const diasPorAsigGrupo = {};
+  for (const s of solucion) {
+    const kp = `${s.profesor}|${s.dia}`;
+    const ke = `${s.espacio}|${s.dia}`;
+    const kg = `${s.grado}|${s.seccion}|${s.dia}`;
+    const kag = `${s.asignatura}|${s.grado}|${s.seccion}`;
+    cargaDiaProfesor[kp] = (cargaDiaProfesor[kp] || 0) + 1;
+    cargaDiaEspacio[ke] = (cargaDiaEspacio[ke] || 0) + 1;
+    cargaDiaGrupo[kg] = (cargaDiaGrupo[kg] || 0) + 1;
+    if (!diasPorAsigGrupo[kag]) diasPorAsigGrupo[kag] = new Set();
+    diasPorAsigGrupo[kag].add(s.dia);
+  }
+  for (const k in cargaDiaProfesor) costo += Math.max(0, cargaDiaProfesor[k] - 3);
+  for (const k in cargaDiaEspacio) costo += Math.max(0, cargaDiaEspacio[k] - 3);
+  for (const k in cargaDiaGrupo) costo += Math.max(0, cargaDiaGrupo[k] - 4);
+  for (const kag in diasPorAsigGrupo) {
+    const dias = diasPorAsigGrupo[kag].size;
+    if (dias === 1 && (Object.values(cargaDiaGrupo).some(v => v > 1))) costo += 10;
+  }
   return costo;
 }
 

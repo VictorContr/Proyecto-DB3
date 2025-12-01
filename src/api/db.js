@@ -56,6 +56,7 @@ class Database_vc_bb {
             userName_bb_vc VARCHAR(80) UNIQUE NOT NULL,
             correo_bb_vc TEXT NOT NULL,
             telefono_bb_vc TEXT NOT NULL,
+            cedula_bb_vc TEXT,
             password_bb_vc VARCHAR(250) NOT NULL
           );
 
@@ -557,6 +558,7 @@ WHERE o.ID_OcupacionEspacio_bb_vc IS NULL;
 
             // Migrar eliminación de columna 'turno' en Bloque si existe, aplicar unicidad y sembrar
             this.migrateRemoveBloqueTurno_vc_bb()
+              .then(() => this.migrateAddCedulaToUsuarios_vc_bb())
               .then(() => this.enforceUniqueness_vc_bb())
               .then(() => this.seedInitialData_vc_bb())
               .catch((err_vc_bb) => {
@@ -678,6 +680,20 @@ WHERE o.ID_OcupacionEspacio_bb_vc IS NULL;
         }
       } catch (err_vc_bb) {
         console.error("❌ Error migrando tabla Bloque para eliminar 'turno':", err_vc_bb.message);
+      }
+    }
+
+    async migrateAddCedulaToUsuarios_vc_bb() {
+      try {
+        const cols_vc_bb = await this.all_vc_bb(`PRAGMA table_info(td_Usuarios_bb_vc);`);
+        const hasCedula_vc_bb = cols_vc_bb.some((c_vc_bb) => c_vc_bb.name === 'cedula_bb_vc');
+        if (!hasCedula_vc_bb) {
+          console.log("[DB] Agregando columna 'cedula_bb_vc' a td_Usuarios_bb_vc...");
+          await this.run_vc_bb(`ALTER TABLE td_Usuarios_bb_vc ADD COLUMN cedula_bb_vc TEXT;`);
+          console.log("[DB] Columna 'cedula_bb_vc' agregada exitosamente.");
+        }
+      } catch (err_vc_bb) {
+        console.error("❌ Error migrando tabla Usuarios para agregar 'cedula_bb_vc':", err_vc_bb.message);
       }
     }
 

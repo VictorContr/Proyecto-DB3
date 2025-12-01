@@ -44,12 +44,12 @@ export class UsuarioModel_vc_bb {
     return await db_vc_bb.get_vc_bb(sql_vc_bb, [userName_vc_bb]);
   }
 
-  async crear_vc_bb({ nombre_bb_vc, apellido_bb_vc, userName_bb_vc, correo_bb_vc, telefono_bb_vc, password_bb_vc }) {
+  async crear_vc_bb({ nombre_bb_vc, apellido_bb_vc, userName_bb_vc, correo_bb_vc, telefono_bb_vc, cedula_bb_vc = null, password_bb_vc }) {
     const sql_vc_bb = `
-      INSERT INTO td_Usuarios_bb_vc (nombre_bb_vc, apellido_bb_vc, userName_bb_vc, correo_bb_vc, telefono_bb_vc, password_bb_vc)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO td_Usuarios_bb_vc (nombre_bb_vc, apellido_bb_vc, userName_bb_vc, correo_bb_vc, telefono_bb_vc, cedula_bb_vc, password_bb_vc)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
-    const result_vc_bb = await db_vc_bb.run_vc_bb(sql_vc_bb, [nombre_bb_vc, apellido_bb_vc, userName_bb_vc, correo_bb_vc, telefono_bb_vc, password_bb_vc]);
+    const result_vc_bb = await db_vc_bb.run_vc_bb(sql_vc_bb, [nombre_bb_vc, apellido_bb_vc, userName_bb_vc, correo_bb_vc, telefono_bb_vc, cedula_bb_vc, password_bb_vc]);
     return result_vc_bb.lastID;
   }
 
