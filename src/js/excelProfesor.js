@@ -30,7 +30,7 @@ export class ExcelHandler_vc_bb {
 
         const confirm_vc_bb = await modal_vc_bb.showConfirm_vc_bb(
             "Confirmar carga",
-            "¿Estás seguro de importar profesores y (opcional) sus asignaturas?\n\nFormato esperado de columnas: Nombre, Apellido, Correo, Teléfono, Cédula, Asignaturas.\n\nNota: 'Asignaturas' puede ir separada por coma, punto y coma o '|'."
+            "¿Estás seguro de importar profesores y (opcional) sus asignaturas?\n\nFormato esperado de columnas: Nombre, Apellido, Correo, Teléfono, Cédula, Asignaturas.\n\nImportante: no incluyas la columna 'Usuario'; el sistema la asigna automáticamente.\n\nNota: 'Asignaturas' puede ir separada por coma, punto y coma o '|'."
         );
 
         if (!confirm_vc_bb) return false;

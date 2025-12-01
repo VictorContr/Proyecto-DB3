@@ -16,6 +16,7 @@ export const descargarProfesoresExcel_vc_bb = async (req, res) => {
       { title_vc_bb: "Apellido", key_vc_bb: "apellido_bb_vc" },
       { title_vc_bb: "Correo", key_vc_bb: "correo_bb_vc" },
       { title_vc_bb: "Teléfono", key_vc_bb: "telefono_bb_vc" },
+      { title_vc_bb: "Usuario", key_vc_bb: "userName_bb_vc" },
       { title_vc_bb: "Cédula", key_vc_bb: "cedula_bb_vc" },
       { title_vc_bb: "Asignaturas", key_vc_bb: "asignaturas" },
     ],
@@ -27,6 +28,7 @@ export const descargarProfesoresExcel_vc_bb = async (req, res) => {
           u.apellido_bb_vc,
           u.correo_bb_vc,
           u.telefono_bb_vc,
+          u.userName_bb_vc,
           u.cedula_bb_vc,
           COALESCE(GROUP_CONCAT(a.nombre_bb_vc, ' | '), '') AS asignaturas
         FROM td_Profesores_bb_vc p
@@ -34,7 +36,7 @@ export const descargarProfesoresExcel_vc_bb = async (req, res) => {
         JOIN td_Usuarios_bb_vc u ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc
         LEFT JOIN td_ProfesorAsignaturas_bb_vc pa ON pa.ID_profesor_profAsig_bb_vc = p.ID_profesor_bb_vc
         LEFT JOIN td_Asignaturas_bb_vc a ON pa.ID_asignatura_profAsig_bb_vc = a.ID_asignatura_bb_vc
-        GROUP BY p.ID_profesor_bb_vc, u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc, u.cedula_bb_vc
+        GROUP BY p.ID_profesor_bb_vc, u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc, u.userName_bb_vc, u.cedula_bb_vc
       `);
       return profesores_vc_bb;
     },

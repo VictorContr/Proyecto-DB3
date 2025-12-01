@@ -141,7 +141,7 @@
         <div class="flex justify-between items-start">
           <div>
             <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Carga de Profesores</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta Profesores. Usa la plantilla para evitar errores y mantén identificadores y asignaturas consistentes.</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Importa o exporta Profesores. Usa la plantilla para evitar errores y mantén identificadores y asignaturas consistentes. Importante: no incluyas la columna "Usuario" al subir; el nombre de usuario se asigna automáticamente.</p>
           </div>
           <button class="lock-btn p-2 rounded-full bg-colegio-blue hover:bg-colegio-darkblue text-white shadow-md"><i class="fas fa-lock text-xl"></i></button>
         </div>
@@ -154,7 +154,7 @@
           </button>
           <div class="mt-4 border-t border-gray-200 dark:border-gray-600 pt-4">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descargar reporte</label>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Descarga la lista actualizada de profesores.</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Descarga la lista actualizada de profesores. Si el reporte incluye la columna "Usuario", elimínala antes de subir: el sistema la genera automáticamente.</p>
             <button type="button" id="btnDownloadReporteProfesores" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition-colors duration-200 flex items-center justify-center">
               <span id="downloadTextProfesores">Descargar Reporte</span>
               <i id="downloadSpinnerProfesores" class="fas fa-spinner fa-spin ml-2 hidden"></i>
