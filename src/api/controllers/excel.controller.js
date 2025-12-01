@@ -79,12 +79,12 @@ export const subirProfesoresExcel_vc_bb = async (req, res) => {
     const { successfulImports_vc_bb, errors_vc_bb } = await ExcelModel_vc_bb.parseAndProcessExcel_vc_bb({
       filePath_vc_bb,
       columns_vc_bb: [
-        { key_vc_bb: "nombre_bb_vc", required_vc_bb: true },
-        { key_vc_bb: "apellido_bb_vc", required_vc_bb: true },
-        { key_vc_bb: "correo_bb_vc", required_vc_bb: true },
-        { key_vc_bb: "telefono_bb_vc", required_vc_bb: false },
+        { key_vc_bb: "nombre_bb_vc", required_vc_bb: true, title_vc_bb: "Nombre" },
+        { key_vc_bb: "apellido_bb_vc", required_vc_bb: true, title_vc_bb: "Apellido" },
+        { key_vc_bb: "correo_bb_vc", required_vc_bb: true, title_vc_bb: "Correo" },
+        { key_vc_bb: "telefono_bb_vc", required_vc_bb: false, title_vc_bb: "Teléfono" },
         // Nueva columna opcional para asignaturas del profesor (separadas por coma, punto y coma o |)
-        { key_vc_bb: "asignaturas", required_vc_bb: false },
+        { key_vc_bb: "asignaturas", required_vc_bb: false, title_vc_bb: "Asignaturas" },
       ],
       processRow_vc_bb: async (rowMap_vc_bb) => {
         const nombre_vc_bb = rowMap_vc_bb.nombre_bb_vc;
@@ -157,7 +157,7 @@ export const subirProfesoresExcel_vc_bb = async (req, res) => {
           for (const nombreAsig_vc_bb of list_vc_bb) {
             // Buscar asignatura por nombre
             const asig_vc_bb = await db_vc_bb.get_vc_bb(
-              `SELECT ID_asignatura_bb_vc FROM td_Asignaturas_bb_vc WHERE nombre_bb_vc = ?`,
+              `SELECT ID_asignatura_bb_vc FROM td_Asignaturas_bb_vc WHERE LOWER(nombre_bb_vc) = LOWER(?)`,
               [nombreAsig_vc_bb]
             );
             if (!asig_vc_bb) {

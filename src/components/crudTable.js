@@ -504,7 +504,7 @@ class CrudTable_vc_bb extends HTMLElement {
 
 
     const pkNames_vc_bb = [
-      'ID_usuario_bb_vc','ID_espacio_bb_vc','ID_asignatura_bb_vc','ID_grado_bb_vc','ID_seccion_bb_vc','ID_DisponibilidadProfesor_bb_vc','ID_DisponibilidadEspacio_bb_vc','ID_clase_bb_vc'
+      'ID_usuario_bb_vc','ID_espacio_bb_vc','ID_asignatura_bb_vc','ID_grado_bb_vc','ID_seccion_bb_vc','ID_DisponibilidadProfesor_bb_vc','ID_DisponibilidadEspacio_bb_vc','ID_clase_bb_vc','ID_gradoAsignatura_bb_vc'
     ];
     const isPk_vc_bb = (c) => pkNames_vc_bb.includes(c) || /^id$/i.test(c) || (this.table_vc_bb && c.toLowerCase() === (`id_${this.table_vc_bb}_bb_vc`).toLowerCase());
     let createCols = cols.filter(col => !isPk_vc_bb(col));
@@ -525,6 +525,13 @@ class CrudTable_vc_bb extends HTMLElement {
       if (k === 'grados_vc_bb') return false;
       return true;
     });
+    }
+    if (this.table_vc_bb === 'gradosAsignaturas') {
+      createCols = createCols.filter(c => {
+        const k = String(c).toLowerCase();
+        if (k === 'nro_grado_bb_vc' || k === 'nombre_asignatura_bb_vc') return false;
+        return true;
+      });
     }
     createCols.forEach(col => {
       const keyLower = col.toLowerCase();
@@ -576,6 +583,26 @@ class CrudTable_vc_bb extends HTMLElement {
         field.name = col;
         field.className = "border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300";
         [1,2,3,4,5].forEach(n => { const opt = document.createElement('option'); opt.value = String(n); opt.textContent = String(n); field.appendChild(opt); });
+      } else if (this.table_vc_bb === 'gradosAsignaturas' && keyLower === 'id_grado_gradoasig_bb_vc') {
+        field = document.createElement('select');
+        field.name = col;
+        field.className = "border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300";
+        ApiGuide_vc_bb.json('GET', '/api/grados')
+          .then(r => r.ok ? (r.data || []) : [])
+          .then(rows => {
+            rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_grado_bb_vc ?? Object.values(rw)[0]; opt.textContent = String(rw.nro_grado_bb_vc ?? Object.values(rw)[1] ?? opt.value); field.appendChild(opt); });
+          })
+          .catch(() => {});
+      } else if (this.table_vc_bb === 'gradosAsignaturas' && keyLower === 'id_asignatura_gradoasig_bb_vc') {
+        field = document.createElement('select');
+        field.name = col;
+        field.className = "border rounded px-3 py-2 h-11 w-full sm:w-auto bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-300";
+        ApiGuide_vc_bb.json('GET', '/api/asignaturas')
+          .then(r => r.ok ? (r.data || []) : [])
+          .then(rows => {
+            rows.forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_asignatura_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.nombre_bb_vc ?? Object.values(rw)[1] ?? opt.value; field.appendChild(opt); });
+          })
+          .catch(() => {});
       } else {
         field = document.createElement("input");
         field.name = col;
@@ -761,9 +788,67 @@ class CrudTable_vc_bb extends HTMLElement {
       return;
     }
 
+    // Special edit for gradosAsignaturas: render selects for grado y asignatura
+    if (this.table_vc_bb === 'gradosAsignaturas') {
+      (async () => {
+        const wrapperFor = (labelText, el) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'flex flex-col gap-2';
+          const label = document.createElement('label');
+          label.className = 'text-sm font-medium text-gray-600 dark:text-gray-200';
+          label.textContent = labelText;
+          wrapper.appendChild(label);
+          wrapper.appendChild(el);
+          return wrapper;
+        };
+
+        const selectGrado = document.createElement('select');
+        selectGrado.name = 'ID_grado_gradoAsig_bb_vc';
+        selectGrado.className = 'border rounded px-3 py-2 h-11 w-full bg-white text-gray-800 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600';
+        try {
+          const r = await ApiGuide_vc_bb.json('GET', '/api/grados');
+          if (r.ok) (r.data || []).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_grado_bb_vc ?? Object.values(rw)[0]; opt.textContent = String(rw.nro_grado_bb_vc ?? Object.values(rw)[1] ?? opt.value); selectGrado.appendChild(opt); });
+        } catch (_) {}
+        if (row_vc_bb.ID_grado_gradoAsig_bb_vc) Array.from(selectGrado.options).forEach(o => { if (String(o.value) === String(row_vc_bb.ID_grado_gradoAsig_bb_vc)) o.selected = true; });
+        form_vc_bb.appendChild(wrapperFor('Grado', selectGrado));
+
+        const selectAsig = document.createElement('select');
+        selectAsig.name = 'ID_asignatura_gradoAsig_bb_vc';
+        selectAsig.className = selectGrado.className;
+        try {
+          const r2 = await ApiGuide_vc_bb.json('GET', '/api/asignaturas');
+          if (r2.ok) (r2.data || []).forEach(rw => { const opt = document.createElement('option'); opt.value = rw.ID_asignatura_bb_vc ?? Object.values(rw)[0]; opt.textContent = rw.nombre_bb_vc ?? Object.values(rw)[1] ?? opt.value; selectAsig.appendChild(opt); });
+        } catch (_) {}
+        if (row_vc_bb.ID_asignatura_gradoAsig_bb_vc) Array.from(selectAsig.options).forEach(o => { if (String(o.value) === String(row_vc_bb.ID_asignatura_gradoAsig_bb_vc)) o.selected = true; });
+        form_vc_bb.appendChild(wrapperFor('Asignatura', selectAsig));
+
+        modalInstance.open_vc_bb(modalTitleText, form_vc_bb);
+        modalInstance.onConfirm_vc_bb(async () => {
+          const body = {
+            ID_grado_gradoAsig_bb_vc: selectGrado.value,
+            ID_asignatura_gradoAsig_bb_vc: selectAsig.value
+          };
+          const id = row_vc_bb.ID_gradoAsignatura_bb_vc || this.findIdValue_vc_bb(row_vc_bb);
+          try {
+            const r = await ApiGuide_vc_bb.json('PUT', `/api/gradosAsignaturas/${id}`, body, Object.assign({ 'Content-Type': 'application/json' }, (this.getCurrentUserId_vc_bb() ? { 'x-user-id': String(this.getCurrentUserId_vc_bb()) } : {})));
+            if (r.ok) {
+              await modal_vc_bb.showSuccess_vc_bb('Éxito','Registro actualizado');
+              modalInstance.close_vc_bb();
+              this.loadData_vc_bb();
+            } else {
+              await modal_vc_bb.showError_vc_bb('Error','No se pudo actualizar');
+            }
+          } catch (_) {
+            await modal_vc_bb.showError_vc_bb('Error','Falló la actualización');
+          }
+        });
+      })();
+      return;
+    }
+
 
     const pkNames2_vc_bb = [
-      'ID_usuario_bb_vc','ID_espacio_bb_vc','ID_asignatura_bb_vc','ID_grado_bb_vc','ID_seccion_bb_vc','ID_DisponibilidadProfesor_bb_vc','ID_DisponibilidadEspacio_bb_vc','ID_clase_bb_vc'
+      'ID_usuario_bb_vc','ID_espacio_bb_vc','ID_asignatura_bb_vc','ID_grado_bb_vc','ID_seccion_bb_vc','ID_DisponibilidadProfesor_bb_vc','ID_DisponibilidadEspacio_bb_vc','ID_clase_bb_vc','ID_gradoAsignatura_bb_vc'
     ];
     const isPk2_vc_bb = (c) => pkNames2_vc_bb.includes(c) || /^id$/i.test(c) || (this.table_vc_bb && c.toLowerCase() === (`id_${this.table_vc_bb}_bb_vc`).toLowerCase());
     let editableKeys = Object.keys(row_vc_bb).filter(k => !isPk2_vc_bb(k));
@@ -960,6 +1045,7 @@ class CrudTable_vc_bb extends HTMLElement {
       'ID_espacio_bb_vc',
       'ID_asignatura_bb_vc',
       'ID_grado_bb_vc',
+      'ID_gradoAsignatura_bb_vc',
       'ID_seccion_bb_vc',
       'ID_usuario_bb_vc',
       'ID_profesor_bb_vc',

@@ -24,6 +24,7 @@ import lockRoutes_vc_bb from "./src/routes/lock.routes.js";
 // Nueva importación necesaria para CRUD de asignaturas
 import asignaturasRoutes_vc_bb from "./src/routes/asignaturas.routes.js";
 import disponibilidadRoutes_vc_bb from "./src/routes/disponibilidad.routes.js";
+import gradoAsignaturasRoutes_vc_bb from "./src/routes/gradoAsignaturas.routes.js";
 
 import excelRoutes_vc_bb, { 
   routerEspaciosExcel_vc_bb, 
@@ -74,6 +75,7 @@ app_vc_bb.use("/api/lock", lockRoutes_vc_bb);
 
 // CRUD de asignaturas (PENSUM real)
 app_vc_bb.use("/api/asignaturas", asignaturasRoutes_vc_bb);
+app_vc_bb.use("/api/gradosAsignaturas", gradoAsignaturasRoutes_vc_bb);
 app_vc_bb.use("/api/disponibilidad", disponibilidadRoutes_vc_bb);
 
 app_vc_bb.use("/api/profesores/excel", excelRoutes_vc_bb);

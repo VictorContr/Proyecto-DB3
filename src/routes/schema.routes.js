@@ -11,6 +11,7 @@ const tableMap = {
   espacios: 'td_Espacios_bb_vc',
   secciones: 'td_Secciones_bb_vc',
   grados: 'td_Grados_bb_vc',
+  gradosAsignaturas: 'td_GradosAsignaturas_bb_vc',
   disponibilidad: 'td_DisponibilidadProfesor_bb_vc'
 };
 

@@ -4,6 +4,7 @@ export { ProfesorModel_vc_bb } from './profesor.model.js';
 export { GradoModel_vc_bb } from './grado.model.js';
 export { SeccionModel_vc_bb } from './seccion.model.js';
 export { AsignaturaModel_vc_bb } from './asignatura.model.js';
+export { GradoAsignaturaModel_vc_bb } from './gradoAsignatura.model.js';
 export { EspacioModel_vc_bb } from './espacio.model.js';
 export { ClaseModel_vc_bb } from './clase.model.js';
 export { DisponibilidadModel_vc_bb } from './disponibilidad.model.js';

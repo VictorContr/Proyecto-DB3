@@ -19,6 +19,7 @@ import indexRoutes_vc_bb from "../../routes/index.routes.js";
 import loginRoutes_vc_bb from "../../routes/login.routes.js";
 import asignaturasRoutes_vc_bb from "../../routes/asignaturas.routes.js";
 import disponibilidadRoutes_vc_bb from "../../routes/disponibilidad.routes.js";
+import gradoAsignaturasRoutes_vc_bb from "../../routes/gradoAsignaturas.routes.js";
 import excelRoutes_vc_bb, { 
   routerEspaciosExcel_vc_bb, 
   routerGradosExcel_vc_bb, 
@@ -89,6 +90,7 @@ class AppModel_vc_bb {
     this.app_vc_bb.use("/api/dias", diasRoutes_vc_bb);
     this.app_vc_bb.use("/api/bloques", bloquesRoutes_vc_bb);
     this.app_vc_bb.use("/api/asignaturas", asignaturasRoutes_vc_bb);
+    this.app_vc_bb.use("/api/gradosAsignaturas", gradoAsignaturasRoutes_vc_bb);
     this.app_vc_bb.use("/api/disponibilidad", disponibilidadRoutes_vc_bb);
 
     // Rutas de Excel
