@@ -1,10 +1,15 @@
 // Base client para seleccionar y consumir la API disponible (MySQL primero, luego SQLite)
 // Expone una clase con helpers y una función para obtener el base URL.
 
-const MYSQL_PORT_DEFAULT = Number(
-  (typeof process !== "undefined" && process.env && process.env.API_MYSQL_PORT) ||
-  3300
-);
+const MYSQL_BASE_DEFAULT = (() => {
+  const hasProc = typeof process !== "undefined" && process.env;
+  const envUrl = hasProc && process.env.API_MYSQL_BASE_URL;
+  if (envUrl && String(envUrl).trim()) return String(envUrl).trim();
+  if (typeof globalThis !== "undefined" && globalThis.API_MYSQL_BASE_URL) {
+    return String(globalThis.API_MYSQL_BASE_URL).trim();
+  }
+  return "https://api-mysql-horarios-bachillerato-bd3-production.up.railway.app";
+})();
 const SQLITE_PORT_DEFAULT = (() => {
   if (typeof process !== "undefined" && process.env && process.env.API_SQLITE_PORT) {
     const n = Number(process.env.API_SQLITE_PORT);
@@ -52,10 +57,11 @@ class ApiGuide_vc_bb {
 
   static async initialize(options = {}) {
     if (this.initialized) return;
-    const mysqlPort = Number(options.mysqlPort || MYSQL_PORT_DEFAULT);
+    const mysqlBaseOpt = options.mysqlBase || MYSQL_BASE_DEFAULT;
     const sqlitePort = Number(options.sqlitePort || SQLITE_PORT_DEFAULT);
-
-    const mysqlBase = `http://localhost:${mysqlPort}`;
+    const mysqlBase = String(mysqlBaseOpt).startsWith("http")
+      ? String(mysqlBaseOpt)
+      : `https://${String(mysqlBaseOpt)}`;
     const sqliteBase = `http://localhost:${sqlitePort}`;
 
     // Probar MySQL primero
@@ -97,7 +103,9 @@ static async request(method, path, { headers = {}, body = undefined, timeoutMs }
     }
   }
 
-  const mysqlBase = `http://localhost:${MYSQL_PORT_DEFAULT}`;
+  const mysqlBase = String(MYSQL_BASE_DEFAULT).startsWith("http")
+    ? String(MYSQL_BASE_DEFAULT)
+    : `https://${String(MYSQL_BASE_DEFAULT)}`;
   const sqliteBase = `http://localhost:${SQLITE_PORT_DEFAULT}`;
   const urlMySQL = buildUrl(mysqlBase, path);
   const urlSQLite = buildUrl(sqliteBase, path);
