@@ -37,6 +37,14 @@ npm run dev
 - Ejecución con Forge en desarrollo:
   - `npm run start`
 
+### Ejecución del instalador (.exe)
+- Antes de abrir el `.exe`, inicia la API manualmente:
+  - En una terminal en la raíz del proyecto: `npm run api`
+- Luego ejecuta el instalador: `out/make/squirrel.windows/x64/project-1.0.0 Setup.exe` y abre la app.
+- Nota: el `.exe` no lanza `tailwind:watch` ni reconstruye CSS automáticamente.
+  - En desarrollo usa `npm run tailwind:watch`.
+  - Para distribución, genera los estilos antes con: `npm run tailwind:build` y luego `npm run make`.
+
 ### Personalización
 - Icono del ejecutable: añade `packagerConfig.icon` en `package.json` apuntando a un `.ico`.
 - Ignora artefactos de build en Git: la carpeta `out/` ya está en `.gitignore`.
