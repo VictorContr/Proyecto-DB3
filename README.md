@@ -23,6 +23,29 @@ npm run dev
   - Solo API (dev): `npm run api`
   - Solo Electron: `npm run electron`
 
+## Empaquetado (.exe) con Electron Forge
+- Requisitos:
+  - Windows x64, Node.js >= 16.
+  - `electron` en `devDependencies` y Electron Forge instalado.
+- Instalar (si hace falta):
+  - `npm install`
+- Crear el instalador:
+  - `npm run make`
+- Artefactos generados:
+  - Instalador: `out/make/squirrel.windows/x64/project-1.0.0 Setup.exe`
+  - Zip: `out/make/zip/win32/x64/project-win32-x64-1.0.0.zip`
+- Ejecución con Forge en desarrollo:
+  - `npm run start`
+
+### Personalización
+- Icono del ejecutable: añade `packagerConfig.icon` en `package.json` apuntando a un `.ico`.
+- Ignora artefactos de build en Git: la carpeta `out/` ya está en `.gitignore`.
+
+### Solución de problemas
+- Error: `Could not find any Electron packages in devDependencies`
+  - Causa: `electron` en `dependencies` en vez de `devDependencies`.
+  - Fix: mover `electron` a `devDependencies` y ejecutar `npm install` de nuevo.
+
 ## Configuración de red (.env)
 - Variables relevantes:
   - `API_SQLITE_PORT=3000` → API local (fallback en desarrollo).
