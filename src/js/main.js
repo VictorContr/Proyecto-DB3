@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import path, { dirname } from 'path';
-import {fileURLToPath} from "url";
+import {fileURLToPath, pathToFileURL} from "url";
 
 const __dirname_vc_bb = dirname(fileURLToPath(import.meta.url))
 let ventana_vc_bb;
@@ -33,6 +33,13 @@ export const crearVentana_vc_bb = async () => {
     }
     return false;
   };
+
+  try {
+    if (!process.env.PORT) process.env.PORT = String(3000);
+    const indexPath_vc_bb = path.join(__dirname_vc_bb, '..', '..', 'index.js');
+    const indexUrl_vc_bb = pathToFileURL(indexPath_vc_bb).href;
+    await import(indexUrl_vc_bb);
+  } catch (e_vc_bb) {}
 
   const serverAvailable_vc_bb = await waitForServer_vc_bb(serverUrl_vc_bb, 20, 250);
   if (serverAvailable_vc_bb) {

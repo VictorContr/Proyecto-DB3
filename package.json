@@ -9,6 +9,9 @@
     "url": "https://github.com/VictorContr/Proyecto-DB3.git"
   },
   "scripts": {
+    "start": "electron-forge start",
+    "make": "electron-forge make",
+    "package": "electron-forge package",
     "dev": "concurrently \"npm run api\" \"npm run electron\" \"npm run tailwind:watch\"",
     "api": "nodemon index.js",
     "electron": "electron .",
@@ -21,6 +24,10 @@
   "devDependencies": {
     "autoprefixer": "^10.4.22",
     "concurrently": "^9.2.1",
+    "electron": "^39.1.1",
+    "@electron-forge/cli": "^6.4.2",
+    "@electron-forge/maker-squirrel": "^6.4.2",
+    "@electron-forge/maker-zip": "^6.4.2",
     "nodemon": "^3.1.10",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.18"
@@ -28,7 +35,6 @@
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "electron": "^39.1.1",
     "electron-reload": "^2.0.0-alpha.1",
     "excel4node": "^1.8.2",
     "express": "^5.1.0",
@@ -40,5 +46,24 @@
     "path": "^0.12.7",
     "sqlite3": "^5.1.7",
     "xlsx-populate": "^1.21.0"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "asar": true
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "Proyecto-DB3"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": ["win32"]
+        }
+      ]
+    }
   }
 }
