@@ -2,8 +2,9 @@
 
 ## Requisitos
 - Node.js (>=16) y npm instalados.
-- MySQL/SQLite según uso (si aplica).
-- Ejecutar desde la raíz del proyecto: `/var/www/html/BD3/Project`.
+- SQLite local para desarrollo (puerto `3000`).
+- MySQL remoto opcional vía Railway (URL pública).
+- Ejecutar desde la raíz del proyecto.
 
 ## Instalación de dependencias
 Abrir terminal en la raíz del proyecto y ejecutar:
@@ -21,6 +22,15 @@ npm run dev
 - Si quieres ejecutar solo uno de los dos:
   - Solo API (dev): `npm run api`
   - Solo Electron: `npm run electron`
+
+## Configuración de red (.env)
+- Variables relevantes:
+  - `API_SQLITE_PORT=3000` → API local (fallback en desarrollo).
+  - `API_MYSQL_BASE_URL=https://api-mysql-horarios-bachillerato-bd3-production.up.railway.app` → API MySQL remota (Railway).
+  - Opción local (comentada por defecto):
+    - `# API_MYSQL_BASE_URL=http://localhost:3300`
+
+La app cliente (`src/js/guide.js`) intenta primero MySQL remoto (`API_MYSQL_BASE_URL`) y, si no responde, cae a SQLite local (`http://localhost:API_SQLITE_PORT`).
 
 ## Estructura del proyecto
 - .env
