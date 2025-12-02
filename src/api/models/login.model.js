@@ -29,3 +29,8 @@ export class LoginModel_vc_bb {
     return await db_vc_bb.get_vc_bb(sql_vc_bb, [userName_vc_bb, password_vc_bb]);
   }
 }
+/*
+LoginModel (SQLite)
+- Autentica usuario por credenciales.
+- Devuelve datos mínimos y rol asociado.
+*/

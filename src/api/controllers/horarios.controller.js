@@ -1,3 +1,8 @@
+/*
+HorariosController (SQLite)
+- generarHorarios_vc_bb: ejecuta generador y responde listado legible.
+- obtenerHorariosProfesor_vc_bb: retorna horario por profesor.
+*/
 import { GeneradorHorarios_vc_bb } from "../models/index.js";
 
 export async function generarHorarios_vc_bb(req_vc_bb, res_vc_bb) {

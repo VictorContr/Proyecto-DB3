@@ -35,3 +35,8 @@ export const requireAdmin_vc_bb = async (req, res, next) => {
     res.status(500).json({ message: "Error en autorización" });
   }
 };
+/*
+AuthMiddleware (SQLite)
+- Verifica sesión y rol del usuario.
+- Controla acceso a rutas públicas y protegidas.
+*/

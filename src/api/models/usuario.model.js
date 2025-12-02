@@ -105,3 +105,8 @@ export class UsuarioModel_vc_bb {
     return result_vc_bb.changes;
   }
 }
+/*
+UsuarioModel (SQLite)
+- CRUD de usuarios.
+- Manejo de credenciales básicas y datos personales.
+*/

@@ -1,3 +1,7 @@
+/*
+LoginController (SQLite)
+- login_vc_bb: autentica usuario (admin/profesor) y retorna datos mínimos.
+*/
 import db_vc_bb from "../db.js";
 
 // Controlador para inicio de sesión (admin o profesor)

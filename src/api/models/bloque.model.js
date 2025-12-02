@@ -32,3 +32,8 @@ export class BloqueModel_vc_bb {
     return await db_vc_bb.get_vc_bb(sql_vc_bb, [hora_vc_bb]);
   }
 }
+/*
+BloqueModel (SQLite)
+- CRUD de bloques horarios.
+- Define tramos de tiempo para la planificación.
+*/

@@ -52,3 +52,8 @@ export class ProfesorModel_vc_bb {
     return result_vc_bb.changes;
   }
 }
+/*
+ProfesorModel (SQLite)
+- CRUD de profesores.
+- Gestión de asignaturas del profesor y relaciones usuario/rol.
+*/

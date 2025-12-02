@@ -76,4 +76,8 @@ class GradoAsignaturaModel_vc_bb {
 }
 
 export { GradoAsignaturaModel_vc_bb };
-
+/*
+GradoAsignaturaModel (SQLite)
+- Vincula grados con asignaturas.
+- Alta/baja de relaciones y consultas por grado/asignatura.
+*/

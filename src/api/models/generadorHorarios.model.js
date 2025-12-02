@@ -1,3 +1,13 @@
+/*
+GeneradorHorarios_vc_bb (SQLite)
+- cargarDatos_vc_bb: carga tablas base y vistas.
+- validarDisponibilidades_vc_bb: verifica requisitos mínimos.
+- construirDominios_vc_bb: arma slots candidatos por asignatura.
+- buscarHorario_vc_bb/buscarSoluciones_vc_bb: búsqueda con costo y límite de tiempo.
+- guardarEnBaseDeDatos_vc_bb: persiste solución en `td_Horario_bb_vc`.
+- obtenerHorariosPorProfesor_vc_bb/obtenerHorariosLegiblesAdmin_vc_bb: vistas legibles.
+- generarLegibleAdmin_vc_bb: pipeline completo y retorno para admin.
+*/
 import db_vc_bb from "../db.js";
 
 export class GeneradorHorarios_vc_bb {

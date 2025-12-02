@@ -70,3 +70,8 @@ export const updateDisponibilidadProfesor_vc_bb = async (req_vc_bb, res_vc_bb) =
   }
 };
 
+/*
+DisponibilidadController (SQLite)
+- Endpoints para gestión de disponibilidad de profesores.
+- Consultas y actualización de días/bloques disponibles.
+*/

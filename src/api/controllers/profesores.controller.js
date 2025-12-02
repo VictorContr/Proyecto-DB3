@@ -70,3 +70,8 @@ export const deleteProfesor_vc_bb = async (req_vc_bb, res_vc_bb) => {
     res_vc_bb.status(500).json({ message: "Error al eliminar profesor" });
   }
 };
+/*
+ProfesoresController (SQLite)
+- Endpoints CRUD de profesores.
+- Vinculación de asignaturas y gestión de disponibilidad.
+*/

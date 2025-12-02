@@ -1,3 +1,16 @@
+/*
+Controlador Asignaturas
+- Clase AsignaturaController_vc_bb: orquesta operaciones de asignaturas y relación con grados.
+- obtenerTodas_vc_bb: lista todas las asignaturas.
+- obtenerPorId_vc_bb: obtiene una asignatura por ID.
+- crear_vc_bb: crea una nueva asignatura y vincula grado opcional.
+- actualizar_vc_bb: actualiza campos de una asignatura y su grado.
+- eliminar_vc_bb: elimina una asignatura.
+- obtenerAsignaturasPorGrado_vc_bb: lista asignaturas de un grado.
+- #obtenerIdGrado_vc_bb: resuelve ID de grado desde ID o número.
+- Exportadas: getAll/create/update/delete delegan al controlador.
+- quitarGrado_vc_bb: desvincula una asignatura de un grado.
+*/
 import { AsignaturaModel_vc_bb, GradoModel_vc_bb } from "../models/index.js";
 
 class AsignaturaController_vc_bb {

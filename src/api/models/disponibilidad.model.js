@@ -62,3 +62,8 @@ export class DisponibilidadModel_vc_bb {
     return result_vc_bb.changes;
   }
 }
+/*
+DisponibilidadModel (SQLite)
+- CRUD de disponibilidad de profesores.
+- Cálculo y consulta de disponibilidad real por día/bloque/espacio.
+*/

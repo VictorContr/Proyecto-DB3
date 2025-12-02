@@ -53,3 +53,8 @@ export class UsuarioRolModel_vc_bb {
     return result_vc_bb.changes;
   }
 }
+/*
+UsuarioRolModel (SQLite)
+- Relaciona usuarios con roles.
+- Gestiona asignación y remoción de roles.
+*/

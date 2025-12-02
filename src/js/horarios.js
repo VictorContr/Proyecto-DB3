@@ -1,3 +1,8 @@
+//
+// Horarios Frontend (SQLite)
+// - generarHorarios_vc_bb: ejecuta API y renderiza tabla.
+// - mostrarHorarioProfesor_vc_bb: construye cuadrícula semanal para el profesor.
+//
 import { ApiGuide_vc_bb } from "./guide.js";
 import { modal_vc_bb } from "./modal.js";
 

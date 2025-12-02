@@ -56,3 +56,8 @@ export class GradoModel_vc_bb {
     return result_vc_bb.changes;
   }
 }
+/*
+GradoModel (SQLite)
+- CRUD de grados (año escolar).
+- Búsqueda por número y relaciones con asignaturas.
+*/

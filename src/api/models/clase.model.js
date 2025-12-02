@@ -55,3 +55,8 @@ export class ClaseModel_vc_bb {
     return result_vc_bb.changes;
   }
 }
+/*
+ClaseModel (SQLite)
+- CRUD de clases por grado/sección.
+- Relaciona asignaturas, profesores y bloques.
+*/

@@ -1,3 +1,16 @@
+/*
+Modelo Asignatura
+- Clase AsignaturaModel_vc_bb: singleton para consultas a asignaturas.
+- obtenerTodos_vc_bb: lista asignaturas con tipo de espacio y grados.
+- obtenerPorId_vc_bb: obtiene una asignatura por ID.
+- obtenerPorNombre_vc_bb: busca asignatura por nombre.
+- crear_vc_bb: inserta nueva asignatura.
+- actualizar_vc_bb: actualiza campos dinámicamente por ID.
+- eliminar_vc_bb: elimina asignatura por ID.
+- obtenerAsignaturasPorGrado_vc_bb: lista asignaturas de un grado.
+- vincularConGrado_vc_bb: crea relación grado-asignatura.
+- desvincularConGrado_vc_bb: elimina relación grado-asignatura.
+*/
 import db_vc_bb from "../db.js";
 
 export class AsignaturaModel_vc_bb {

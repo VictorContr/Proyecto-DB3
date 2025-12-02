@@ -150,3 +150,8 @@ export class ExcelModel_vc_bb {
     return result_vc_bb;
   }
 }
+/*
+ExcelModel (SQLite)
+- Carga masiva desde archivos Excel.
+- Normaliza y valida datos antes de persistir.
+*/

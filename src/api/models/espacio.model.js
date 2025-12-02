@@ -85,3 +85,8 @@ export class EspacioModel_vc_bb {
     return result_vc_bb.changes;
   }
 }
+/*
+EspacioModel (SQLite)
+- CRUD de espacios físicos.
+- Validación de tipo de espacio y capacidad.
+*/
